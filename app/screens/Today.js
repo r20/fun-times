@@ -10,12 +10,6 @@ import theme, { getEventStyle } from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 
 
-/** 
- * TBD - could also show current event time in binary and other forms 
- * TBD - The Today screen isn't re-rendered when navigate away and back.
- * Some might expect the seconds to change, so look in to that.
-*/
-
 function Today(props) {
 
   return (<View style={styles.container} >

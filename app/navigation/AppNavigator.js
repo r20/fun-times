@@ -38,7 +38,6 @@ getDefaultNavigationOptions = ({ navigation }) => {
 
 
 /* 
-  TBD - Need an initial screen to explain things when no events have been added yet.
   TBD - When on SelectedEvent or AddEvent and then go to another tab on bottom (besides Events)
     and then when click back to Events, we may want to go to the EventList
 */

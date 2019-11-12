@@ -2,44 +2,25 @@ import React, { Component } from 'react';
 
 import { Decimal } from 'decimal.js-light';
 
-/* 
+/**
+ * Most of the code in here is for finding interesting milestones.
+ * It was quick proof of concept code, needing refactoring.
+ * The new code will look for more things, do more tagging,
+ * and consider number of items found and not just a range to
+ * look in.
+ * Since there became a need to use Decimal for accuracy,
+ * it may be helpful to have typescript code that
+ * does the calculations.
+ */
 
-  Most of the code in here is for finding interesting milestones.
-  It was quick proof of concept code, and needs refactored
-  and cleaned up.
-
-  TBD - Other interesting numbers to consider:
-  prime numbers (prime time), although there may be too many
-*/
-
-
-function findMultiplesOfNumberInRange(num, start, end) {
-  if (num <= 0) {
-    return [];
-  }
-
-  const multiples = [];
-  const startMultiple = Math.ceil(start.div(num).toNumber());
-  const endMultiple = Math.floor(end.div(num).toNumber());
-  if (startMultiple <= endMultiple) {
-    // We want the interesting multiples between these
-    const length = Math.log(startMultiple) * Math.LOG10E + 1 | 0;
-    if (length === 0) {
-      return [];
-    }
-    const increment = (length >= 4) ? Math.pow(10, length - 2) : Math.pow(10, length - 1);
-
-    for (let interesting = increment * (Math.ceil((new Decimal(startMultiple)).div(increment))); interesting <= endMultiple; interesting = interesting + increment) {
-      multiples.push(interesting);
-    }
-  }
-  console.log("Interesting multiples of ", num, " within the range ", start, end, " are: ", multiples);
-  return multiples;
-}
 
 
 /**
- * Find numbers like 22222 or 777 
+ * Find numbers with all the same digit, like 22222 or 777.
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Decimal} start - start of range to look for interesting number within
+ * @param {Decimal} end - end of range to look for interesting number within
  */
 function findRepdigitsInRange(start, end) {
   const found = [];
@@ -60,10 +41,11 @@ function findRepdigitsInRange(start, end) {
     }
     console.log("repdigit is ", repdigit);
     if (String(repdigit).charAt(0) === '9') {
-      // Get more ones
+      // Go to the next repdigit by getting more ones (e.g. from 9999 to 11111)
       repones = Number(String(repones) + '1');
       repdigit = repones;
     } else {
+      // Go to the next repdigit (e.g. from 2222 to 3333)
       repdigit = repdigit + repones;
     }
   }
@@ -74,7 +56,13 @@ function findRepdigitsInRange(start, end) {
 
 
 /**
- * Find numbers like 1234567 or 54321 
+ * Find interesting numbers like 1234567, 54321, or 543210
+ * (They count up starting with 1, or count down to 1,
+ *  or count down to 0)
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Decimal} start - start of range to look for interesting number within
+ * @param {Decimal} end - end of range to look for interesting number within
  */
 function findConsecutivesInRange(start, end) {
   const found = [];
@@ -106,7 +94,7 @@ function findConsecutivesInRange(start, end) {
       }
     }
     if (len >= 4) {
-      /* These are counting down, ending in 1
+      /* These are counting down, ending in 0
         210 isn't very interesting, so needs
         to be at least 3210 (4 in length) */
       interesting = Number(goingdown.slice(10 - len, 10));
@@ -122,12 +110,51 @@ function findConsecutivesInRange(start, end) {
   return found;
 }
 
+
+/**
+ * Find interesting numbers that mostly end in zeros
+ * (like 12000 or 34000000) that when multiplied by num
+ * are within the range.
+ * If num is 1, it might find interesting numbers like 12000, 13000, 14000, etc.
+ * If num is pi, it might find 20000 and 21000 if pi*20000 and pi*21000 are within the range.
+ * 
+ * @param {Number or Decimal} num - A factor that when multiplied by an interesting number is in the range
+ * @param {Decimal} start - start of range to look for interesting number within
+ * @param {Decimal} end - end of range to look for interesting number within
+ */
+function findInterestingFactorsInRange(num, start, end) {
+  if (num <= 0) {
+    return [];
+  }
+
+  const factors = [];
+  const startFactor = Math.ceil(start.div(num).toNumber());
+  const endFactor = Math.floor(end.div(num).toNumber());
+  if (startFactor <= endFactor) {
+    const length = Math.log(startFactor) * Math.LOG10E + 1 | 0;
+    if (length === 0) {
+      return [];
+    }
+    const increment = (length >= 4) ? Math.pow(10, length - 2) : Math.pow(10, length - 1);
+
+    for (let interesting = increment * (Math.ceil((new Decimal(startFactor)).div(increment))); interesting <= endFactor; interesting = interesting + increment) {
+      factors.push(interesting);
+    }
+  }
+  console.log("Interesting factors that combine with ", num, " within the range ", start, end, " are: ", factors);
+  return factors;
+}
+
 /**
  * Find binary numbers starting with 1 then all zeros.
  * (i.e. 2^N)
- * TBD - could find other interesting binary patterns in another function.
+ * 
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Decimal} start - start of range to look for interesting number within
+ * @param {Decimal} end - end of range to look for interesting number within
  */
-function findExponentsForBinariesInRange(start, end) {
+function findBinariesWithOneOneInRange(start, end) {
   const found = [];
   const nums = [];
   const base = 2
@@ -148,6 +175,15 @@ function findExponentsForBinariesInRange(start, end) {
 }
 
 
+/**
+ * Find "super powers" (n^n) within the range.
+ * E.g. 2^2, 3^3, 4^4, etc.
+ * 
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Decimal} start - start of range to look for interesting number within
+ * @param {Decimal} end - end of range to look for interesting number within
+ */
 function findSuperPowersInRange(start, end) {
   const found = [];
   const nums = [];
@@ -177,63 +213,18 @@ function findSuperPowersInRange(start, end) {
 
 
 /**
- * TBD: During a refactor, this wasn't updated, and it's not used anymore.
- * It needs updated to use Decimal.
- * 
- * Using event date division, 1980/12/25 (6.6) * 10^n
- * Using event date subtraction, 1980-12-25 (1943) * 10^n
- * 
- * TBD - And this never got implemented:
- * Using event date, 1980 12 25 (year month day) or 25 12 1980 (day month year) or 12 25 1980 (month day year) * 10^n
+ * fromMillisToUnit and fromUnitToMillis
+ * don't account for leap years or leap seconds.
+ * They along with most other code in here will be replaced.
  */
-function findEventDateNumbersInRange(eventdate, start, end) {
-  const found = [];
-  const year = eventdate.getFullYear();
-  const month = eventdate.getMonth() + 1; // +1 because it uses 0-11
-  const day = eventdate.getDate();
 
-  // Using event date division, 1980/12/25 (6.6)
-  const withdivision = year / month / day;
-
-  // Using event date subtraction, 1980-12-25 (1943)
-  const withsubtraction = year - month - day;
-  let tenpower = 0;
-  let num = withsubtraction * Math.pow(10, tenpower);
-  while (num <= end) {
-    if (num >= start) {
-      found.push(num);
-    }
-    tenpower = tenpower + 1;
-    num = withsubtraction * Math.pow(10, tenpower);
-  }
-
-  tenpower = 0;
-  num = withdivision * Math.pow(10, tenpower);
-  while (num <= end) {
-    if (num >= start) {
-      found.push(num);
-    }
-    tenpower = tenpower + 1;
-    num = withdivision * Math.pow(10, tenpower);
-  }
-
-
-  console.log("Interesting numbers using event date within the range ", start, end, " are: ", found);
-
-  return found;
-}
-
-
-/*
-  TBD - fromMillisToUnit and fromUnitToMillis
-  need improved to account for leap years and leap seconds.
-  To do so, need dates to be part of the function too.
-  When update code to use moment.js or another library
-  we can either fix or replace these.
-*/
 
 /**
- * Returns Decimal type of number in the units specified.
+ * Converts the milliseconds to the unit specified and 
+ * retrns it as a Decimal type.
+ * 
+ * @param {String} unit - string representing time units (e.g. minutes, seconds, etc.)
+ * @param {Number} milliseconds
  */
 function fromMillisToUnit(unit, milliseconds) {
   const millis = new Decimal(milliseconds);
@@ -252,6 +243,12 @@ function fromMillisToUnit(unit, milliseconds) {
   }
 }
 
+/**
+ * Converts the numberInUnits based on unit to milliseconds.
+ * 
+ * @param {String} unit - string representing time units (e.g. minutes, seconds, etc.)
+ * @param {Number} numberInUnits - number to be converted.
+ */
 function fromUnitToMillis(unit, numberInUnits) {
   let num = new Decimal(numberInUnits);
   let ans;
@@ -278,27 +275,26 @@ const PHI_DECIMAL = new Decimal(1.618033988749895);
 
 
 /**
- * TBD - Other things to add:
+ * This function calls others to get the interesting milestones.
+ * Returns an array of objects that contain interesting info
+ * to be used to report interesting milestone dates.
+ * The objects have
+ *  event: the event that was passed in to generate the array
+ *  unit: (e.g. minutes, seconds, etc.)
+ *  tags: array(e.g. [ "Super power", "pi"]
+ *  description: A partial description of what was found (doesn't have unit)
+ *  time: in epoch milliseconds  
  * 
- * Have a slice of pi (find a number within the digits of pi)
- * More variations using event date, like eventmonth^eventday
- * or eventmonth and eventday only (not year)
- * Have upcoming events.
- * Have predetermined holidays and special dates they can pick from 
- * (like Thanksgiving, Super Bowl, Pi Day, etc. )
+ * @param {Object} event - object with info about the event, like epochMillis
+ * @param {Number} nowTime - in epoch milliseconds
+ * @param {Number} futureDistanceDays - number of days in future to look for interesting numbers
  */
-
 export function InterestingDatesFinder(event, nowTime, futureDistanceDays) {
 
   const eventTime = event.epochMillis;
-
   const futureTime = nowTime + fromUnitToMillis("days", futureDistanceDays);
-
-  const eventToNow = nowTime - eventTime;
-  const eventToFuture = futureTime - eventTime;
-
-  const eventDate = new Date(eventTime);
-
+  const eventToNow = nowTime - eventTime; // elapsed time period between event and now
+  const eventToFuture = futureTime - eventTime; // elapsed time period between event and futureDistanceDays
 
   const units = ['seconds', 'minutes', 'hours', 'days', 'months', 'years'];
   var somenums = [];
@@ -324,12 +320,10 @@ export function InterestingDatesFinder(event, nowTime, futureDistanceDays) {
         time: eventTime + fromUnitToMillis(unit, Math.pow(power, power)),
       };
       interestingList.push(interestingInfo);
-      // TBD - need to account for special powers, like pi (to tell them it's pi)
-      // And maybe I need to be able to group all pi things together.
     }
 
     if (unit !== "years") {
-      somenums = findMultiplesOfNumberInRange(1, start, end);
+      somenums = findInterestingFactorsInRange(1, start, end);
       for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
         const num = somenums[sIdx];
         var interestingInfo = {
@@ -362,7 +356,7 @@ export function InterestingDatesFinder(event, nowTime, futureDistanceDays) {
       const tag = data[dIdx].tag;
       const mult = data[dIdx].mult;
 
-      somenums = findMultiplesOfNumberInRange(mult, start, end);
+      somenums = findInterestingFactorsInRange(mult, start, end);
       for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
         const num = somenums[sIdx];
         var interestingInfo = {
@@ -376,8 +370,7 @@ export function InterestingDatesFinder(event, nowTime, futureDistanceDays) {
       }
     }
 
-    somenums = findExponentsForBinariesInRange(start, end);
-    // TBD Need to maybe also show this in binary form??
+    somenums = findBinariesWithOneOneInRange(start, end);
     for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
       const expo = somenums[sIdx];
       var interestingInfo = {
@@ -420,6 +413,15 @@ export function InterestingDatesFinder(event, nowTime, futureDistanceDays) {
 
 }
 
+/**
+ * Converts number (x) to a string with commas.
+ * TBD - It would be nice to convert to a format
+ * based on locale because not everyone is used
+ * to commas.
+ * 
+ * E.g. 12345.67 is changed to "12,345.67"
+ * x - number
+ */
 export function numberWithCommas(x) {
   var parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -428,8 +430,8 @@ export function numberWithCommas(x) {
 
 /**
  * Return nicely formatted string for the date
- * according to locale.
- * If date doesn't look like Date object, just return date.
+ * object according to locale.
+ * date - Date object
  */
 export function getDisplayStringForDate(date) {
   try {

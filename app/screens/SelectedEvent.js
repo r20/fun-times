@@ -18,12 +18,7 @@ function SelectedEvent(props) {
     return null;
   }
 
-  /*
-    TBD - The delete button placement isn't great.
-      Improve it and/or consider swipe to delete on Events screen.
-      See https://github.com/jemise111/react-native-swipe-list-view
-  */
-  const onPressRemoveItem = () => {
+   const onPressRemoveItem = () => {
 
     Alert.alert(
       'Remove Event ',

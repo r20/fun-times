@@ -12,12 +12,12 @@ import { colors, getRandomColor } from '../style/theme'
 import { withEventListContext } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
 
-/* TBD - in a future release of expo, use react-native's RNDateTimePicker
-  instead of DatePickerAndroid which will make it easier to add support for ios.
-  If it's not released soon enough, could use DatePickerIOS or look at 
-  DateTimePicker (yarn add @react-native-community/datetimepicker)
-*/
-
+/**
+ * TBD The date picker only supports Android right now.
+ * Would like to support setting the time of day also.
+ * Maybe use react-native's RNDateTimePicker when expo gets
+ * support for that.
+ */
 function AddEvent(props) {
 
   const [title, setTitle] = useState('');
@@ -49,12 +49,6 @@ function AddEvent(props) {
 
       /*
         TBD - For prototype, this supports only within a certain range.
-        (Or else there are too many upcoming events found.)
-        Later I'll change algorithm to return the next N milestones instead of returning
-        all events within a range.
-        Also need to add support for future events and show important countdown milestones.
-        Also need to accept an exact time to seconds, probably doing away with the date picker
-        and making my own with easier to use input fields.
       */
       const theMaxDate = new Date();
       theMaxDate.setFullYear(theMaxDate.getFullYear() - 5);
