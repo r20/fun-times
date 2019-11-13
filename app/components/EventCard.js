@@ -3,6 +3,12 @@ import PropTypes from 'prop-types'
 import { View, Text, StyleSheet } from 'react-native'
 import theme, { getEventStyle } from '../style/theme'
 
+/**
+ * Components in this file provide a way for consistent styling of information
+ * about an event using the event's color.
+ * EventCard can have an EventHeader and one or more EventCardBodyText components within it.
+ */
+
 const EventCard = (props) => (
     <View style={[styles.card, getEventStyle(props.event), props.style]} >
         {props.children}

@@ -12,4 +12,6 @@ i18n.fallbacks = true;
 i18n.translations = { es: Translations.es, en: Translations.en };
 i18n.locale = Localization.locale;
 
+
+// Export the ready to use i18n 
 export default i18n;

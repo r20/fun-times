@@ -9,8 +9,8 @@ import {getContrastFontColor} from '../style/theme'
 
 /**
  * Offers a grid of the colors for selection.
- * This wouldn't really work if white or close to white was among colors to select.
- * Could add a border for that case if wanted to support it.
+ * Doesn't support white or close to white right now
+ * (because there's no border and it'd be hard to see).
  */
 function ColorPicker(props) {
 

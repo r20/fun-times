@@ -48,7 +48,7 @@ function AddEvent(props) {
       const startingDate = selectedDate.date ? selectedDate.date : new Date(2000, 5, 15, 12, 0, 0);
 
       /*
-        TBD - For prototype, this supports only within a certain range.
+        For prototype, this supports only within a certain range.
       */
       const theMaxDate = new Date();
       theMaxDate.setFullYear(theMaxDate.getFullYear() - 5);

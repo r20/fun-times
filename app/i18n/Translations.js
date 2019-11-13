@@ -1,3 +1,8 @@
+
+/**
+ * This is a start for using i18n.
+ * More needs added.
+ */
 export const en = {
   menuEventsTitle: "Events",
   menuTodayTitle: "Today",
@@ -17,6 +22,9 @@ export const en = {
   seconds: '{{someValue}} seconds',
 };
 
+/**
+ * These would need translated.
+ */
 export const es = {
   menuEventsTitle: "Events",
   menuTodayTitle: "Today",

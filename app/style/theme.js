@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 
-/* TBD - Add theming to allow user to switch between
+/* TBD - Eventually add theming to allow user to switch between
   style themes (such as white background vs black background
 */
 

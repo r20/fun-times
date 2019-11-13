@@ -3,6 +3,9 @@ import { AsyncStorage } from 'react-native'
 
 const STORAGE_KEY_EVENTS = '@save_events';
 
+/**
+ * Returns a Date object for the event based on its epochMillis time.
+ */
 export function getDateFromEvent(event) {
   const { title, epochMillis } = event;
   return new Date(epochMillis);
@@ -18,6 +21,11 @@ const EventListContext = createContext({
   getEventWithTitle: () => { return null; },
 });
 
+/**
+ * Provides a way to see, remove, add events.
+ * The events are stored using AsyncStorage.
+ * The events are held in state.events array.
+ */
 export class EventListProvider extends React.Component {
 
   constructor(props) {
@@ -64,6 +72,11 @@ export class EventListProvider extends React.Component {
     }
   }
 
+  /**
+   * Add a newly created event to the array (and saves it as well).
+   * Events should have unique titles. If there's already an event
+   * with the same title, this will replace it.
+   */
   addEvent = async (newEvent) => {
     try {
       // Make sure there's not an event by that title already
@@ -78,6 +91,10 @@ export class EventListProvider extends React.Component {
   }
 
 
+  /**
+   * Removes the specified event from storage and from the events array,
+   * based on its title.
+   */
   removeEvent = async (eventToRemove) => {
     try {
       if (eventToRemove && eventToRemove.title) {
@@ -115,6 +132,9 @@ export class EventListProvider extends React.Component {
     }
   }
 
+  /**
+   * Remove all events.
+   */
   removeAllEvents = async () => {
     try {
       await this.updateEvents([]);
@@ -123,11 +143,18 @@ export class EventListProvider extends React.Component {
     }
   }
 
+  /**
+   * Save the events array using AsyncStorage
+   */
   saveEvents = async (events) => {
     await AsyncStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(events));
   }
 
   render() {
+    /* Make events array (via state)
+      and some of the functions available to consumers
+      via the value attribute.
+    */
     return (
       <EventListContext.Provider value={{
         ...this.state,

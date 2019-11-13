@@ -2,11 +2,10 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { createAppContainer } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Ionicons, FontAwesome, AntDesign, Entypo } from '@expo/vector-icons'
+import { Ionicons, FontAwesome, Entypo } from '@expo/vector-icons'
 // Search for available icons at https://expo.github.io/vector-icons/
 
 import EventsNavigator from './EventsNavigator'
-import Events from '../screens/Events'
 import Today from '../screens/Today'
 import Calendar from '../screens/Calendar'
 import More from '../screens/More'
@@ -36,12 +35,11 @@ getDefaultNavigationOptions = ({ navigation }) => {
   return options;
 };
 
-
-/* 
-  TBD - When on SelectedEvent or AddEvent and then go to another tab on bottom (besides Events)
-    and then when click back to Events, we may want to go to the EventList
-*/
-
+/**
+ * The bottom tab navigator has 4 tabs.
+ * The first (Events) is actually not a single screen, 
+ * but a stack navigator of screens (Events, AddEvent, SelectedEvent).
+ */
 const TabNavigator = createBottomTabNavigator(
   {
     Events: { screen: EventsNavigator },
