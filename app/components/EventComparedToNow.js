@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 
 import { getDateFromEvent } from '../context/EventListContext'
 import * as JSDate from '../utils/jsDate'
-import * as Utils from '../utils/Utils'
+import {numberWithCommas} from '../utils/Utils'
 import i18n from '../i18n/i18n'
 import { EventCardBodyText } from './EventCard'
 
@@ -26,7 +26,7 @@ export default function EventComparedToNow(props) {
     {
       timeUnits.map((tu) => {
         const n = JSDate.datediff(tu.jsDateKey, date, now);
-        return <EventCardBodyText key={tu.lKey} event={props.event}>{i18n.t(tu.lKey, { someValue: Utils.numberWithCommas(n) })}</EventCardBodyText>
+        return <EventCardBodyText key={tu.lKey} event={props.event}>{i18n.t(tu.lKey, { someValue: numberWithCommas(n) })}</EventCardBodyText>
       })
     }
   </React.Fragment>

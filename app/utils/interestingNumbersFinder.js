@@ -1,0 +1,360 @@
+
+import { Decimal } from 'decimal.js-light';
+
+import * as logger from './logger'
+import {numberWithCommas} from './Utils'
+
+/*
+  This file has useful functions for finding interesting times.
+
+  jmr - See https://www.janko.at/Humor/Wissenschaft/Runde%20Zahlen.htm
+  about round numbers.
+  I should have categories for types of numbers people may be interested in
+  e.g. physicists, mathematicians, electricians, etc.
+*/
+
+
+
+
+/**
+ * Find numbers with all the same digit, like 22222 or 777.
+ * Must be at least 3 digits.
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Number} start - start of range to look for interesting numbers within
+ * @param {Number} end - end of range to look for interesting numbers within
+ */
+function findRepdigitsInRange(start, end) {
+  const found = [];
+  if (end < 111) {
+    // Not interesting enough if only 2 digits
+    return [];
+  }
+
+  const startlength = Math.log(start) * Math.LOG10E + 1 | 0;
+  const manyones = '11111111111111111111111111111111111111111111111111111111111111111111111';
+
+  // Needs to be at least 3 to be interesting
+  let repones = Number(manyones.slice(0, Math.max(3, startlength)));
+  let repdigit = repones;
+  while (end >= repdigit) {
+    if (start <= repdigit) {
+      found.push(repdigit);
+    }
+    logger.log("repdigit is ", repdigit);
+    if (String(repdigit).charAt(0) === '9') {
+      // Go to the next repdigit by getting more ones (e.g. from 9999 to 11111)
+      repones = Number(String(repones) + '1');
+      repdigit = repones;
+    } else {
+      // Go to the next repdigit (e.g. from 2222 to 3333)
+      repdigit = repdigit + repones;
+    }
+  }
+  return found;
+}
+
+
+/**
+ * Find interesting numbers like 1234567, 54321, or 543210
+ * (They count up starting with 1, or count down to 1,
+ *  or count down to 0)
+ * Returns array of interesting numbers found.
+ * 
+ * @param {Number} start - start of range to look for interesting numbers within
+ * @param {Number} end - end of range to look for interesting numbers within
+ */
+function findConsecutivesInRange(start, end) {
+  const found = [];
+  if (end < 123) {
+    // Not interesting enough if only 2 digits
+    return [];
+  }
+
+  const startlength = Math.log(start) * Math.LOG10E + 1 | 0;
+  const endlength = Math.log(end) * Math.LOG10E + 1 | 0;
+  const goingdown = '9876543210';
+  const goingup = '123456789';
+
+  for (var len = Math.max(3, startlength); len <= Math.min(endlength, 10); len++) {
+    let interesting;
+
+    if (len <= 9) {
+      /* These are counting up from 1 */
+      interesting = Number(goingup.slice(0, len));
+      if (start <= interesting && end >= interesting) {
+        found.push(interesting);
+      }
+
+      /* These are counting down, ending in 1 */
+      interesting = Number(goingdown.slice(9 - len, 9));
+      if (start <= interesting && end >= interesting) {
+        found.push(interesting);
+      }
+    }
+    if (len >= 4) {
+      /* These are counting down, ending in 0
+        210 isn't very interesting, so needs
+        to be at least 3210 (4 in length) */
+      interesting = Number(goingdown.slice(10 - len, 10));
+      if (start <= interesting && end >= interesting) {
+        found.push(interesting);
+      }
+    }
+  }
+  return found;
+}
+
+
+/**
+ * Find interesting numbers that mostly end in zeros (round factors)
+ * (like 2000 or 4000000) that when multiplied by the multiplier parameter.
+ * are within the range.
+ * For example,
+ * If multiplier is 1, it might find  1000, 2000, 3000, etc.
+ * If multiplier is pi, it might find pi*20000 and pi*21000 
+ * 
+ * Returns an array of interesting numbers that when multiplied by multiplier are within the range.
+ * 
+ * @param {Number|Decimal} multiplier - A factor that when multiplied by an interesting number is in the range
+ * @param {Decimal} start - start of range to look for interesting numbers within
+ * @param {Decimal} end - end of range to look for interesting numbers within
+ */
+function findRoundFactorsInRange(multiplier, start, end) {
+
+  const multiplierDecimal = new Decimal(multiplier);
+  const startDecimal = new Decimal(start);
+  const endDecimal = new Decimal(end);
+  if (multiplierDecimal.lte(0)) {
+    return [];
+  }
+
+  const factors = [];
+
+  const startFactor = Math.ceil(startDecimal.div(multiplierDecimal).toNumber());
+  const endFactor = Math.floor(endDecimal.div(multiplierDecimal).toNumber());
+  if (startFactor <= endFactor) {
+    let length = Math.log(startFactor) * Math.LOG10E + 1 | 0;
+
+    length = Math.max(2, length);  // Needs to have some minimum amount of digits to be interesting
+    let base = Math.pow(10, length - 1);
+
+    let firstDigit = Math.ceil((new Decimal(startFactor)).div(base));
+    let interesting = firstDigit * base;
+    while (interesting <= endFactor) {
+      factors.push(interesting);
+      firstDigit++;
+
+      /* We go from 10 to 100 by 10s, and 100 to 1000 by 100s
+        then starting at 1000 (length 4) we allow 2 non zero
+        digits (e.g. 8,000 9,000 10,000 11,000 12,000 ... ) */
+      if (length < 4 && firstDigit > 9) {
+        length++;
+        base = base * 10;
+        firstDigit = 1;
+
+      } else if (length >= 4 && firstDigit > 99) {
+        firstDigit = 1;
+        base = base * 100;
+      }
+      interesting = firstDigit * base;
+    }
+
+  }
+  return factors;
+}
+
+/**
+ * Find integer exponents (expo) that are >=2 such that
+ * the power (base^expo) is within the start and end range.
+ * 
+ * Returns array of the exponents
+ * 
+ * @param {Decimal|Number} base - Should be > 1
+ * @param {Number} start - start of range to look for interesting exponents within
+ * @param {Number} end - end of range to look for interesting exponents within
+ */
+function findExponentsForBaseSoPowerInRange(base, start, end) {
+  const decimalBase = new Decimal(base);
+
+  if (decimalBase.lt(2) || start > end) {
+    return [];
+  }
+
+  const found = [];
+  let exponent = 2;
+  let powerDecimal = decimalBase.toPower(exponent);
+  while (powerDecimal.lte(end)) {
+    if (powerDecimal.gte(start)) {
+      found.push(exponent);
+    }
+    exponent = exponent + 1;
+    powerDecimal = decimalBase.toPower(exponent);
+  }
+  return found;
+}
+
+
+/**
+ * Find "super powers" (n^n) where n is an integer >= 4 within the range.
+ * E.g. 4^4, 5^5, 6^6, etc.
+ * 
+ * Returns array of interesting powers (the "n") found.
+ * 
+ * @param {Number} start - start of range to look for interesting powers within
+ * @param {Number} end - end of range to look for interesting powers within
+ */
+function findSuperPowersInRange(start, end) {
+  const found = [];
+  let baseAndExpo = 4;
+  let num = Math.pow(baseAndExpo, baseAndExpo);
+  while (end >= num) {
+    if (start <= num) {
+      found.push(baseAndExpo);
+    }
+    baseAndExpo = baseAndExpo + 1;
+    num = Math.pow(baseAndExpo, baseAndExpo);
+  }
+
+  return found;
+}
+
+/**
+ * Returns true if power^power is within the range.
+ * 
+ * @param {Decimal|Number} power 
+ * @param {Number} start - start of range
+ * @param {Number} end - end of range
+ */
+function isSuperPowerInRange(power, start, end) {
+  const powerDecimal = new Decimal(power);
+  const superPowerDecimal = powerDecimal.toPower(powerDecimal);
+  return superPowerDecimal.gte(start) && superPowerDecimal.lte(end);
+}
+
+
+const PI_DECIMAL = new Decimal(3.141592653589);
+const EULERS_DECIMAL = new Decimal(2.71828);
+const PHI_DECIMAL = new Decimal(1.618033988749895);
+
+
+
+/**
+ * This function calls others to get interesting numbers that
+ * are within the start and end.
+ * 
+ * Returns an array of objects that contain info about the interesting numbers.
+ * 
+ * The objects have
+ *  tags: array, e.g. [ "super power", "pi"]
+ *  descriptor: A partial description of what was found
+ *  number: The number within the range.  It in and of itself might not seem interesting, and the descriptor and tags help explain its interest.
+ * 
+ * @param {Number} start - start of range to look for interesting numbers within
+ * @param {Number} end - end of range to look for interesting numbers within
+ */
+export function findInterestingNumbers(start, end) {
+
+  var interestingList = [];
+
+  let somenums;
+
+  somenums = findRoundFactorsInRange(1, start, end);
+  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+    const num = somenums[sIdx];
+    let interestingInfo = {
+      tags: ['round'],
+      descriptor: numberWithCommas(num),
+      number: num,
+    };
+    interestingList.push(interestingInfo);
+  }
+
+  /* Need to also find super powers using oher numbers, like pi,
+    and tag them with both super power and other tag */
+  somenums = findSuperPowersInRange(start, end);
+  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+    const power = somenums[sIdx];
+    const num = Math.pow(power, power);
+    var interestingInfo = {
+      tags: ["super power"],
+      descriptor: "Super power!! " + power + "^" + power + " (" + numberWithCommas(Math.pow(power, power)) + ")",
+      number: num,
+    };
+    interestingList.push(interestingInfo);
+  }
+
+  const data = [
+    {
+      tag: 'pi',
+      multDecimal: PI_DECIMAL
+    },
+    // {
+    //   tag: "e (Euler's number)",
+    //   multDecimal: EULERS_DECIMAL
+    // },
+    // {
+    //   tag: "phi (golden number)",
+    //   multDecimal: PHI_DECIMAL
+    // },
+  ];
+  for (let dIdx = 0; dIdx < data.length; dIdx++) {
+    const tag = data[dIdx].tag;
+    const multDecimal = data[dIdx].multDecimal;
+
+
+    somenums = findRoundFactorsInRange(multDecimal, start, end);
+    for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+      const factor = somenums[sIdx];
+
+      const productDecimal = multDecimal.times(factor);
+
+      let interestingInfo = {
+        tags: [tag],
+        descriptor: numberWithCommas(factor) + "*" + tag + " (" + numberWithCommas(Decimal.round(productDecimal)) + ")",
+        number: productDecimal.toNumber(),
+      };
+      interestingList.push(interestingInfo);
+    }
+  }
+
+  /**
+   * If 2^expo is in range, it's an interesting binary number (starting with 1 and ending in all zeros)
+   */
+  somenums = findExponentsForBaseSoPowerInRange(2, start, end);
+  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+    const expo = somenums[sIdx];
+    let interestingInfo = {
+      tags: ["binary"],
+      descriptor: "Binary! 2^" + numberWithCommas(expo) + " (" + numberWithCommas(Math.pow(2, expo)) + ")",
+      number: Math.pow(2, expo),
+    };
+    interestingList.push(interestingInfo);
+  }
+
+  somenums = findConsecutivesInRange(start, end);
+  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+    const num = somenums[sIdx];
+    let interestingInfo = {
+      tags: ['count'],
+      descriptor: numberWithCommas(num),
+      number: num,
+    };
+    interestingList.push(interestingInfo);
+  }
+
+  somenums = findRepdigitsInRange(start, end);
+  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
+    const num = somenums[sIdx];
+    let interestingInfo = {
+      tags: ['repdigits'], // could tag with the digit
+      descriptor: numberWithCommas(num),
+      number: num,
+    };
+    interestingList.push(interestingInfo);
+  }
+
+  return interestingList;
+}
+
+

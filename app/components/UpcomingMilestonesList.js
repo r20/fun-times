@@ -7,10 +7,11 @@ import * as Utils from '../utils/Utils'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
+import {findInterestingDates} from '../utils/interestingDatesFinder'
 
 export default function UpcomingMilestonesList(props) {
 
-  const howManyDaysAhead = 50;
+  const howManyDaysAhead = 365;
   const now = new Date();
   const nowTime = now.getTime();
 
@@ -19,7 +20,7 @@ export default function UpcomingMilestonesList(props) {
     const event = props.events[idx];
     const eventDate = getDateFromEvent(event);
     const eventTime = eventDate.getTime(); // can probably use event.milliSeconds (or whatever it is)
-    specials = specials.concat(Utils.InterestingDatesFinder(event, nowTime, howManyDaysAhead));
+    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead));
   }
   specials.sort((a, b) => { return (a.time - b.time); });
 
