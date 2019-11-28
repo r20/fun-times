@@ -21,10 +21,12 @@ function Today(props) {
       renderItem={({ item }) => {
 
         const title = item.title;
+        const now = new Date();
+        const nowMillis = now.getTime();
 
         return (<EventCard event={item}>
           <EventCardHeader event={item}>{title}</EventCardHeader>
-          <EventComparedToNow event={item} />
+          <EventComparedToNow event={item} nowMillis={nowMillis} />
         </EventCard>
         );
       }

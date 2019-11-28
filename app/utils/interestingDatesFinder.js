@@ -1,6 +1,6 @@
 import { Decimal } from 'decimal.js-light';
 import * as logger from './logger'
-
+import moment from 'moment'
 import { interestingNumbersFinder } from './interestingNumbersFinder'
 import { sortedInterestingNumbers } from './interestingNumbers'
 import * as Utils from './Utils'
@@ -22,19 +22,28 @@ import * as Utils from './Utils'
  */
 export function findInterestingDates(event, nowTime, futureDistanceDays) {
 
-    const eventTime = event.epochMillis;
-    const futureTime = nowTime + Utils.fromUnitToMillis("days", futureDistanceDays);
-    const eventToNow = nowTime - eventTime; // elapsed time period between event and now
-    const eventToFuture = futureTime - eventTime; // elapsed time period between event and futureDistanceDays
+    const eventMoment = moment(event.epochMillis);
+    const nowMoment = moment(nowTime);
+    const futureMoment = nowMoment.clone().add(futureDistanceDays, 'days');
+    const isEventInFuture = (event.epochMillis > nowTime);
 
-    const units = ['seconds', 'minutes', 'hours', 'days', 'months', 'years'];
+    // jmr - should I add 'weeks' ?
+    const units = ['seconds', 'minutes', 'hours', 'days',  'months', 'years'];
     var interestingList = [];
     for (let idx = 0; idx < units.length; idx++) {
         const unit = units[idx];
-        console.log(" Before getting start and end");
-        var start = Utils.fromMillisToUnit(unit, eventToNow);
-        var end = Utils.fromMillisToUnit(unit, eventToFuture);
-        console.log(" After getting start and end");
+        let start, end;
+        const spanBetweenNowAndEvent = Math.abs(nowMoment.diff(eventMoment, unit));
+        const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
+        console.log(" spanBetweenNowAndEvent ", spanBetweenNowAndEvent);
+        console.log(" spanBetweenFutureAndEvent ", spanBetweenFutureAndEvent);
+        if (isEventInFuture) {
+            start = futureMoment.isBefore(eventMoment) ? spanBetweenFutureAndEvent : 0;
+            end = spanBetweenNowAndEvent;
+        } else {
+            start = spanBetweenNowAndEvent;
+            end = spanBetweenFutureAndEvent;
+        }
 
         console.log(" Unit ", unit, start, end);
         for (var i = 0; i < sortedInterestingNumbers.length; i++) {
@@ -43,13 +52,19 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
                 // Since they're sorted, if we get one > end we're done with this loop
                 break;
             }
+            let interestingTime;
+            if (isEventInFuture) {
+                interestingTime = eventMoment.clone().subtract(info.number, unit).valueOf();
+            } else {
+                interestingTime = eventMoment.clone().add(info.number, unit).valueOf();
+            }
             if (info.number >= start && info.number <= end) {
                 let interestingInfo = {
                     event: event,
                     unit: unit,
                     tags: info.tags,
                     description: info.descriptor,
-                    time: eventTime + Utils.fromUnitToMillis(unit, info.number),
+                    time: interestingTime,
                 };
                 interestingList.push(interestingInfo);
             }

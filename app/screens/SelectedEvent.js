@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
+import { moment } from 'moment'
 
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
@@ -18,7 +19,7 @@ function SelectedEvent(props) {
     return null;
   }
 
-   const onPressRemoveItem = () => {
+  const onPressRemoveItem = () => {
 
     Alert.alert(
       'Remove Event ',
@@ -46,6 +47,11 @@ function SelectedEvent(props) {
 
   const date = getDateFromEvent(event);
 
+  const now = new Date();
+  const nowMillis = now.getTime();
+  const i18nKey = (nowMillis > date.getTime()) ? "timeSinceEventTitle" : "timeUntilEventTitle";
+  const cardHeaderTitle = i18n.t(i18nKey, { someValue: Utils.getDisplayStringForDate(date) });
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 15 }}>
@@ -55,8 +61,8 @@ function SelectedEvent(props) {
           </TouchableOpacity>
         </View>
         <EventCard event={event}>
-          <EventCardHeader event={event}>{i18n.t("timeSinceEventTitle", { someValue: Utils.getDisplayStringForDate(date) })}</EventCardHeader>
-          <EventComparedToNow event={event} />
+          <EventCardHeader event={event}>{cardHeaderTitle}</EventCardHeader>
+          <EventComparedToNow event={event} nowMillis={nowMillis} />
         </EventCard>
 
         <EventCard event={event}>

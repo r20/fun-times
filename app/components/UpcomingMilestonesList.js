@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList } from 'react-native'
+import moment from 'moment'
 
 import { getDateFromEvent } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
@@ -28,7 +29,7 @@ export default function UpcomingMilestonesList(props) {
   /* 
     Combination of event title and time
     would NOT be unique if a time had more than one representation
-    that was interesting.
+    that was interesting. So, description is also added.
   */
   const keyExtractor = (item) => {
     return ('key_' + item.event.title + "_" + item.time + "_" + item.description)

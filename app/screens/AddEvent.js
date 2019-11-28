@@ -51,10 +51,10 @@ function AddEvent(props) {
         For prototype, this supports only within a certain range.
       */
       const theMaxDate = new Date();
-      theMaxDate.setFullYear(theMaxDate.getFullYear() - 5);
+      theMaxDate.setFullYear(theMaxDate.getFullYear() + 25);
 
       const theMinDate = new Date();
-      theMinDate.setFullYear(theMaxDate.getFullYear() - 75);
+      theMinDate.setFullYear(theMaxDate.getFullYear() - 200);
 
       const { action, year, month, day } = await DatePickerAndroid.open({
         date: startingDate,

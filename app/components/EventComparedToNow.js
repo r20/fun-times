@@ -11,7 +11,7 @@ import { EventCardBodyText } from './EventCard'
 
 export default function EventComparedToNow(props) {
   const date = getDateFromEvent(props.event);
-  const now = new Date();
+  const now = new Date(props.nowMillis);
 
   const timeUnits = [
     { jsDateKey: 'm', lKey: 'months', defaultSigdig: 2 },
@@ -35,5 +35,6 @@ export default function EventComparedToNow(props) {
 
 EventComparedToNow.propTypes = {
   event: PropTypes.object.isRequired,
+  nowMillis: PropTypes.number.isRequired,
 };
 
