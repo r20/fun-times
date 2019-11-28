@@ -1,5 +1,6 @@
 import React, { createContext } from 'react'
 import { AsyncStorage } from 'react-native'
+import moment from 'moment'
 
 const STORAGE_KEY_EVENTS = '@save_events';
 
@@ -9,6 +10,14 @@ const STORAGE_KEY_EVENTS = '@save_events';
 export function getDateFromEvent(event) {
   const { title, epochMillis } = event;
   return new Date(epochMillis);
+}
+
+/**
+ * Returns a momentjs object for the event based on its epochMillis time.
+ */
+export function getMomentFromEvent(event) {
+  const { title, epochMillis } = event;
+  return moment(epochMillis);
 }
 
 // These are created with defaults.  The provider sets the real values using value prop.

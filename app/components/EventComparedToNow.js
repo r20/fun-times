@@ -1,32 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View } from 'react-native'
+import moment from 'moment'
 
-import { getDateFromEvent } from '../context/EventListContext'
-import * as JSDate from '../utils/jsDate'
-import {numberWithCommas} from '../utils/Utils'
+import { getMomentFromEvent } from '../context/EventListContext'
+import { numberWithCommas } from '../utils/Utils'
 import i18n from '../i18n/i18n'
 import { EventCardBodyText } from './EventCard'
 
 
 export default function EventComparedToNow(props) {
-  const date = getDateFromEvent(props.event);
-  const now = new Date(props.nowMillis);
+  const eventMoment = getMomentFromEvent(props.event);
+  const nowMoment = moment(props.nowMillis);
 
-  const timeUnits = [
-    { jsDateKey: 'm', lKey: 'months', defaultSigdig: 2 },
-    { jsDateKey: 'w', lKey: 'weeks', defaultSigdig: 2 },
-    { jsDateKey: 'd', lKey: 'days', defaultSigdig: 3 },
-    { jsDateKey: 'h', lKey: 'hours', defaultSigdig: 3 },
-    { jsDateKey: 'n', lKey: 'minutes', defaultSigdig: 3 },
-    { jsDateKey: 's', lKey: 'seconds', defaultSigdig: 3 },
-  ];
+  const timeUnits = ['months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
 
   return (<React.Fragment>
     {
       timeUnits.map((tu) => {
-        const n = JSDate.datediff(tu.jsDateKey, date, now);
-        return <EventCardBodyText key={tu.lKey} event={props.event}>{i18n.t(tu.lKey, { someValue: numberWithCommas(n) })}</EventCardBodyText>
+
+        const n = Math.abs(eventMoment.diff(nowMoment, tu));
+        return <EventCardBodyText key={tu.lKey} event={props.event}>{i18n.t(tu, { someValue: numberWithCommas(n) })}</EventCardBodyText>
       })
     }
   </React.Fragment>
