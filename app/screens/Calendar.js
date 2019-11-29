@@ -15,10 +15,9 @@ function Calendar(props) {
   );
 }
 
-
 const CalendarWithContext = withEventListContext(Calendar);
 
-export default withSingleScreenInStackNavigator(CalendarWithContext, i18n.t("headerUpcomingTitle"));
+export default withSingleScreenInStackNavigator(CalendarWithContext, i18n.t("headerUpcomingCalendarScreenTitle"));
 
 
 const styles = StyleSheet.create({

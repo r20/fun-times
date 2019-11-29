@@ -20,7 +20,10 @@ function Today(props) {
       keyExtractor={item => item.title}
       renderItem={({ item }) => {
 
-        const title = item.title;
+        const nowTime = (new Date()).getTime();
+        const isEventInFuture = (item.epochMillis > nowTime);
+        const sinceOrUntil = isEventInFuture ? "until" : "since";
+        const title = "Time " + sinceOrUntil + " " + item.title;
         const now = new Date();
         const nowMillis = now.getTime();
 

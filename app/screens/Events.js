@@ -16,6 +16,8 @@ function Events(props) {
   }
 
   const empty = !props.eventListContext.events.length;
+  /* TBD - word the empty screen text differently now that future events are supported,
+    and word it accounting for built in selectable events (holidays, supper bowl, etc.) */
   return (
     <View style={styles.container}>
       {!empty && <EventList {...props} />}

@@ -18,9 +18,8 @@ export default function EventComparedToNow(props) {
   return (<React.Fragment>
     {
       timeUnits.map((tu) => {
-
-        const n = Math.abs(eventMoment.diff(nowMoment, tu));
-        return <EventCardBodyText key={tu.lKey} event={props.event}>{i18n.t(tu, { someValue: numberWithCommas(n) })}</EventCardBodyText>
+        const num = Math.abs(eventMoment.diff(nowMoment, tu));
+        return <EventCardBodyText key={tu} event={props.event}>{i18n.t(tu, { someValue: numberWithCommas(num) })}</EventCardBodyText>
       })
     }
   </React.Fragment>

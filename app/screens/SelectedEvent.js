@@ -49,8 +49,11 @@ function SelectedEvent(props) {
 
   const now = new Date();
   const nowMillis = now.getTime();
-  const i18nKey = (nowMillis > date.getTime()) ? "timeSinceEventTitle" : "timeUntilEventTitle";
-  const cardHeaderTitle = i18n.t(i18nKey, { someValue: Utils.getDisplayStringForDate(date) });
+  const i18nKeyNow = (nowMillis > date.getTime()) ? "timeSinceEventTitle" : "timeUntilEventTitle";
+  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: Utils.getDisplayStringForDate(date) });
+
+  const i18nKeyUpcoming = (nowMillis > date.getTime()) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
+  const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: Utils.getDisplayStringForDate(date) });
 
   return (
     <View style={styles.container}>
@@ -61,12 +64,12 @@ function SelectedEvent(props) {
           </TouchableOpacity>
         </View>
         <EventCard event={event}>
-          <EventCardHeader event={event}>{cardHeaderTitle}</EventCardHeader>
+          <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>
           <EventComparedToNow event={event} nowMillis={nowMillis} />
         </EventCard>
 
         <EventCard event={event}>
-          <EventCardHeader event={event}>Upcoming Milestones</EventCardHeader>
+          <EventCardHeader event={event}>{cardHeaderTitleUpcoming}</EventCardHeader>
           <UpcomingMilestonesList events={[event]} renderEventCardBodyTextOnly={true} />
         </EventCard>
       </ScrollView>
