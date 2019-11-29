@@ -27,8 +27,7 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
     const futureMoment = nowMoment.clone().add(futureDistanceDays, 'days');
     const isEventInFuture = (event.epochMillis > nowTime);
 
-    // jmr - should I add 'weeks' ?
-    const units = ['seconds', 'minutes', 'hours', 'days',  'months', 'years'];
+    const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     var interestingList = [];
     for (let idx = 0; idx < units.length; idx++) {
         const unit = units[idx];
