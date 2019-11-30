@@ -15,6 +15,7 @@
     "expo-localization": "~7.0.0",
     "i18n-js": "^3.3.0",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
     "native-base": "^2.13.8",
     "react": "16.8.3",
     "react-dom": "16.8.3",

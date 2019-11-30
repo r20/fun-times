@@ -86,9 +86,10 @@ function AddEvent(props) {
       title: title,
       epochMillis: selectedDate.date.getTime(),
       color: selectedColor,
+      isCustom: true,
     }
 
-    if (props.eventListContext.getEventWithTitle(title)) {
+    if (props.eventListContext.getCustomEventWithTitle(title)) {
       Alert.alert(
         'Unable To Add Event',
         'The event "' + title + '" already exists',
@@ -101,7 +102,7 @@ function AddEvent(props) {
 
       console.log("Saving event ", title, "--", selectedDate.date);
 
-      props.eventListContext.addEvent(event);
+      props.eventListContext.addCustomEvent(event);
 
       // Go back to Events screen when push save
       props.navigation.navigate("Events");

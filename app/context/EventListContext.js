@@ -1,8 +1,13 @@
 import React, { createContext } from 'react'
 import { AsyncStorage } from 'react-native'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
-const STORAGE_KEY_EVENTS = '@save_events';
+import { standardEvents } from '../utils/standardEvents'
+
+/* This is an array of custom events */
+const STORAGE_KEY_CUSTOM_EVENTS_ARRAY = '@save_custom_events_array';
+/* This is an object with standard event keys as keys and true as value if it's selected */
+const STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT = '@save_selected_standard_event_keys_object';
 
 /**
  * Returns a Date object for the event based on its epochMillis time.
@@ -22,62 +27,107 @@ export function getMomentFromEvent(event) {
 
 // These are created with defaults.  The provider sets the real values using value prop.
 const EventListContext = createContext({
-  events: [],
-  addEvent: async () => { },
-  removeEvent: async () => { },
-  updateEvents: async () => { },
-  removeAllEvents: async () => { },
-  getEventWithTitle: () => { return null; },
+  allEvents: [],
+  customEvents: [],
+  selectedStandardEvents: [],
+  addCustomEvent: async () => { },
+  removeCustomEvent: async () => { },
+  updateCustomEvents: async () => { },
+  removeAllCustomEvents: async () => { },
+  getCustomEventWithTitle: () => { return null; },
 });
 
 /**
- * Provides a way to see, remove, add events.
- * The events are stored using AsyncStorage.
- * The events are held in state.events array.
+ * Provides a way to see events of interest, including a way to 
+ * add and remove custom events.
+ * Uses AsyncStorage to track things.
  */
 export class EventListProvider extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      events: []
+      allEvents: [],
+      customEvents: [],
+      selectedStandardEvents: [],
     };
   }
 
   async componentDidMount() {
-    let events = [];
+    let customEvents = [];
     try {
-      events = await AsyncStorage.getItem(STORAGE_KEY_EVENTS);
-      events = JSON.parse(events);
-      if (!events) {
-        events = [];
+      customEvents = await AsyncStorage.getItem(STORAGE_KEY_CUSTOM_EVENTS_ARRAY);
+      customEvents = JSON.parse(customEvents);
+      if (!customEvents) {
+        customEvents = [];
       }
     } catch (e) {
-      console.warn("Failed to load events.");
-      console.log("Error from failing to load events: ", e);
+      console.warn("Failed to load customEvents.");
+      console.log("Error from failing to load customEvents: ", e);
     }
-    this.setState({ events });
+    let selectedStandardEvents = [];
+    try {
+      let selectedStandardKeysMap = await AsyncStorage.getItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT);
+      selectedStandardKeysMap = JSON.parse(selectedStandardKeysMap);
+      if (!selectedStandardKeysMap) {
+        /* Since map is falsey (not even {}), this is probably first time using app.
+           Get the standard events that should be selected by default and select them */
+        selectedStandardEvents = [];
+
+        for (let idx = 0; idx < standardEvents.length; idx++) {
+          const std = standardEvents[idx];
+          if (std.isSelectedByDefault) {
+            selectedStandardEvents.push(std);
+          }
+        }
+        // Save them
+        this.saveSelectedStandardEventKeys(selectedStandardEvents);
+
+      } else {
+        for (let idx = 0; idx < standardEvents.length; idx++) {
+          const std = standardEvents[idx];
+          if (selectedStandardKeysMap[std.key]) {
+            selectedStandardEvents.push(std);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load selectedStandardEvents.");
+      console.log("Error from failing to load selectedStandardEvents: ", e);
+    }
+    let allEvents = customEvents.concat(selectedStandardEvents); // change to those selected
+    allEvents = allEvents.sort((a, b) => {
+      return b.epochMillis - a.epochMillis;
+    });
+
+    this.setState({ customEvents, allEvents, selectedStandardEvents });
   }
+
 
   /**
    * Sorts and updates events, saving to storage
    * and doing setState on the events.
    */
-  updateEvents = async (newEvents) => {
+  updateCustomEvents = async (newEvents) => {
     try {
       if (Array.isArray(newEvents)) {
         let newEventsSorted = newEvents.sort((a, b) => {
           return b.epochMillis - a.epochMillis;
         });
-        await this.saveEvents(newEventsSorted);
-        this.setState({ events: newEventsSorted });
-        console.log('Events updated!');
+        await this.saveCustomEvents(newEventsSorted);
+        let newAllEvents = newEventsSorted.concat(this.state.selectedStandardEvents);
+        newAllEvents = newAllEvents.sort((a, b) => {
+          return b.epochMillis - a.epochMillis;
+        });
+        this.setState({ customEvents: newEventsSorted, allEvents: newAllEvents });
+
+        console.log('Custom Events updated!');
       } else {
-        console.log("Events didn't look like array so not saved:", newEvents);
+        console.log("Custom Events didn't look like array so not saved:", newEvents);
       }
     } catch (e) {
-      console.warn("Failed to save events.");
-      console.log("Error from failing to update events: ", e);
+      console.warn("Failed to save custom events.");
+      console.log("Error from failing to update custom events: ", e);
     }
   }
 
@@ -86,52 +136,52 @@ export class EventListProvider extends React.Component {
    * Events should have unique titles. If there's already an event
    * with the same title, this will replace it.
    */
-  addEvent = async (newEvent) => {
+  addCustomEvent = async (newEvent) => {
     try {
       // Make sure there's not an event by that title already
-      var filtered = this.state.events.filter(function (value, index, arr) {
+      var filtered = this.state.customEvents.filter(function (value, index, arr) {
         return (value.title !== newEvent.title);
       });
       filtered.push(newEvent);
-      await this.updateEvents(filtered);
+      await this.updateCustomEvents(filtered);
     } catch (err) {
-      console.warn("Error adding event", err);
+      console.warn("Error adding custom event", err);
     }
   }
 
 
   /**
-   * Removes the specified event from storage and from the events array,
+   * Removes the specified event from storage and from the customEvents array,
    * based on its title.
    */
-  removeEvent = async (eventToRemove) => {
+  removeCustomEvent = async (eventToRemove) => {
     try {
       if (eventToRemove && eventToRemove.title) {
-        var filtered = this.state.events.filter(function (value, index, arr) {
+        var filtered = this.state.customEvents.filter(function (value, index, arr) {
           return (value.title !== eventToRemove.title);
         });
-        if (filtered.length !== this.state.events.length) {
-          await this.updateEvents(filtered);
+        if (filtered.length !== this.state.customEvents.length) {
+          await this.updateCustomEvents(filtered);
         } else {
           // we didn't find the array to remove
-          console.log("We didn't find an event to remove: ", eventToRemove.title);
+          console.log("We didn't find a custom event to remove: ", eventToRemove.title);
         }
       } else {
-        console.log("Event to remove doesn't look right");
+        console.log("Custom Event to remove doesn't look right");
       }
     } catch (e) {
-      console.warn("Failed to remove event.");
-      console.log("Error from failing to add event: ", e);
+      console.warn("Failed to remove custom event.");
+      console.log("Error from failing to add custom event: ", e);
     }
   }
 
 
   /**
-   * Return an event that has a matching title.
+   * Return a custom event that has a matching title.
    * Return null if there are none.
    */
-  getEventWithTitle = (title) => {
-    var filtered = this.state.events.filter(function (value, index, arr) {
+  getCustomEventWithTitle = (title) => {
+    var filtered = this.state.customEvents.filter(function (value, index, arr) {
       return (value.title === title);
     });
     if (filtered.length) {
@@ -142,36 +192,47 @@ export class EventListProvider extends React.Component {
   }
 
   /**
-   * Remove all events.
+   * Remove all custom events.
    */
-  removeAllEvents = async () => {
+  removeAllCustomEvents = async () => {
     try {
-      await this.updateEvents([]);
+      await this.updateCustomEvents([]);
     } catch (e) {
-      console.log('Failed to remove events.');
+      console.log('Failed to remove custom events.');
     }
   }
 
   /**
-   * Save the events array using AsyncStorage
+   * Save the keys of selected standard events.
    */
-  saveEvents = async (events) => {
-    await AsyncStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(events));
+  saveSelectedStandardEventKeys = async (selectedStandardEventsArray) => {
+    let map = {};
+    for (let idx = 0; idx < selectedStandardEventsArray.length; idx++) {
+      map[selectedStandardEventsArray[idx].key] = true;
+    }
+    await AsyncStorage.setItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT, JSON.stringify(map));
+  }
+
+  /**
+   * Save the custom events array using AsyncStorage
+   */
+  saveCustomEvents = async (events) => {
+    await AsyncStorage.setItem(STORAGE_KEY_CUSTOM_EVENTS_ARRAY, JSON.stringify(events));
   }
 
   render() {
-    /* Make events array (via state)
+    /* Make allEvents, customEvents, selectedStandardEvents arrays (via state)
       and some of the functions available to consumers
       via the value attribute.
     */
     return (
       <EventListContext.Provider value={{
         ...this.state,
-        updateEvents: this.updateEvents,
-        removeAllEvents: this.removeAllEvents,
-        addEvent: this.addEvent,
-        removeEvent: this.removeEvent,
-        getEventWithTitle: this.getEventWithTitle,
+        updateCustomEvents: this.updateCustomEvents,
+        removeAllCustomEvents: this.removeAllCustomEvents,
+        addCustomEvent: this.addCustomEvent,
+        removeCustomEvent: this.removeCustomEvent,
+        getCustomEventWithTitle: this.getCustomEventWithTitle,
       }}>
         {this.props.children}
       </EventListContext.Provider>

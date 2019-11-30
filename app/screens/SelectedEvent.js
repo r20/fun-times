@@ -33,7 +33,7 @@ function SelectedEvent(props) {
         {
           text: 'OK', onPress: () => {
             console.log('OK Pressed');
-            props.eventListContext.removeEvent(event);
+            props.eventListContext.removeCustomEvent(event);
             // Go back to Events screen when push save
             props.navigation.navigate("Events");
           }
@@ -59,9 +59,11 @@ function SelectedEvent(props) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 15 }}>
         <View style={{ alignSelf: 'flex-end', paddingBottom: 10, }}>
+          {event.isCustom &&
           <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
             <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
           </TouchableOpacity>
+          }
         </View>
         <EventCard event={event}>
           <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>

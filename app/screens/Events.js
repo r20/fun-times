@@ -15,9 +15,9 @@ function Events(props) {
     props.navigation.navigate("AddEvent");
   }
 
-  const empty = !props.eventListContext.events.length;
+  const empty = !props.eventListContext.allEvents.length;
   /* TBD - word the empty screen text differently now that future events are supported,
-    and word it accounting for built in selectable events (holidays, supper bowl, etc.) */
+    and word it for standard events (holidays, supper bowl, etc.) */
   return (
     <View style={styles.container}>
       {!empty && <EventList {...props} />}

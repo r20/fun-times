@@ -1,6 +1,6 @@
 import { Decimal } from 'decimal.js-light';
 import * as logger from './logger'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { interestingNumbersFinder } from './interestingNumbersFinder'
 import { sortedInterestingNumbers } from './interestingNumbers'
 import * as Utils from './Utils'

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View } from 'react-native'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import { getMomentFromEvent } from '../context/EventListContext'
 import { numberWithCommas } from '../utils/Utils'

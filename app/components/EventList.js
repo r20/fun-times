@@ -19,7 +19,7 @@ class EventList extends Component {
       <View style={styles.container}>
         <FlatList
           contentContainerStyle={{ padding: 15 }}
-          data={this.props.eventListContext.events}
+          data={this.props.eventListContext.allEvents}
           keyExtractor={item => item.title}
           renderItem={({ item }) =>
             <EventListItem event={item} onPressSelectEvent={() => { this.selectEvent(item) }} />
