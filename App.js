@@ -5,7 +5,7 @@ import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 
 import { EventListProvider } from './app/context/EventListContext';
-import AppNavigator from './app/navigation/AppNavigator';
+import AppStackNavigator from './app/navigation/AppStackNavigator';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -29,6 +29,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <EventListProvider ><AppNavigator /></EventListProvider>
+    return <EventListProvider ><AppStackNavigator /></EventListProvider>
   }
 }

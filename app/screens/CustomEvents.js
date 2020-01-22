@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
 
-
+import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import { withEventListContext } from '../context/EventListContext'
-
+import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
 
 
 function CustomEvents(props) {
@@ -41,7 +41,8 @@ function CustomEvents(props) {
 
 }
 
-export default withEventListContext(CustomEvents);
+const CustomEventsWithContext = withEventListContext(CustomEvents);
+export default withSingleScreenInStackNavigator(CustomEventsWithContext, i18n.t("headerCustomEventsTitle"));
 
 CustomEvents.propTypes = {
   navigation: PropTypes.object.isRequired,

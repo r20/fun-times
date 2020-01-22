@@ -5,8 +5,8 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
 // Search for available icons at https://expo.github.io/vector-icons/
 
-import CustomEventsNavigator from './CustomEventsNavigator'
-import BuiltinEventsNavigator from './BuiltinEventsNavigator'
+import BuiltinEvents from '../screens/BuiltinEvents'
+import CustomEvents from '../screens/CustomEvents'
 import Today from '../screens/Today'
 import Calendar from '../screens/Calendar'
 import More from '../screens/More'
@@ -40,17 +40,11 @@ getDefaultNavigationOptions = ({ navigation }) => {
   return options;
 };
 
-/**
- * The bottom tab navigator has several tabs.
- * The first (CustomEvents) is actually not a single screen, 
- * but a stack navigator of screens (CustomEvents, AddEvent, EventInfo).
- * The second (BuiltinEvents) is also a stack navigator
- * of screens.
- */
+
 const TabNavigator = createBottomTabNavigator(
   {
-    CustomEvents: { screen: CustomEventsNavigator },
-    BuiltinEvents: { screen: BuiltinEventsNavigator },
+    CustomEvents: { screen: CustomEvents },
+    BuiltinEvents: { screen: BuiltinEvents },
     Today: { screen: Today },
     Calendar: { screen: Calendar },
     More: { screen: More },
@@ -70,4 +64,4 @@ const TabNavigator = createBottomTabNavigator(
   }
 );
 
-export default createAppContainer(TabNavigator);
+export default TabNavigator;

@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
 
-
+import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import { withEventListContext } from '../context/EventListContext'
-
+import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
 
 
 function BuiltinEvents(props) {
@@ -31,7 +31,8 @@ function BuiltinEvents(props) {
   );
 }
 
-export default withEventListContext(BuiltinEvents);
+const BuiltinEventsWithContext = withEventListContext(BuiltinEvents);
+export default withSingleScreenInStackNavigator(BuiltinEventsWithContext, i18n.t("headerBuiltinEventsTitle"));
 
 BuiltinEvents.propTypes = {
   navigation: PropTypes.object.isRequired,
