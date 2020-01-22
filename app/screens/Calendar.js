@@ -10,7 +10,7 @@ import i18n from '../i18n/i18n'
 function Calendar(props) {
 
   return (<View style={styles.container} >
-    <UpcomingMilestonesList events={props.eventListContext.allEvents} renderEventCardBodyTextOnly={false} />
+    <UpcomingMilestonesList events={props.eventListContext.allSelectedEvents} renderEventCardBodyTextOnly={false} />
   </View>
   );
 }

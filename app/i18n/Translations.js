@@ -4,11 +4,14 @@
  * More needs added.
  */
 export const en = {
-  menuEventsTitle: "Events",
+  menuBuiltinEventsTitle: "Common Events",
+  menuCustomEventsTitle: "Custom Events",
   menuTodayTitle: "Today",
   menuUpcomingTitle: "Upcoming",
   menuMoreTitle: "Settings",
-  headerEventsTitle: "Events",
+  headerBuiltinEventsTitle: "Common Events",
+  headerCustomEventsTitle: "Custom Events",
+  headerAddEventTitle: "Add Event",
   headerTodayTitle: "Today",
   headerUpcomingCalendarScreenTitle: "Upcoming Milestones",
   headerMoreTitle: "Settings",
@@ -29,11 +32,13 @@ export const en = {
  * These would need translated.
  */
 export const es = {
-  menuEventsTitle: "Events",
+  menuBuiltinEventsTitle: "Built in Events",
+  menuCustomEventsTitle: "Custom Events",
   menuTodayTitle: "Today",
   menuUpcomingTitle: "Upcoming",
   menuMoreTitle: "Settings",
-  headerEventsTitle: "Events",
+  headerBuiltinEventsTitle: "Built in Events",
+  headerCustomEventsTitle: "Custom Events",
   headerTodayTitle: "Today",
   headerUpcomingCalendarScreenTitle: "Upcoming Milestons",
   headerMoreTitle: "Settings",

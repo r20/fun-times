@@ -2,21 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Text, TouchableOpacity } from 'react-native'
 
-import { getDateFromEvent } from '../context/EventListContext'
-import {getDisplayStringForDate} from '../utils/Utils'
+
+import {getEventDisplayDate} from '../utils/Event'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 
 export default function EventListItem(props) {
-  const date = getDateFromEvent(props.event);
 
   const title = props.event.title;
 
   return (
-    <TouchableOpacity onPress={props.onPressSelectEvent} >
+    <TouchableOpacity onPress={props.onPressEventInfo} >
       <EventCard event={props.event}>
         <EventCardHeader event={props.event} >{title}</EventCardHeader>
-        <EventCardBodyText event={props.event} >{getDisplayStringForDate(date)}</EventCardBodyText>
+        <EventCardBodyText event={props.event} >{getEventDisplayDate(props.event)}</EventCardBodyText>
       </EventCard>
     </TouchableOpacity>
   );
@@ -24,7 +23,7 @@ export default function EventListItem(props) {
 
 
 EventListItem.propTypes = {
-  onPressSelectEvent: PropTypes.func.isRequired,
+  onPressEventInfo: PropTypes.func.isRequired,
   event: PropTypes.object.isRequired,
 }
 

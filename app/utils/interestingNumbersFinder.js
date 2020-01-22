@@ -2,14 +2,14 @@
 import { Decimal } from 'decimal.js-light';
 
 import * as logger from './logger'
-import {numberWithCommas} from './Utils'
+import { numberWithCommas } from './Utils'
 
 /*
   This file has useful functions for finding interesting times.
 
-  jmr - See https://www.janko.at/Humor/Wissenschaft/Runde%20Zahlen.htm
+  TBD - See https://www.janko.at/Humor/Wissenschaft/Runde%20Zahlen.htm
   about round numbers.
-  I should have categories for types of numbers people may be interested in
+  Maybe we'll have categories for types of numbers people may be interested in
   e.g. physicists, mathematicians, electricians, etc.
 */
 

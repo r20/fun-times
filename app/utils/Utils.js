@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { Decimal } from 'decimal.js-light';
+import * as logger from '../utils/logger'
 
 /**
  * Most of the code in here is for finding interesting milestones.
@@ -101,9 +102,9 @@ export function getDisplayStringForDate(date) {
       return date.toLocaleDateString();
     }
   } catch (err) {
-    console.warn("Error with date", err);
+    logger.warn("Error with date", err);
   }
 
-  console.log("Something is wrong with the date");
+  logger.log("Something is wrong with the date");
   return '????/??/??';
 }

@@ -6,13 +6,15 @@ import { moment } from 'moment'
 
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
-import { getDateFromEvent, withEventListContext } from '../context/EventListContext'
+import { withEventListContext } from '../context/EventListContext'
+import { getEventDisplayDate } from '../utils/Event'
 import * as Utils from '../utils/Utils'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader } from '../components/EventCard'
+import * as logger from '../utils/logger'
 
-function SelectedEvent(props) {
+function EventInfo(props) {
 
   const event = props.navigation.getParam("event", '');
   if (!event) {
@@ -27,15 +29,15 @@ function SelectedEvent(props) {
       [
         {
           text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
+          onPress: () => logger.log('Cancel Pressed'),
           style: 'cancel',
         },
         {
           text: 'OK', onPress: () => {
-            console.log('OK Pressed');
+            logger.log('OK Pressed');
             props.eventListContext.removeCustomEvent(event);
-            // Go back to Events screen when push save
-            props.navigation.navigate("Events");
+            // Go back to CustomEvents screen when push save
+            props.navigation.navigate("CustomEvents");
           }
         },
       ],
@@ -45,15 +47,13 @@ function SelectedEvent(props) {
 
   }
 
-  const date = getDateFromEvent(event);
-
   const now = new Date();
   const nowMillis = now.getTime();
-  const i18nKeyNow = (nowMillis > date.getTime()) ? "timeSinceEventTitle" : "timeUntilEventTitle";
-  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: Utils.getDisplayStringForDate(date) });
+  const i18nKeyNow = (nowMillis > event.epochMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
+  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: getEventDisplayDate(event) });
 
-  const i18nKeyUpcoming = (nowMillis > date.getTime()) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
-  const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: Utils.getDisplayStringForDate(date) });
+  const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
+  const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getEventDisplayDate(event) });
 
   return (
     <View style={styles.container}>
@@ -80,9 +80,9 @@ function SelectedEvent(props) {
 
 }
 
-export default withEventListContext(SelectedEvent);
+export default withEventListContext(EventInfo);
 
-SelectedEvent.propTypes = {
+EventInfo.propTypes = {
   navigation: PropTypes.object.isRequired,
 }
 

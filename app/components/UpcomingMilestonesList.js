@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList } from 'react-native'
 import moment from 'moment-timezone'
 
-import { getDateFromEvent } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
+import { getEventDisplayDate, getDisplayDateForEpoch } from '../utils/Event'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
@@ -41,13 +41,14 @@ export default function UpcomingMilestonesList(props) {
         keyExtractor={keyExtractor}
         renderItem={({ item }) => {
           const event = item.event;
-          const specialDate = new Date(item.time);
+          const specialDisplayDateTime = getDisplayDateForEpoch(item.time, event.useTimeOfDay);
+          const eventDisplayDateTime = getEventDisplayDate(event);
           const isEventInFuture = (event.epochMillis > nowTime);
           const sinceOrUntil = isEventInFuture ? " until " : " since ";
-          const desc = item.description + " " + item.unit + sinceOrUntil + event.title;
+          const desc = item.description + " " + item.unit + sinceOrUntil + event.title + " (" + eventDisplayDateTime + ")";
 
           return (<EventCard event={event}>
-            <EventCardHeader event={event}>{Utils.getDisplayStringForDate(specialDate)}</EventCardHeader>
+            <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
             <EventCardBodyText event={event} >{desc}</EventCardBodyText>
           </EventCard>);
         }
@@ -59,8 +60,8 @@ export default function UpcomingMilestonesList(props) {
       {
         specials.map((item) => {
           const event = item.event;
-          const specialDate = new Date(item.time);
-          const desc = Utils.getDisplayStringForDate(specialDate) + " -- " + item.description + " " + item.unit;
+          const specialDisplayDateTime = getDisplayDateForEpoch(item.time, event.useTimeOfDay);
+          const desc = specialDisplayDateTime + " -- " + item.description + " " + item.unit;
           const key = keyExtractor(item);
 
           return (
@@ -76,7 +77,7 @@ export default function UpcomingMilestonesList(props) {
 UpcomingMilestonesList.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object).isRequired,
   /* 
-    This was done this way so SelectedEvent could use this code too.
+    This was done this way so EventInfo could use this code too.
     If true renders a FlatList with EventCard components with headers,
     else renders EventCardBodyText only
   */

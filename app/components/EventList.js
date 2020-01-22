@@ -8,9 +8,9 @@ import EventListItem from './EventListItem'
 
 class EventList extends Component {
 
-  selectEvent = (event) => {
+  onPressEventInfo = (event) => {
     // Passed param will be accessible via props.navigation.getParam()
-    this.props.navigation.navigate("SelectedEvent", { event: event });
+    this.props.navigation.navigate("EventInfo", { event: event });
   }
 
   render() {
@@ -22,7 +22,7 @@ class EventList extends Component {
           data={this.props.eventListContext.allEvents}
           keyExtractor={item => item.title}
           renderItem={({ item }) =>
-            <EventListItem event={item} onPressSelectEvent={() => { this.selectEvent(item) }} />
+            <EventListItem event={item} onPressEventInfo={() => { this.onPressEventInfo(item) }} />
           }
         />
       </View>

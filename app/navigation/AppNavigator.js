@@ -2,10 +2,11 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { createAppContainer } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Ionicons, FontAwesome, Entypo } from '@expo/vector-icons'
+import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
 // Search for available icons at https://expo.github.io/vector-icons/
 
-import EventsNavigator from './EventsNavigator'
+import CustomEventsNavigator from './CustomEventsNavigator'
+import BuiltinEventsNavigator from './BuiltinEventsNavigator'
 import Today from '../screens/Today'
 import Calendar from '../screens/Calendar'
 import More from '../screens/More'
@@ -18,37 +19,44 @@ getDefaultNavigationOptions = ({ navigation }) => {
 
   const { routeName } = navigation.state;
 
-  const size = 25;
-  if (routeName === 'Events') {
-    options.tabBarIcon = ({ focused, tintColor }) => <Ionicons name="ios-list" size={size} color={tintColor} />;
-    options.title = i18n.t("menuEventsTitle");
+  const size = 30;
+  if (routeName === 'CustomEvents') {
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name="create" size={size} color={tintColor} />;
+    options.title = i18n.t("menuCustomEventsTitle");
+  } else if (routeName === 'BuiltinEvents') {
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="star" size={size} color={tintColor} />;
+    options.title = i18n.t("menuBuiltinEventsTitle");
   } else if (routeName === 'Today') {
-    options.tabBarIcon = ({ focused, tintColor }) => <FontAwesome name="star" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="calendar-today" size={size} color={tintColor} />;
     options.title = i18n.t("menuTodayTitle");
   } else if (routeName === 'Calendar') {
-    options.tabBarIcon = ({ focused, tintColor }) => <FontAwesome name="calendar-o" size={size} color={tintColor} />;
+    // TBD: Or should I use calendar-blank as the icon?  It's too similar to calendar-today
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="timetable" size={size} color={tintColor} />;
     options.title = i18n.t("menuUpcomingTitle");
   } else {
-    options.tabBarIcon = ({ focused, tintColor }) => <Entypo name="menu" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="menu" size={size} color={tintColor} />;
     options.title = i18n.t("menuMoreTitle");
   }
   return options;
 };
 
 /**
- * The bottom tab navigator has 4 tabs.
- * The first (Events) is actually not a single screen, 
- * but a stack navigator of screens (Events, AddEvent, SelectedEvent).
+ * The bottom tab navigator has several tabs.
+ * The first (CustomEvents) is actually not a single screen, 
+ * but a stack navigator of screens (CustomEvents, AddEvent, EventInfo).
+ * The second (BuiltinEvents) is also a stack navigator
+ * of screens.
  */
 const TabNavigator = createBottomTabNavigator(
   {
-    Events: { screen: EventsNavigator },
+    CustomEvents: { screen: CustomEventsNavigator },
+    BuiltinEvents: { screen: BuiltinEventsNavigator },
     Today: { screen: Today },
     Calendar: { screen: Calendar },
     More: { screen: More },
   },
   {
-    initialRouteName: 'Events',
+    initialRouteName: 'CustomEvents',
     lazy: true,
     tabBarOptions: {
       showLabel: false,

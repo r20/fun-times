@@ -16,7 +16,7 @@ function Today(props) {
 
     <FlatList
       contentContainerStyle={{ padding: 15 }}
-      data={props.eventListContext.allEvents}
+      data={props.eventListContext.allSelectedEvents}
       keyExtractor={item => item.title}
       renderItem={({ item }) => {
 

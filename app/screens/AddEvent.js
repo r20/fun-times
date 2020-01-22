@@ -11,6 +11,8 @@ import { colors, getRandomColor } from '../style/theme'
 
 import { withEventListContext } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
+import Event from '../utils/Event'
+import * as logger from '../utils/logger'
 
 /**
  * TBD The date picker only supports Android right now.
@@ -69,7 +71,7 @@ function AddEvent(props) {
         setSelectedDate({ date: newDate });
       }
     } catch ({ code, message }) {
-      console.warn('Cannot open date picker', message);
+      logger.warn('Cannot open date picker', message);
     }
   }
 
@@ -82,12 +84,7 @@ function AddEvent(props) {
 
     Keyboard.dismiss();
 
-    const event = {
-      title: title,
-      epochMillis: selectedDate.date.getTime(),
-      color: selectedColor,
-      isCustom: true,
-    }
+    const event = new Event({ title, epochMillis: selectedDate.date.getTime(), color: selectedColor, isCustom: true });
 
     if (props.eventListContext.getCustomEventWithTitle(title)) {
       Alert.alert(
@@ -100,12 +97,12 @@ function AddEvent(props) {
       )
     } else {
 
-      console.log("Saving event ", title, "--", selectedDate.date);
+      logger.log("Saving event ", title, "--", selectedDate.date);
 
       props.eventListContext.addCustomEvent(event);
 
-      // Go back to Events screen when push save
-      props.navigation.navigate("Events");
+      // Go back to CustomEvents screen when push save
+      props.navigation.navigate("CustomEvents");
     }
 
   }

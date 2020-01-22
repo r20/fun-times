@@ -34,8 +34,8 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
         let start, end;
         const spanBetweenNowAndEvent = Math.abs(nowMoment.diff(eventMoment, unit));
         const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
-        console.log(" spanBetweenNowAndEvent ", spanBetweenNowAndEvent);
-        console.log(" spanBetweenFutureAndEvent ", spanBetweenFutureAndEvent);
+        logger.log(" spanBetweenNowAndEvent ", spanBetweenNowAndEvent);
+        logger.log(" spanBetweenFutureAndEvent ", spanBetweenFutureAndEvent);
         if (isEventInFuture) {
             start = futureMoment.isBefore(eventMoment) ? spanBetweenFutureAndEvent : 0;
             end = spanBetweenNowAndEvent;
@@ -44,7 +44,7 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
             end = spanBetweenFutureAndEvent;
         }
 
-        console.log(" Unit ", unit, start, end);
+        logger.log(" Unit ", unit, start, end);
         for (var i = 0; i < sortedInterestingNumbers.length; i++) {
             const info = sortedInterestingNumbers[i];
             if (info.number > end) {

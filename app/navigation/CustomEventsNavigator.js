@@ -1,39 +1,42 @@
 import React from 'react'
 import { createStackNavigator } from 'react-navigation-stack'
 
-import Events from '../screens/Events'
+import CustomEvents from '../screens/CustomEvents'
 import AddEvent from '../screens/AddEvent'
-import SelectedEvent from '../screens/SelectedEvent'
+import EventInfo from '../screens/EventInfo'
 import theme, { getContrastFontColor } from '../style/theme'
 
-const EventsNavigator = createStackNavigator({
-    Events: {
+import i18n from '../i18n/i18n'
+
+
+const CustomEventsNavigator = createStackNavigator({
+    CustomEvents: {
         navigationOptions: {
-            title: "Events",
+            title: i18n.t("headerCustomEventsTitle"),
         },
-        screen: Events
+        screen: CustomEvents
     },
     AddEvent: {
         navigationOptions: {
-            title: 'Add Event',
+            title: i18n.t('headerAddEventTitle'),
         },
         screen: AddEvent
     },
-    SelectedEvent: {
+    EventInfo: {
         navigationOptions: ({ navigation }) => {
             const event = navigation.getParam("event");
-            const selectedTitle = event.title;
+            const eventTitle = event.title;
             const headerColor = event.color || theme.PRIMARY_BACKGROUND_COLOR;
 
             return ({
-                title: selectedTitle,
+                title: eventTitle,
                 headerStyle: {
                     backgroundColor: headerColor,
                 },
                 headerTintColor: getContrastFontColor(headerColor),
             });
         },
-        screen: SelectedEvent
+        screen: EventInfo
     },
 }, {
     headerLayoutPreset: 'center',
@@ -47,4 +50,4 @@ const EventsNavigator = createStackNavigator({
 });
 
 
-export default EventsNavigator;
+export default CustomEventsNavigator;
