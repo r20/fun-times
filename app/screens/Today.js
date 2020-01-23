@@ -16,10 +16,13 @@ function Today(props) {
 
     <FlatList
       contentContainerStyle={{ padding: 15 }}
-      data={props.eventListContext.allSelectedEvents}
+      data={props.eventListContext.allEvents}
       keyExtractor={item => item.title}
       renderItem={({ item }) => {
 
+        if (!props.eventListContext.isEventSelected(item)) {
+          return null;
+        }
         const nowTime = (new Date()).getTime();
         const isEventInFuture = (item.epochMillis > nowTime);
         const sinceOrUntil = isEventInFuture ? "until" : "since";

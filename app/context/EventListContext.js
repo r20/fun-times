@@ -2,14 +2,15 @@ import React, { createContext } from 'react'
 import { AsyncStorage } from 'react-native'
 import moment from 'moment-timezone'
 
-import { standardEvents } from '../utils/standardEvents'
+import { standardEventsData } from '../utils/standardEventsData'
 import { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 
 /* This is an array of custom events */
 const STORAGE_KEY_CUSTOM_EVENTS_ARRAY = '@save_custom_events_array';
-/* This is an object with standard event keys as keys and true as value if it's selected */
-const STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT = '@save_selected_standard_event_keys_object';
+/* This is an object with standard event keys as keys and true/false as value 
+  depending on whether selected */
+const STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP = '@save_standard_events_key_to_selected_map';
 
 /**
  * Returns a momentjs object for the event based on its epochMillis time.
@@ -19,19 +20,21 @@ export function getMomentFromEvent(event) {
   return moment(epochMillis);
 }
 
+function isEventSelected(event) {
+  return (event && event.selected);
+}
+
 // These are created with defaults.  The provider sets the real values using value prop.
 const EventListContext = createContext({
-  allSelectedEvents: [],
+  allEvents: [],
   customEvents: [],
-  selectedStandardEvents: [],
+  standardEvents: [],
   addCustomEvent: async () => { },
   removeCustomEvent: async () => { },
   updateCustomEvents: async () => { },
-  selectCustomEvent: async () => { },
-  deselectCustomEvent: async () => { },
-  selectStandardEvent: async () => { },
-  deselectStandardEvent: async () => { },
+  toggleEventSelected: () => { },
   removeAllCustomEvents: async () => { },
+  isEventSelected: isEventSelected,
   getCustomEventWithTitle: () => { return null; },
 });
 
@@ -45,11 +48,10 @@ export class EventListProvider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      allSelectedEvents: [],
+      allEvents: [],
       customEvents: [],
-      selectedCustomEvents: [],
-      standardEvents: standardEvents,
-      selectedStandardEvents: [],
+      standardEventsSelectedMap: {},
+      standardEvents: [],
     };
   }
 
@@ -65,52 +67,49 @@ export class EventListProvider extends React.Component {
       logger.warn("Failed to load customEvents.");
       logger.log("Error from failing to load customEvents: ", e);
     }
-    let selectedStandardEvents = [];
+    let standardEvents = standardEventsData || [];
     try {
-      let selectedStandardKeysMap = await AsyncStorage.getItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT);
-      selectedStandardKeysMap = JSON.parse(selectedStandardKeysMap);
+      let standardEventsSelectedMap = await AsyncStorage.getItem(STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP);
+      standardEventsSelectedMap = JSON.parse(standardEventsSelectedMap);
 
-      if (!selectedStandardKeysMap) {
+      if (!standardEventsSelectedMap) {
         /* Since map is falsey (not even {}), this is probably first time using app. */
-        selectedStandardKeysMap = {};
+        standardEventsSelectedMap = {};
       }
 
       let aStandardEventWasSelectedByDefault = false;
       for (let idx = 0; idx < standardEvents.length; idx++) {
         const std = standardEvents[idx];
-        if (selectedStandardKeysMap[std.key] === true) {
-          selectedStandardEvents.push(std);
-        } else if (selectedStandardKeysMap[std.key] === undefined && std.isSelectedByDefault) {
-          /* If selectedStandardKeysMap[std.key] is false, they've chosen to NOT have this
+        if (standardEventsSelectedMap[std.key] === true) {
+          std.selected = true;
+        } else if (standardEventsSelectedMap[std.key] === undefined && std.isSelectedByDefault) {
+          /* If standardEventsSelectedMap[std.key] is false, they've chosen to NOT have this
               standard event selected anymore. Leave it that way. */
-          selectedStandardEvents.push(std);
+          std.selected = true;
           aStandardEventWasSelectedByDefault = true;
         }
       }
       if (aStandardEventWasSelectedByDefault) {
         // Save them
-        this.saveSelectedStandardEventKeys(selectedStandardEvents);
+        await this.saveSelectedStandardEventsMap(standardEventsSelectedMap);
       }
 
     } catch (e) {
-      logger.warn("Failed to load selectedStandardEvents.");
-      logger.log("Error from failing to load selectedStandardEvents: ", e);
+      logger.warn("Failed to load or process selected standard events map.");
+      logger.log("Error from failing to load selected standard events map: ", e);
     }
-
-    let selectedCustomEvents = [];
-    for (let idx = 0; idx < customEvents.length; idx++) {
-      const custom = customEvents[idx];
-      if (custom.selected) {
-        selectedCustomEvents.push(custom);
-      }
-    }
-
-    let allSelectedEvents = selectedCustomEvents.concat(selectedStandardEvents); // change to those selected
-    allSelectedEvents = allSelectedEvents.sort((a, b) => {
+    customEvents = customEvents.sort((a, b) => {
+      return b.epochMillis - a.epochMillis;
+    });
+    standardEvents = standardEvents.sort((a, b) => {
+      return b.epochMillis - a.epochMillis;
+    });
+    let allEvents = customEvents.concat(standardEvents);
+    allEvents = allEvents.sort((a, b) => {
       return b.epochMillis - a.epochMillis;
     });
 
-    this.setState({ allSelectedEvents, customEvents, selectedCustomEvents, standardEvents, selectedStandardEvents });
+    this.setState({ allEvents, customEvents, standardEvents });
   }
 
 
@@ -125,7 +124,8 @@ export class EventListProvider extends React.Component {
           return b.epochMillis - a.epochMillis;
         });
         await this.saveCustomEvents(newEventsSorted);
-        let newAllEvents = newEventsSorted.concat(this.state.selectedStandardEvents);
+
+        let newAllEvents = newEventsSorted.concat(this.state.standardEvents);
         newAllEvents = newAllEvents.sort((a, b) => {
           return b.epochMillis - a.epochMillis;
         });
@@ -213,28 +213,58 @@ export class EventListProvider extends React.Component {
   }
 
 
-
   /**
-   * Finds event accoring to oldEvent's title and replaces it
+   * Finds event according to oldEvent's title and replaces it
    * with the newEvent.
+   * Updates state and updates async storage as needed.
    */
-  modifyCustomEvent = async (oldEvent, newEvent) => {
+  modifyEvent = (oldEvent, newEvent) => {
     try {
       if (newEvent && newEvent.title && oldEvent && oldEvent.title) {
         // Take out the old version
-        let filtered = this.state.customEvents.filter(function (value, index, arr) {
-          return (value.title !== oldEvent.title);
-        });
+        let newArray = [];
+        if (oldEvent.isCustom) {
+          newArray = this.state.customEvents.filter(function (value, index, arr) {
+            return (value.title !== oldEvent.title);
+          });
+          if (newArray.length !== this.state.customEvents.length) {
+            // Add in the new version of the event
+            newArray.push(newEvent);
+            // This will update state and async storage
+            this.updateCustomEvents(newArray);
 
-        if (filtered.length !== this.state.customEvents.length) {
-          // Add in the new version of the event
-          filtered.push(newEvent);
-          await this.updateCustomEvents(filtered);
-
+          } else {
+            // we didn't find the array to remove
+            logger.log("We didn't find a custom event to modify: ", oldEvent.title, newEvent.title);
+          }
         } else {
-          // we didn't find the array to remove
-          logger.log("We didn't find a custom event to modify: ", oldEvent.title, newEvent.title);
+          newArray = this.state.standardEvents.filter(function (value, index, arr) {
+            return (value.title !== oldEvent.title);
+          });
+
+          if (newArray.length !== this.state.standardEvents.length) {
+            // Add in the new version of the event
+            newArray.push(newEvent);
+
+            newArray = newArray.sort((a, b) => {
+              return b.epochMillis - a.epochMillis;
+            });
+            let allEvents = this.state.customEvents.concat(newArray);
+            allEvents = allEvents.sort((a, b) => {
+              return b.epochMillis - a.epochMillis;
+            });
+
+            // Update state
+            this.setState({ allEvents, standardEvents: newArray });
+            // Update async storage if needed
+            this._updateAsyncStorageStandardEventsMapIfSelectionChange(oldEvent, newEvent);
+
+          } else {
+            // we didn't find the array to remove
+            logger.log("We didn't find event to modify: ", oldEvent.title, newEvent.title);
+          }
         }
+
       } else {
         logger.log("Custom Event to modify doesn't look right");
       }
@@ -244,79 +274,59 @@ export class EventListProvider extends React.Component {
     }
   }
 
-  /**
-   * Marks event with selected = true
-   */
-  selectCustomEvent = async (event) => {
+
+  toggleEventSelected = (event) => {
     let newEvent = cloneEvent(event);
-    newEvent.selected = true;
-    await this.modifyCustomEvent(event, newEvent);
+    newEvent.selected = !newEvent.selected;
+    this.modifyEvent(event, newEvent);
   }
 
-  /**
-   * Marks event with selected = false
-   */
-  deselectCustomEvent = async (event) => {
-    let newEvent = cloneEvent(event);
-    newEvent.selected = false;
-    await this.modifyCustomEvent(event, newEvent);
-  }
+  _updateAsyncStorageStandardEventsMapIfSelectionChange = async (oldEvent, newEvent) => {
+    if (newEvent && oldEvent && newEvent.selected !== oldEvent.selected) {
+      try {
+        if (newEvent && newEvent.key) {
+          let selectedStandardKeysMap = await AsyncStorage.getItem(STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP);
+          selectedStandardKeysMap = JSON.parse(selectedStandardKeysMap);
 
-  selectStandardEvent = async (event) => {
-    try {
-      if (event && event.key) {
-        let selectedStandardKeysMap = await AsyncStorage.getItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT);
-        selectedStandardKeysMap = JSON.parse(selectedStandardKeysMap);
+          if (!selectedStandardKeysMap) {
+            /* Since map is falsey (not even {}), this is probably first time using app. */
+            selectedStandardKeysMap = {};
+          }
+          if (newEvent.selected) {
+            selectedStandardKeysMap[newEvent.key] = true;
+            await this.saveSelectedStandardEventsMap(selectedStandardKeysMap);
+          } else {
+            if (selectedStandardKeysMap[newEvent.key]) {
+              /* Instead of deleting the key, we still want it in there and set to false
+              so that if it's on by default we can know the user chose to turn it off. */
+              selectedStandardKeysMap[newEvent.key] = false;
+              await this.saveSelectedStandardEventsMap(selectedStandardKeysMap);
+            } else {
+              logger.log("Event was already deselected.");
+            }
+          }
 
-        if (!selectedStandardKeysMap) {
-          /* Since map is falsey (not even {}), this is probably first time using app. */
-          selectedStandardKeysMap = {};
-        }
-        selectedStandardKeysMap[event.key] = true;
-        await AsyncStorage.setItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT, JSON.stringify(selectedStandardKeysMap));
-
-      } else {
-        logger.warn("Event to select is malformed.");
-        logger.log("Event to select is malformed: ", event);
-      }
-    } catch (err) {
-      logger.warn("Failed to select event.");
-      logger.log("Error from failing to select standard event: ", err);
-    }
-  }
-
-
-  deselectStandardEvent = async (event) => {
-    try {
-      if (event && event.key) {
-        let selectedStandardKeysMap = await AsyncStorage.getItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT);
-        selectedStandardKeysMap = JSON.parse(selectedStandardKeysMap);
-
-        if (selectedStandardKeysMap && selectedStandardKeysMap[event.key]) {
-          delete selectedStandardKeysMap[event.key];
-          await AsyncStorage.setItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT, JSON.stringify(selectedStandardKeysMap));
         } else {
-          logger.log("Event was already deselected.");
+          logger.warn("Unexpected: Standard Event is malformed.");
+          logger.log("Standard Event is malformed: ", newEvent);
         }
-      } else {
-        logger.warn("Event to dedeselect is malformed.");
-        logger.log("Event to select is malformed: ", event);
+      } catch (err) {
+        logger.warn("Failure while trying to save standard event selection data.");
+        logger.log("Failure while trying to save standard event selection data. ", err);
       }
-    } catch (err) {
-      logger.warn("Failed to deselect event.");
-      logger.log("Error from failing to deselect standard event: ", err);
+    } else {
+      logger.log("newEvent doesn't need selected modified: ", oldEvent, newEvent);
     }
   }
 
+
+
   /**
-   * Save the keys of selected standard events.
+   * Save the selected map for standard events.
    */
-  saveSelectedStandardEventKeys = async (selectedStandardEventsArray) => {
-    let map = {};
-    for (let idx = 0; idx < selectedStandardEventsArray.length; idx++) {
-      map[selectedStandardEventsArray[idx].key] = true;
-    }
-    await AsyncStorage.setItem(STORAGE_KEY_SELECTED_STANDARD_EVENT_KEYS_OBJECT, JSON.stringify(map));
+  saveSelectedStandardEventsMap = async (map) => {
+    let mapToSave = map || {};
+    await AsyncStorage.setItem(STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP, JSON.stringify(mapToSave));
   }
 
   /**
@@ -327,9 +337,8 @@ export class EventListProvider extends React.Component {
   }
 
   render() {
-    /* Make allSelectedEvents, customEvents, selectedCustomEvents, standardEvents,
-      selectedStandardEvents arrays (via state) and some of the functions available to consumers
-      via the value attribute.
+    /* Make allSelectedEvents, customEvents, standardEventsData arrays (via state) 
+      and some of the functions available to consumers via the value attribute.
     */
     return (
       <EventListContext.Provider value={{
@@ -337,10 +346,8 @@ export class EventListProvider extends React.Component {
         removeAllCustomEvents: this.removeAllCustomEvents,
         addCustomEvent: this.addCustomEvent,
         removeCustomEvent: this.removeCustomEvent,
-        selectCustomEvent: this.selectCustomEvent,
-        deselectCustomEvent: this.deselectCustomEvent,
-        selectStandardEvent: this.selectStandardEvent,
-        deselectStandardEvent: this.deselectStandardEvent,
+        toggleEventSelected: this.toggleEventSelected,
+        isEventSelected: isEventSelected,
         getCustomEventWithTitle: this.getCustomEventWithTitle,
       }}>
         {this.props.children}

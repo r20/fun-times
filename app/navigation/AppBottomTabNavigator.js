@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
 // Search for available icons at https://expo.github.io/vector-icons/
 
-import BuiltinEvents from '../screens/BuiltinEvents'
+import StandardEvents from '../screens/StandardEvents'
 import CustomEvents from '../screens/CustomEvents'
 import Today from '../screens/Today'
 import Calendar from '../screens/Calendar'
@@ -23,9 +23,9 @@ getDefaultNavigationOptions = ({ navigation }) => {
   if (routeName === 'CustomEvents') {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name="create" size={size} color={tintColor} />;
     options.title = i18n.t("menuCustomEventsTitle");
-  } else if (routeName === 'BuiltinEvents') {
+  } else if (routeName === 'StandardEvents') {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="star" size={size} color={tintColor} />;
-    options.title = i18n.t("menuBuiltinEventsTitle");
+    options.title = i18n.t("menuStandardEventsTitle");
   } else if (routeName === 'Today') {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="calendar-today" size={size} color={tintColor} />;
     options.title = i18n.t("menuTodayTitle");
@@ -44,7 +44,7 @@ getDefaultNavigationOptions = ({ navigation }) => {
 const TabNavigator = createBottomTabNavigator(
   {
     CustomEvents: { screen: CustomEvents },
-    BuiltinEvents: { screen: BuiltinEvents },
+    StandardEvents: { screen: StandardEvents },
     Today: { screen: Today },
     Calendar: { screen: Calendar },
     More: { screen: More },

@@ -9,8 +9,12 @@ import i18n from '../i18n/i18n'
 
 function Calendar(props) {
 
+  let filtered = props.eventListContext.allEvents.filter(function (value, index, arr) {
+    return props.eventListContext.isEventSelected(value);
+  });
+
   return (<View style={styles.container} >
-    <UpcomingMilestonesList events={props.eventListContext.allSelectedEvents} renderEventCardBodyTextOnly={false} />
+    <UpcomingMilestonesList events={filtered} renderEventCardBodyTextOnly={false} />
   </View>
   );
 }

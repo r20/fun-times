@@ -16,21 +16,16 @@ function CustomEvents(props) {
     props.navigation.navigate("AddEvent");
   }
 
-  const onPressEventInfo = (event) => {
-    // Passed param will be accessible via props.navigation.getParam()
-    props.navigation.navigate("EventInfo", { event: event });
-  }
-
   const empty = !props.eventListContext.customEvents.length;
   return (
     <View style={styles.container}>
       {!empty && 
         <FlatList
-          contentContainerStyle={{ padding: 15 }}
+          contentContainerStyle={{ padding: 15, paddingBottom: 100, }}
           data={props.eventListContext.customEvents}
           keyExtractor={item => item.title}
           renderItem={({ item }) =>
-            <EventListItem event={item} onPressEventInfo={() => { onPressEventInfo(item) }} />
+            <EventListItem event={item} />
           }
         />
         }

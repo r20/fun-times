@@ -9,13 +9,7 @@ import { withEventListContext } from '../context/EventListContext'
 import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
 
 
-function BuiltinEvents(props) {
-
-
-  const onPressEventInfo = (event) => {
-    // Passed param will be accessible via props.navigation.getParam()
-    props.navigation.navigate("EventInfo", { event: event });
-  }
+function StandardEvents(props) {
 
   return (
     <View style={styles.container}>
@@ -24,17 +18,17 @@ function BuiltinEvents(props) {
         data={props.eventListContext.standardEvents}
         keyExtractor={item => item.title}
         renderItem={({ item }) =>
-          <EventListItem event={item} onPressEventInfo={() => { onPressEventInfo(item) }} />
+          <EventListItem event={item} />
         }
       />
     </View>
   );
 }
 
-const BuiltinEventsWithContext = withEventListContext(BuiltinEvents);
-export default withSingleScreenInStackNavigator(BuiltinEventsWithContext, i18n.t("headerBuiltinEventsTitle"));
+const StandardEventsWithContext = withEventListContext(StandardEvents);
+export default withSingleScreenInStackNavigator(StandardEventsWithContext, i18n.t("headerStandardEventsTitle"));
 
-BuiltinEvents.propTypes = {
+StandardEvents.propTypes = {
   navigation: PropTypes.object.isRequired,
 }
 

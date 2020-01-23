@@ -1,5 +1,5 @@
 import moment from 'moment-timezone'
-import Event, { TAGS } from '../utils/Event'
+import Event, { TAGS } from './Event'
 
 
 /* TBD - Need an easy way for users to see list of new events added to this list,
@@ -129,5 +129,5 @@ events.sort((a, b) => {
     return b.epochMillis - a.epochMillis;
 });
 
-export const standardEvents = events;
+export const standardEventsData = events;
 
