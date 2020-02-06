@@ -17,8 +17,9 @@ import * as logger from '../utils/logger'
 /**
  * TBD The date picker only supports Android right now.
  * Would like to support setting the time of day also.
- * Maybe use react-native's RNDateTimePicker when expo gets
- * support for that.
+ * I've updgraded expo to 36, and can try to use 
+ *  RNDateTimePicker now.
+ * 
  */
 function AddEvent(props) {
 
