@@ -21,10 +21,10 @@ getDefaultNavigationOptions = ({ navigation }) => {
 
   const size = 30;
   if (routeName === 'CustomEvents') {
-    options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name="create" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <Entypo name="add-to-list" size={size} color={tintColor} />;
     options.title = i18n.t("menuCustomEventsTitle");
   } else if (routeName === 'StandardEvents') {
-    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="star" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <Entypo name="list" size={size} color={tintColor} />;
     options.title = i18n.t("menuStandardEventsTitle");
   } else if (routeName === 'Today') {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="calendar-today" size={size} color={tintColor} />;
@@ -34,7 +34,7 @@ getDefaultNavigationOptions = ({ navigation }) => {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="timetable" size={size} color={tintColor} />;
     options.title = i18n.t("menuUpcomingTitle");
   } else {
-    options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="menu" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name="more-vert" size={size} color={tintColor} />;
     options.title = i18n.t("menuMoreTitle");
   }
   return options;
