@@ -14,7 +14,7 @@ export default class Event {
         epochMillis
         color
         keywords
-        useTimeOfDay
+        isFullDay
         isCustom
         isSelectedByDefault // For standard events
         specialNumbers // TBD - need to figure out how to implement this.  Thisis other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
@@ -24,6 +24,7 @@ export default class Event {
         // Take the this object, add in some defaults, then add in passed in options (which may override defaults)
         Object.assign(this, {
             tag: [],
+            isFullDay: true,
             specialNumbers: [],
             keywords: [],
         }, options);
@@ -54,28 +55,3 @@ export const TAGS = {
     SPORTS: "Sports",
 };
 
-
-export function getEventDisplayDate(event) {
-
-    if (event) {
-        return getDisplayDateForEpoch(event.epochMillis, event.useTimeOfDay);
-    }
-    logger.log("Something is wrong with the event");
-    return '????/??/??';
-}
-
-export function getDisplayDateForEpoch(epochMillis, useTimeOfDay = false) {
-    try {
-        const date = new Date(epochMillis);
-        if (useTimeOfDay) {
-            return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-        } else {
-            return date.toLocaleDateString();
-        }
-
-    } catch (err) {
-        logger.warn("Error while getting display date", err);
-    }
-
-    return '????/??/??';
-}

@@ -6,6 +6,7 @@ import {
 } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
+import EventDateTimePicker from '../components/EventDateTimePicker'
 import ColorPickerModal from '../components/ColorPickerModal'
 import { colors, getRandomColor } from '../style/theme'
 
@@ -14,66 +15,16 @@ import * as Utils from '../utils/Utils'
 import Event from '../utils/Event'
 import * as logger from '../utils/logger'
 
-/**
- * TBD The date picker only supports Android right now.
- * Would like to support setting the time of day also.
- * I've updgraded expo to 36, and can try to use 
- *  RNDateTimePicker now.
- * 
- */
 function AddEvent(props) {
 
   const [title, setTitle] = useState('');
-  /* 
-    selectedDate is object with date property holding a Date javascript object 
-    because we can't seem to put date object directly in state 
-   */
-  const [selectedDate, setSelectedDate] = useState({ date: null });
-
-  const eventPlaceholders = {
-    title: "Title (e.g. Maria's birthday)",
-  }
-
-
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [useFullDay, setUseFullDay] = useState(true);
   const [selectedColor, setSelectedColor] = useState(getRandomColor);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
 
-  const onPressDatePicker = async () => {
-    Keyboard.dismiss();
-    try {
-
-      /* 
-        Start on a date that makes it convenient for using the spinner.
-        Also, using a time in middle of the day (12:00) because otherwise
-        picking a day, closing the picker, and reopening will sometimes
-        have the previous day
-       */
-      const startingDate = selectedDate.date ? selectedDate.date : new Date(2000, 5, 15, 12, 0, 0);
-
-      /*
-        For prototype, this supports only within a certain range.
-      */
-      const theMaxDate = new Date();
-      theMaxDate.setFullYear(theMaxDate.getFullYear() + 25);
-
-      const theMinDate = new Date();
-      theMinDate.setFullYear(theMaxDate.getFullYear() - 200);
-
-      const { action, year, month, day } = await DatePickerAndroid.open({
-        date: startingDate,
-        maxDate: theMaxDate,
-        minDate: theMinDate,
-        /* Use spinner since it's not obvious to some users on Android how to 
-          change year in 'calendar' mode which is the default mode. */
-        mode: 'spinner',
-      });
-      if (action !== DatePickerAndroid.dismissedAction) {
-        const newDate = new Date(year, month, day, 12, 0, 0);
-        setSelectedDate({ date: newDate });
-      }
-    } catch ({ code, message }) {
-      logger.warn('Cannot open date picker', message);
-    }
+  const eventPlaceholders = {
+    title: "Title (e.g. Maria's birthday)",
   }
 
 
@@ -85,7 +36,7 @@ function AddEvent(props) {
 
     Keyboard.dismiss();
 
-    const event = new Event({ title, epochMillis: selectedDate.date.getTime(), color: selectedColor, isCustom: true });
+    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true });
 
     if (props.eventListContext.getCustomEventWithTitle(title)) {
       Alert.alert(
@@ -98,7 +49,7 @@ function AddEvent(props) {
       )
     } else {
 
-      logger.log("Saving event ", title, "--", selectedDate.date);
+      logger.log("Saving event ", title, "--", selectedDate);
 
       props.eventListContext.addCustomEvent(event);
 
@@ -108,7 +59,6 @@ function AddEvent(props) {
 
   }
 
-  const datePickerTitle = selectedDate.date ? Utils.getDisplayStringForDate(selectedDate.date) : "Select Date";
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
@@ -129,7 +79,9 @@ function AddEvent(props) {
           maxLength={50}
           value={title ? title : ''}
         />
-        <Button onPress={onPressDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
+
+        <EventDateTimePicker date={selectedDate} useFullDay={useFullDay} onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay} />
+
         <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
           <Text>Select Color</Text>
           <MaterialCommunityIcons
@@ -148,7 +100,7 @@ function AddEvent(props) {
           />
 
         </TouchableOpacity>
-        <Button disabled={!selectedDate.date || !title} onPress={onPressSave} title="Save" accessibilityLabel="Save new event" />
+        <Button disabled={!selectedDate || !title} onPress={onPressSave} title="Save" accessibilityLabel="Save new event" />
       </View>
     </TouchableWithoutFeedback>
   );

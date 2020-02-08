@@ -2,13 +2,12 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
-import { moment } from 'moment'
 
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import { withEventListContext } from '../context/EventListContext'
-import { getEventDisplayDate } from '../utils/Event'
-import * as Utils from '../utils/Utils'
+import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
+
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader } from '../components/EventCard'
@@ -50,19 +49,19 @@ function EventInfo(props) {
   const now = new Date();
   const nowMillis = now.getTime();
   const i18nKeyNow = (nowMillis > event.epochMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
-  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: getEventDisplayDate(event) });
+  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: getDisplayStringDateTimeForEvent(event) });
 
   const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
-  const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getEventDisplayDate(event) });
+  const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getDisplayStringDateTimeForEvent(event) });
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 15 }}>
         <View style={{ alignSelf: 'flex-end', paddingBottom: 10, }}>
           {event.isCustom &&
-          <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
-            <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
+              <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
+            </TouchableOpacity>
           }
         </View>
         <EventCard event={event}>

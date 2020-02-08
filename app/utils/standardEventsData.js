@@ -27,7 +27,7 @@ const events = [
         key: "Christmas", // Each holiday needs unique key.  Specify key if different than title.
         epochMillis: moment("2020-12-25 0:00", 'YYYY-MM-DD HH:mm').valueOf(), // Day and/or time it starts
         keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
-        useTimeOfDay: false, // If a certain time and not the whole day is significant
+        isFullDay: true, // If event is whole day, not a specific time
         color: "red",
         /* An array of numbers that are meaningful to the event that should be used to calculate special
         milestone times.  The numbers in the date of the event should automatically be included. No need to set those.
@@ -48,7 +48,7 @@ const events = [
         isSelectedByDefault: true,
         epochMillis: moment().startOf('year').add(1, 'years').valueOf(),
         //        epochMillis: moment("2020-01-01 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-        useTimeOfDay: true,
+        isFullDay: false,
         color: "silver",
         tag: [TAGS.HOLIDAY],
     }),
@@ -66,7 +66,6 @@ const events = [
         key: "March Madness Tournament Begins",
         isSelectedByDefault: true,
         epochMillis: moment("2020-03-17 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-        useTimeOfDay: false,
         color: "orange",
         specialNumbers: [64, 68],
         tag: [TAGS.SPORTS],
@@ -76,7 +75,6 @@ const events = [
         key: "March Madness Final Four",
         isSelectedByDefault: true,
         epochMillis: moment("2020-04-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-        useTimeOfDay: false,
         color: "orange",
         specialNumbers: [4, 64, 68],
         tag: [TAGS.SPORTS],

@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { withNavigation } from 'react-navigation'
 
 import { withEventListContext } from '../context/EventListContext'
-import { getEventDisplayDate } from '../utils/Event'
+import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import * as logger from '../utils/logger'
@@ -44,7 +44,7 @@ function EventListItem(props) {
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
         <EventCard event={props.event}>
           <EventCardHeader event={props.event} >{title}</EventCardHeader>
-          <EventCardBodyText event={props.event} >{getEventDisplayDate(props.event)}</EventCardBodyText>
+          <EventCardBodyText event={props.event} >{getDisplayStringDateTimeForEvent(props.event)}</EventCardBodyText>
         </EventCard>
       </TouchableOpacity>
     </View>

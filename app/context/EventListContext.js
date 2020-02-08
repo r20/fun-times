@@ -12,6 +12,7 @@ const STORAGE_KEY_CUSTOM_EVENTS_ARRAY = '@save_custom_events_array';
   depending on whether selected */
 const STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP = '@save_standard_events_key_to_selected_map';
 
+
 /**
  * Returns a momentjs object for the event based on its epochMillis time.
  */

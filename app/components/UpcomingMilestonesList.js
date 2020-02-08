@@ -1,10 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList } from 'react-native'
-import moment from 'moment-timezone'
 
-import * as Utils from '../utils/Utils'
-import { getEventDisplayDate, getDisplayDateForEpoch } from '../utils/Event'
+import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
@@ -41,8 +39,8 @@ export default function UpcomingMilestonesList(props) {
         keyExtractor={keyExtractor}
         renderItem={({ item }) => {
           const event = item.event;
-          const specialDisplayDateTime = getDisplayDateForEpoch(item.time, event.useTimeOfDay);
-          const eventDisplayDateTime = getEventDisplayDate(event);
+          const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
+          const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
           const isEventInFuture = (event.epochMillis > nowTime);
           const sinceOrUntil = isEventInFuture ? " until " : " since ";
           const desc = item.description + " " + item.unit + sinceOrUntil + event.title + " (" + eventDisplayDateTime + ")";
@@ -60,7 +58,7 @@ export default function UpcomingMilestonesList(props) {
       {
         specials.map((item) => {
           const event = item.event;
-          const specialDisplayDateTime = getDisplayDateForEpoch(item.time, event.useTimeOfDay);
+          const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
           const desc = specialDisplayDateTime + " -- " + item.description + " " + item.unit;
           const key = keyExtractor(item);
 

@@ -108,3 +108,51 @@ export function getDisplayStringForDate(date) {
   logger.log("Something is wrong with the date");
   return '????/??/??';
 }
+
+/**
+ * Return nicely formatted string for the date
+ * object according to locale.
+ * date - Date object
+ */
+export function getDisplayStringForTime(date) {
+  try {
+    if (date && date.toLocaleTimeString) {
+      /* Would be nice to know if device is using 24 hour format
+    and display accordingly, but that was difficult. */
+      return date.toLocaleTimeString();
+    }
+  } catch (err) {
+    logger.warn("Error with date time", err);
+  }
+
+  logger.log("Something is wrong with the time");
+  return '????';
+}
+
+
+export function getDisplayStringDateTimeForEvent(event) {
+
+  if (event) {
+      return getDisplayStringDateTimeForEpoch(event.epochMillis, event.isFullDay);
+  }
+  logger.log("Something is wrong with the event");
+  return '????/??/??';
+}
+
+export function getDisplayStringDateTimeForEpoch(epochMillis, noShowTimeOfDay = true) {
+  try {
+      const date = new Date(epochMillis);
+      if (noShowTimeOfDay) {
+          return date.toLocaleDateString();
+      } else {
+          /* Would be nice to know if device is using 24 hour format
+              and display accordingly, but that was difficult. */
+          return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+      }
+
+  } catch (err) {
+      logger.warn("Error while getting display date", err);
+  }
+
+  return '????/??/??';
+}
