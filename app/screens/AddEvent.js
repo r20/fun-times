@@ -14,6 +14,7 @@ import { withEventListContext } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
 import Event from '../utils/Event'
 import * as logger from '../utils/logger'
+import i18n from '../i18n/i18n'
 
 function AddEvent(props) {
 
@@ -39,11 +40,12 @@ function AddEvent(props) {
     const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true });
 
     if (props.eventListContext.getCustomEventWithTitle(title)) {
+
       Alert.alert(
-        'Unable To Add Event',
-        'The event "' + title + '" already exists',
+        i18n.t("eventUnableToAddTitle"),
+        i18n.t("eventUnableToAddAlreadyExists", { someValue: title }),
         [
-          { text: 'OK' },
+          { text: i18n.t("ok") },
         ],
         { cancelable: true }
       )
@@ -74,33 +76,38 @@ function AddEvent(props) {
           style={{
             height: 50, borderColor: 'gray', borderWidth: 1, padding: 5
           }}
+
           onChangeText={text => setTitle(text)}
           placeholder={eventPlaceholders.title}
           maxLength={50}
           value={title ? title : ''}
         />
 
-        <EventDateTimePicker date={selectedDate} useFullDay={useFullDay} onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay} />
+        <EventDateTimePicker date={selectedDate} useFullDay={useFullDay}
+          onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+          onShowPicker={Keyboard.dismiss}
+        />
+
 
         <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
-          <Text>Select Color</Text>
+          <Text>{i18n.t("selectColor")}</Text>
           <MaterialCommunityIcons
             name="palette"
             style={{ fontSize: 50, color: selectedColor }}
           />
-          <ColorPickerModal
-            visible={colorPickerVisible}
-            colors={colors}
-            selectedColor={selectedColor}
-            text=""
-            onSelect={newColor => {
-              setSelectedColor(newColor);
-              setColorPickerVisible(false);
-            }}
-          />
-
         </TouchableOpacity>
-        <Button disabled={!selectedDate || !title} onPress={onPressSave} title="Save" accessibilityLabel="Save new event" />
+        <ColorPickerModal
+          visible={colorPickerVisible}
+          colors={colors}
+          selectedColor={selectedColor}
+          text=""
+          onSelect={newColor => {
+            setSelectedColor(newColor);
+            setColorPickerVisible(false);
+          }}
+        />
+
+        <Button disabled={!selectedDate || !title} onPress={onPressSave} title={i18n.t("save")} accessibilityLabel="Save new event" />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -121,8 +128,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   colorPicker: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-
 });
+

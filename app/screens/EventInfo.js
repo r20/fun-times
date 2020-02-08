@@ -23,16 +23,16 @@ function EventInfo(props) {
   const onPressRemoveItem = () => {
 
     Alert.alert(
-      'Remove Event ',
-      "Do you want to remove event " + event.title + "?",
+      i18n.t('eventRemoveTitle'),
+      i18n.t('eventRemoveConfirmation', { someValue: event.title }),
       [
         {
-          text: 'Cancel',
+          text: i18n.t('cancel'),
           onPress: () => logger.log('Cancel Pressed'),
           style: 'cancel',
         },
         {
-          text: 'OK', onPress: () => {
+          text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
             props.eventListContext.removeCustomEvent(event);
             // Go back to CustomEvents screen when push save

@@ -26,6 +26,17 @@ export const en = {
   hours: '{{someValue}} hours',
   minutes: '{{someValue}} minutes',
   seconds: '{{someValue}} seconds',
+  ok: 'OK',
+  save: 'Save',
+  cancel: 'Cancel',
+  eventUnableToAddTitle: 'Unable To Add Event',
+  eventUnableToAddAlreadyExists: 'The event \'{{someValue}}\' already exists',
+  eventRemoveConfirmation: 'Are you sure you want to remove event \'{{someValue}}\'?',
+  eventRemoveTitle: 'Remove Event',
+  selectColor: 'Select Color',
+  fullDay: 'Full Day',
+  selectTime: 'Select Time',
+  selectDate: 'Select Date',
 };
 
 /**

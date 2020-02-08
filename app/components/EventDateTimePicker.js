@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Button, Platform, Switch, Text } from 'react-native';
+import { StyleSheet, View, Button, Platform, Switch, Text, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
+import i18n from '../i18n/i18n'
 
 /* 
   Start on a date that makes it convenient for using the spinner.
@@ -41,6 +42,9 @@ function EventDateTimePicker(props) {
   };
 
   const showMode = currentMode => {
+    if (props.onShowPicker) {
+      props.onShowPicker();
+    }
     setShow(true);
     setMode(currentMode);
   };
@@ -62,10 +66,9 @@ function EventDateTimePicker(props) {
   const theMinDate = new Date();
   theMinDate.setFullYear(theMinDate.getFullYear() - 200);
 
-  // jmr - put these in i18n translations
-  const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : "Select Date";
+  const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 
-  const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : "Select Time"
+  const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
 
 
   const startingDate = props.date ? props.date : defaultStartingDate;
@@ -81,8 +84,8 @@ function EventDateTimePicker(props) {
 
       <Button onPress={showDatepicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
 
-      <View style={styles.fullDay}>
-        <Text>Full Day</Text>
+      <View style={styles.fullDaySelection}>
+        <Text>{i18n.t("fullDay")}</Text>
         <Switch
           value={props.useFullDay}
           onValueChange={isYes => {
@@ -115,12 +118,13 @@ EventDateTimePicker.propTypes = {
   useFullDay: PropTypes.bool.isRequired,
   onSelectDate: PropTypes.func.isRequired,
   onSetUseFullDay: PropTypes.func.isRequired,
+  onShowPicker: PropTypes.func, // If a picker is shown, this gets called
 };
 
 export default EventDateTimePicker;
 
 const styles = StyleSheet.create({
-  fullDay: {
+  fullDaySelection: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
