@@ -35,8 +35,8 @@ function EventInfo(props) {
           text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
             props.eventListContext.removeCustomEvent(event);
-            // Go back to CustomEvents screen when push save
-            props.navigation.navigate("CustomEvents");
+            // Go back to events screen when push save
+            props.navigation.navigate("EventsScreen");
           }
         },
       ],

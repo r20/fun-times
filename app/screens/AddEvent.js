@@ -55,8 +55,8 @@ function AddEvent(props) {
 
       props.eventListContext.addCustomEvent(event);
 
-      // Go back to CustomEvents screen when push save
-      props.navigation.navigate("CustomEvents");
+      // Go back to events screen when push save
+      props.navigation.navigate("EventsScreen");
     }
 
   }
