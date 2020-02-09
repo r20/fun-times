@@ -35,6 +35,7 @@ const AppStackNavigator = createStackNavigator({
         title: eventTitle,
         headerStyle: {
           backgroundColor: headerColor,
+
         },
         headerTintColor: getContrastFontColor(headerColor),
       });
@@ -45,6 +46,9 @@ const AppStackNavigator = createStackNavigator({
   headerLayoutPreset: 'center',
   defaultNavigationOptions: ({ navigation }) => ({
     headerBackTitle: null, // so no title on back button.
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
     headerStyle: {
       backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
     },

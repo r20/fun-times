@@ -53,7 +53,10 @@ const TabNavigator = createBottomTabNavigator(
       inactiveTintColor: theme.PRIMARY_INACTIVE_TEXT_COLOR,
       activeBackgroundColor: theme.PRIMARY_ACTIVE_BACKGROUND_COLOR,
       inactiveBackgroundColor: theme.PRIMARY_INACTIVE_BACKGROUND_COLOR,
-
+      style: {
+        borderTopWidth: 1,
+        borderTopColor: theme.TAB_BAR_BORDER_COLOR,
+      },
     },
     defaultNavigationOptions: getDefaultNavigationOptions,
   }

@@ -29,8 +29,7 @@ export class DeviceProvider extends React.Component {
       const using24HourFormat = await DeviceTimeFormat.is24HourFormat();
       this.setState({ is24HourFormat: using24HourFormat });
     } catch (e) {
-      logger.warn("Failed to load customEvents.");
-      logger.log("Error from failing to load customEvents: ", e);
+      logger.log("Error from getting device info: ", e);
     }
   }
 

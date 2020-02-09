@@ -23,6 +23,9 @@ export function withSingleScreenInStackNavigator(Screen, title) {
             headerStyle: {
                 backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
             },
+            headerTitleStyle: {
+                fontWeight: 'bold',
+            },
             headerTintColor: theme.PRIMARY_TEXT_COLOR,
         }
     }
