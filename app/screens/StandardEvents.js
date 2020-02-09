@@ -6,11 +6,9 @@ import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import { withEventListContext } from '../context/EventListContext'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
-
+import * as logger from '../utils/logger'
 
 function StandardEvents(props) {
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -26,11 +24,8 @@ function StandardEvents(props) {
 }
 
 const StandardEventsWithContext = withEventListContext(StandardEvents);
-export default withSingleScreenInStackNavigator(StandardEventsWithContext, i18n.t("headerStandardEventsTitle"));
+export default StandardEventsWithContext;
 
-StandardEvents.propTypes = {
-  navigation: PropTypes.object.isRequired,
-}
 
 const styles = StyleSheet.create({
   container: {

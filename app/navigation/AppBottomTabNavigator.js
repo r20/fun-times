@@ -5,8 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
 // Search for available icons at https://expo.github.io/vector-icons/
 
-import StandardEvents from '../screens/StandardEvents'
-import CustomEvents from '../screens/CustomEvents'
+import EventsScreen from '../screens/EventsScreen'
 import Today from '../screens/Today'
 import Calendar from '../screens/Calendar'
 import More from '../screens/More'
@@ -20,12 +19,9 @@ getDefaultNavigationOptions = ({ navigation }) => {
   const { routeName } = navigation.state;
 
   const size = 30;
-  if (routeName === 'CustomEvents') {
-    options.tabBarIcon = ({ focused, tintColor }) => <Entypo name="add-to-list" size={size} color={tintColor} />;
-    options.title = i18n.t("menuCustomEventsTitle");
-  } else if (routeName === 'StandardEvents') {
-    options.tabBarIcon = ({ focused, tintColor }) => <Entypo name="list" size={size} color={tintColor} />;
-    options.title = i18n.t("menuStandardEventsTitle");
+  if (routeName === 'EventsScreen') {
+    options.tabBarIcon = ({ focused, tintColor }) => <FontAwesome name="birthday-cake" size={size} color={tintColor} />;
+    options.title = i18n.t("menuEventsTitle");
   } else if (routeName === 'Today') {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="calendar-today" size={size} color={tintColor} />;
     options.title = i18n.t("menuTodayTitle");
@@ -43,14 +39,13 @@ getDefaultNavigationOptions = ({ navigation }) => {
 
 const TabNavigator = createBottomTabNavigator(
   {
-    CustomEvents: { screen: CustomEvents },
-    StandardEvents: { screen: StandardEvents },
+    EventsScreen: { screen: EventsScreen },
     Today: { screen: Today },
     Calendar: { screen: Calendar },
     More: { screen: More },
   },
   {
-    initialRouteName: 'CustomEvents',
+    initialRouteName: 'EventsScreen',
     lazy: true,
     tabBarOptions: {
       showLabel: false,

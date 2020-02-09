@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
+import { withNavigation } from 'react-navigation'
 
 import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import { withEventListContext } from '../context/EventListContext'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
 
 
 function CustomEvents(props) {
@@ -19,7 +19,7 @@ function CustomEvents(props) {
   const empty = !props.eventListContext.customEvents.length;
   return (
     <View style={styles.container}>
-      {!empty && 
+      {!empty &&
         <FlatList
           contentContainerStyle={{ padding: 15, paddingBottom: 100, }}
           data={props.eventListContext.customEvents}
@@ -28,7 +28,7 @@ function CustomEvents(props) {
             <EventListItem event={item} />
           }
         />
-        }
+      }
       {empty && <Text style={styles.emptyText}>Add birthdays, anniversaries, and other special occasions to discover interesting upcoming milestones.</Text>}
       <AddEventButton onPress={onPressAddEvent} />
     </View>
@@ -36,8 +36,8 @@ function CustomEvents(props) {
 
 }
 
-const CustomEventsWithContext = withEventListContext(CustomEvents);
-export default withSingleScreenInStackNavigator(CustomEventsWithContext, i18n.t("headerCustomEventsTitle"));
+const CustomEventsWithContext = withEventListContext(withNavigation(CustomEvents));
+export default CustomEventsWithContext;
 
 CustomEvents.propTypes = {
   navigation: PropTypes.object.isRequired,
