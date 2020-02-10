@@ -37,7 +37,7 @@ function AddEvent(props) {
 
     Keyboard.dismiss();
 
-    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true });
+    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true, selected: true, });
 
     if (props.eventListContext.getCustomEventWithTitle(title)) {
 
@@ -61,6 +61,12 @@ function AddEvent(props) {
 
   }
 
+  /* jmr- TODOs:
+   Standard events should be sorted
+  Julia's upcoming milestones had birthday (10 years) that was old
+  Too many time since and upcoming milestones
+  Improve styling / colors
+  */
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
