@@ -20,6 +20,8 @@ especially the ones that will be on by default. */
 
 */
 
+// jmr - allow for past events too.
+// BUT, have a way to tell if only interested in this as a future event, then don't include it if it's in the past.
 
 const events = [
     new Event({
@@ -123,9 +125,6 @@ const events = [
     }),
 ];
 
-events.sort((a, b) => {
-    return b.epochMillis - a.epochMillis;
-});
 
 export const standardEventsData = events;
 

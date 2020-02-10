@@ -25,6 +25,12 @@ function isEventSelected(event) {
   return (event && event.selected);
 }
 
+function eventSorter(a, b) {
+  return a.epochMillis - b.epochMillis;
+
+}
+
+
 // These are created with defaults.  The provider sets the real values using value prop.
 const EventListContext = createContext({
   allEvents: [],
@@ -68,7 +74,19 @@ export class EventListProvider extends React.Component {
       logger.warn("Failed to load customEvents.");
       logger.log("Error from failing to load customEvents: ", e);
     }
+
+
+    const nowMillis = (new Date()).getTime();
     let standardEvents = standardEventsData || [];
+    standardEvents = standardEvents.filter((val, idx) => {
+      // If it's only important as a future event, then only include it if it's in the future
+      if (val.onlyUseIfFuture && val.epochMillis < nowMillis) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
     try {
       let standardEventsSelectedMap = await AsyncStorage.getItem(STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP);
       standardEventsSelectedMap = JSON.parse(standardEventsSelectedMap);
@@ -99,16 +117,10 @@ export class EventListProvider extends React.Component {
       logger.warn("Failed to load or process selected standard events map.");
       logger.log("Error from failing to load selected standard events map: ", e);
     }
-    customEvents = customEvents.sort((a, b) => {
-      return b.epochMillis - a.epochMillis;
-    });
-    standardEvents = standardEvents.sort((a, b) => {
-      return b.epochMillis - a.epochMillis;
-    });
+    customEvents = customEvents.sort(eventSorter);
+    standardEvents.sort(eventSorter);
     let allEvents = customEvents.concat(standardEvents);
-    allEvents = allEvents.sort((a, b) => {
-      return b.epochMillis - a.epochMillis;
-    });
+    allEvents = allEvents.sort(eventSorter);
 
     this.setState({ allEvents, customEvents, standardEvents });
   }
@@ -121,15 +133,11 @@ export class EventListProvider extends React.Component {
   updateCustomEvents = async (newEvents) => {
     try {
       if (Array.isArray(newEvents)) {
-        let newEventsSorted = newEvents.sort((a, b) => {
-          return b.epochMillis - a.epochMillis;
-        });
+        let newEventsSorted = newEvents.sort(eventSorter);
         await this.saveCustomEvents(newEventsSorted);
 
         let newAllEvents = newEventsSorted.concat(this.state.standardEvents);
-        newAllEvents = newAllEvents.sort((a, b) => {
-          return b.epochMillis - a.epochMillis;
-        });
+        newAllEvents = newAllEvents.sort(eventSorter);
         this.setState({ customEvents: newEventsSorted, allEvents: newAllEvents });
 
         logger.log('Custom Events updated!');
@@ -247,13 +255,9 @@ export class EventListProvider extends React.Component {
             // Add in the new version of the event
             newArray.push(newEvent);
 
-            newArray = newArray.sort((a, b) => {
-              return b.epochMillis - a.epochMillis;
-            });
+            newArray = newArray.sort(eventSorter);
             let allEvents = this.state.customEvents.concat(newArray);
-            allEvents = allEvents.sort((a, b) => {
-              return b.epochMillis - a.epochMillis;
-            });
+            allEvents = allEvents.sort(eventSorter);
 
             // Update state
             this.setState({ allEvents, standardEvents: newArray });

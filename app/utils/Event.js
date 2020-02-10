@@ -16,6 +16,7 @@ export default class Event {
         keywords
         isFullDay
         isCustom
+        onlyUseIfFuture // Only show this event if it is in the future
         selected // Whether the event is selected/visible in non-events screens
         isSelectedByDefault // For standard events
         specialNumbers // TBD - need to figure out how to implement this.  Thisis other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
@@ -28,6 +29,7 @@ export default class Event {
             isFullDay: true,
             specialNumbers: [],
             keywords: [],
+            onlyUseIfFuture: true,
         }, options);
         // If key not specified, set it to title
         this.key = options.key || options.title;
