@@ -5,9 +5,9 @@ import { StyleSheet } from 'react-native'
 */
 
 export default {
-  FONT_SIZE_SMALL: 13,
-  FONT_SIZE_MEDIUM: 16,
-  FONT_SIZE_LARGE: 18,
+  FONT_SIZE_SMALL: 9,
+  FONT_SIZE_MEDIUM: 12,
+  FONT_SIZE_LARGE: 14,
   PRIMARY_BACKGROUND_COLOR: '#ffffff',
   PRIMARY_TEXT_COLOR: '#444444',
   PRIMARY_ACTIVE_BACKGROUND_COLOR: '#ffffff',

@@ -44,16 +44,16 @@ const styles = StyleSheet.create({
     header: {
         fontSize: theme.FONT_SIZE_MEDIUM+2,
         fontWeight: 'bold',
-        paddingBottom: 5,
+        paddingBottom: 3,
     },
     bodyText: {
         fontSize: theme.FONT_SIZE_MEDIUM,
     },
     card: {
         flex: 1,
-        padding: 15,
-        margin: 10,
-        borderRadius: 5,
+        padding: 10,
+        margin: 5,
+        borderRadius: 3,
         overflow: 'hidden'
     }
 });
