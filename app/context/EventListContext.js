@@ -273,6 +273,7 @@ export class EventListProvider extends React.Component {
             logger.log("We didn't find a custom event to modify: ", oldEvent.title, newEvent.title);
           }
         } else {
+          // Take out the old version
           newArray = this.state.standardEvents.filter(function (value, index, arr) {
             return (value.title !== oldEvent.title);
           });
@@ -324,17 +325,15 @@ export class EventListProvider extends React.Component {
             selectedStandardKeysMap = {};
           }
           if (newEvent.selected) {
+            logger.log("Event selected.");
             selectedStandardKeysMap[newEvent.key] = true;
             await this.saveSelectedStandardEventsMap(selectedStandardKeysMap);
           } else {
-            if (selectedStandardKeysMap[newEvent.key]) {
-              /* Instead of deleting the key, we still want it in there and set to false
-              so that if it's on by default we can know the user chose to turn it off. */
-              selectedStandardKeysMap[newEvent.key] = false;
-              await this.saveSelectedStandardEventsMap(selectedStandardKeysMap);
-            } else {
-              logger.log("Event was already deselected.");
-            }
+            /* Instead of deleting the key, we still want it in there and set to false
+            so that if it's on by default we can know the user chose to turn it off. */
+            logger.log("Event deselected.");
+            selectedStandardKeysMap[newEvent.key] = false;
+            await this.saveSelectedStandardEventsMap(selectedStandardKeysMap);
           }
 
         } else {
