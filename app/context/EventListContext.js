@@ -80,7 +80,7 @@ export class EventListProvider extends React.Component {
     let standardEvents = standardEventsData || [];
     standardEvents = standardEvents.filter((val, idx) => {
       // If it's only important as a future event, then only include it if it's in the future
-      if (val.onlyUseIfFuture && val.epochMillis < nowMillis) {
+      if (val.ignoreIfPast && val.epochMillis < nowMillis) {
         return false;
       } else {
         return true;

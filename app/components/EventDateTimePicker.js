@@ -59,9 +59,12 @@ function EventDateTimePicker(props) {
 
   /*
   For prototype, this supports only within a certain range.
+  jmr - The DateTimePicker library crashes if value is 2039 or beyond.
+  Until I figure that out, restruct selecting date to end of 2038.
+  (However, right now nothing is stopping code from using this component and 
+    passing a props.date past that.)
 */
-  const theMaxDate = new Date();
-  theMaxDate.setFullYear(theMaxDate.getFullYear() + 200);
+  const theMaxDate = new Date(2038, 11, 31);
 
   const theMinDate = new Date();
   theMinDate.setFullYear(theMinDate.getFullYear() - 200);

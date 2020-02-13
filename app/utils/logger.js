@@ -1,6 +1,6 @@
 
 
-let isLogOn = false;
+let isLogOn = false; // jmr
 
 export function turnLogOff() {
     isLogOn = false;
@@ -11,7 +11,7 @@ export function turnLogOn() {
 
 export function log() {
     if (isLogOn) {
-        // jmr   console.log.apply(console, arguments);
+        console.log.apply(console, arguments);
     }
 }
 

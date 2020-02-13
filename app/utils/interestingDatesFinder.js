@@ -58,14 +58,20 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
                 interestingTime = eventMoment.clone().add(info.number, unit).valueOf();
             }
             if (info.number >= start && info.number <= end) {
-                let interestingInfo = {
-                    event: event,
-                    unit: unit,
-                    tags: info.tags,
-                    description: info.descriptor,
-                    time: interestingTime,
-                };
-                interestingList.push(interestingInfo);
+                if (interestingTime > nowTime) {
+                    /* InterestingTime needs to be in the future.
+                    E.g. An interesting time of 10 years ahead of a past event
+                    might be eariler this year but in past.  Don't show it.  */
+
+                    let interestingInfo = {
+                        event: event,
+                        unit: unit,
+                        tags: info.tags,
+                        description: info.descriptor,
+                        time: interestingTime,
+                    };
+                    interestingList.push(interestingInfo);
+                }
             }
         }
     }

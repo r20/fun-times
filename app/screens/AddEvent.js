@@ -37,7 +37,7 @@ function AddEvent(props) {
 
     Keyboard.dismiss();
 
-    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true, selected: true, onlyUseIfFuture: false });
+    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false });
 
     if (props.eventListContext.getCustomEventWithTitle(title)) {
 
@@ -63,8 +63,12 @@ function AddEvent(props) {
 
   /* jmr- TODOs:
   If create event past 2040 or so, app crashes
-  Julia's upcoming milestones had birthday (10 years) that was old
   Too many time since and upcoming milestones
+  (I could by default not show milestones that are within 4 days of an event
+    to drastically reduce.  I could make this configurable.
+    Perhaps I make a slider thing to show more/less milestones
+    and close days is one thing I adjust and I adjust something else?
+    Need to decide whether to show pi variables and other types of times too.)
   Improve styling / colors
   */
 
