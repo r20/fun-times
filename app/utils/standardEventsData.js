@@ -42,7 +42,7 @@ events.push(new Event({
     milestone times.  The numbers in the date of the event should automatically be included. No need to set those.
     */
     specialNumbers: undefined,
-    tag: [TAGS.HOLIDAY, TAGS.RELIGION],
+    tags: [TAGS.HOLIDAY, TAGS.RELIGION],
 }));
 events.push(new Event({
     title: "Easter",
@@ -50,7 +50,7 @@ events.push(new Event({
     epochMillis: moment("2020-04-12 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "purple",
-    tag: [TAGS.HOLIDAY, TAGS.RELIGION],
+    tags: [TAGS.HOLIDAY, TAGS.RELIGION],
 }));
 events.push(new Event({
     title: "New Year's Day",
@@ -60,7 +60,7 @@ events.push(new Event({
     //        epochMillis: moment("2020-01-01 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     isFullDay: false,
     color: "silver",
-    tag: [TAGS.HOLIDAY],
+    tags: [TAGS.HOLIDAY],
 }));
 events.push(new Event({
     title: "Super Bowl LIV",
@@ -70,7 +70,7 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "brown",
     specialNumbers: [54],
-    tag: [TAGS.SPORTS],
+    tags: [TAGS.SPORTS],
 }));
 events.push(new Event({
     title: "March Madness Tournament Begins",
@@ -80,7 +80,7 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "orange",
     specialNumbers: [64, 68],
-    tag: [TAGS.SPORTS],
+    tags: [TAGS.SPORTS],
 }));
 events.push(new Event({
     title: "March Madness Final Four",
@@ -90,7 +90,7 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "orange",
     specialNumbers: [4, 64, 68],
-    tag: [TAGS.SPORTS],
+    tags: [TAGS.SPORTS],
 }));
 events.push(new Event({
     title: "Thanksgiving",
@@ -99,7 +99,7 @@ events.push(new Event({
     epochMillis: moment("2020-11-26 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "brown",
-    tag: [TAGS.HOLIDAY],
+    tags: [TAGS.HOLIDAY],
 }));
 events.push(new Event({
     title: "US Independence Day",
@@ -108,7 +108,7 @@ events.push(new Event({
     epochMillis: moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "red",
-    tag: [TAGS.HOLIDAY],
+    tags: [TAGS.HOLIDAY],
 }));
 events.push(new Event({
     title: "Pi Day",
@@ -118,7 +118,7 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "orange",
     specialNumbers: undefined, // TBD: How should we tell it to use pi??
-    tag: [TAGS.QUIRKY],
+    tags: [TAGS.QUIRKY, 'pi'],
 }));
 events.push(new Event({
     title: "May the Fourth (Star Wars Day)",
@@ -127,7 +127,7 @@ events.push(new Event({
     epochMillis: moment("2020-05-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "black",
-    tag: [TAGS.QUIRKY],
+    tags: [TAGS.QUIRKY],
 }));
 events.push(new Event({
     title: "US Presidential Election",
@@ -137,7 +137,7 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "red",
     specialNumbers: [46], // A new president would be the 46th
-    tag: [TAGS.QUIRKY],
+    tags: [TAGS.QUIRKY],
 }));
 
 

@@ -62,7 +62,6 @@ function AddEvent(props) {
   }
 
   /* jmr- TODOs:
-  If create event past 2040 or so, app crashes
   Too many time since and upcoming milestones
   (I could by default not show milestones that are within 4 days of an event
     to drastically reduce.  I could make this configurable.

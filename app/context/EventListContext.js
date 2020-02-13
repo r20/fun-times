@@ -62,6 +62,31 @@ export class EventListProvider extends React.Component {
     };
   }
 
+  /* If make a code change that would break old stored events, put stuff in this function
+    to upgrade them. 
+    jmr- I could change code to store the event object version (or code version) and
+    do update only if needed. */
+  updateCustomEventsForAppUpdate = (customEvents) => {
+    try {
+      let needsSaved = false;
+      for (var idx = 0; idx < customEvents.length; idx++) {
+        const event = customEvents[idx];
+        if (!event.tags) {
+          needsSaved = true;
+          event.tags = [];
+        }
+      }
+
+      if (needsSaved) {
+        this.saveCustomEvents(customEvents);
+      }
+    } catch (e) {
+      logger.warn("Failed to do version upgrade for customEvents.");
+      logger.log("Error from failing version upgrade of customEvents: ", e);
+    }
+    return customEvents;
+  }
+
   async componentDidMount() {
     let customEvents = [];
     try {
@@ -75,6 +100,7 @@ export class EventListProvider extends React.Component {
       logger.log("Error from failing to load customEvents: ", e);
     }
 
+    customEvents = this.updateCustomEventsForAppUpdate(customEvents);
 
     const nowMillis = (new Date()).getTime();
     let standardEvents = standardEventsData || [];

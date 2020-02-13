@@ -20,12 +20,12 @@ export default class Event {
         selected // Whether the event is selected/visible in non-events screens
         isSelectedByDefault // For standard events
         specialNumbers // TBD - need to figure out how to implement this.  Thisis other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
-        tag
+        tags
     */
     constructor(options = {}) {
         // Take the this object, add in some defaults, then add in passed in options (which may override defaults)
         Object.assign(this, {
-            tag: [],
+            tags: [],
             isFullDay: true,
             specialNumbers: [],
             keywords: [],

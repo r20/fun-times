@@ -19,12 +19,15 @@ import * as Utils from './Utils'
  * @param {Object} event - object with info about the event, like epochMillis
  * @param {Number} nowTime - in epoch milliseconds
  * @param {Number} futureDistanceDays - number of days in future to look for interesting numbers
+ * @param {Number} tooCloseDays - number of days within the event to ignore interesting dates
+ *                        (because looking close to the event, e.g. 4 days, causes LOTS of interesting times)
  */
-export function findInterestingDates(event, nowTime, futureDistanceDays) {
+export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays) {
 
     const eventMoment = moment(event.epochMillis);
     const nowMoment = moment(nowTime);
     const futureMoment = nowMoment.clone().add(futureDistanceDays, 'days');
+    const tooCloseMillis = tooCloseDays ? tooCloseDays * 24 * 3600 * 1000 : 0;
     const isEventInFuture = (event.epochMillis > nowTime);
 
     const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
@@ -47,6 +50,16 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
         logger.log(" Unit ", unit, start, end);
         for (var i = 0; i < sortedInterestingNumbers.length; i++) {
             const info = sortedInterestingNumbers[i];
+            if (info.tags.indexOf('pi') >= 0 && event.tags.indexOf('pi') < 0) {
+                /* jmr - need to decide which types of interesting numbers to show
+                And if don't usually show all of these, then pi shouldn't be in the sortedInterestingNumbers
+                to begin with. We could have some standard ones in one array, and then have other arrays to concat
+                in according to tags or keywords or whtever mechanism is used. 
+                Also note that having tags on the info and tags on event could be somewhat confusing since they're
+                not the same thing. */
+                // Don't use pi numbers unless event has pi tag
+                continue;
+            }
             if (info.number > end) {
                 // Since they're sorted, if we get one > end we're done with this loop
                 break;
@@ -62,15 +75,20 @@ export function findInterestingDates(event, nowTime, futureDistanceDays) {
                     /* InterestingTime needs to be in the future.
                     E.g. An interesting time of 10 years ahead of a past event
                     might be eariler this year but in past.  Don't show it.  */
-
-                    let interestingInfo = {
-                        event: event,
-                        unit: unit,
-                        tags: info.tags,
-                        description: info.descriptor,
-                        time: interestingTime,
-                    };
-                    interestingList.push(interestingInfo);
+                    if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
+                        /* The interestingTime can't be too close to the event.
+                        Must be less than the event - tooCloseMillis,
+                        or greater than event+tooCloseMillis
+                        */
+                        let interestingInfo = {
+                            event: event,
+                            unit: unit,
+                            tags: info.tags,
+                            description: info.descriptor,
+                            time: interestingTime,
+                        };
+                        interestingList.push(interestingInfo);
+                    }
                 }
             }
         }

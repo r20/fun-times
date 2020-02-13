@@ -11,13 +11,14 @@ import { findInterestingDates } from '../utils/interestingDatesFinder'
 export default function UpcomingMilestonesList(props) {
 
   const howManyDaysAhead = 365;
+  const tooCloseDays = 4;
   const now = new Date();
   const nowTime = now.getTime();
 
   let specials = [];
   for (var idx = 0; idx < props.events.length; idx++) {
     const event = props.events[idx];
-    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead));
+    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays));
   }
   specials.sort((a, b) => { return (a.time - b.time); });
 
