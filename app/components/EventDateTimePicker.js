@@ -7,6 +7,9 @@ import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 
+export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
+ 
+
 /* 
   Start on a date that makes it convenient for using the spinner.
   Also, using a time in middle of the day (12:00) because otherwise
@@ -67,7 +70,7 @@ function EventDateTimePicker(props) {
   const theMaxDate = new Date(2038, 11, 31);
 
   const theMinDate = new Date();
-  theMinDate.setFullYear(theMinDate.getFullYear() - 200);
+  theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
 
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 

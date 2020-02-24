@@ -16,7 +16,7 @@ export const en = {
   headerUpcomingCalendarScreenTitle: "Upcoming Milestones",
   headerMoreTitle: "Settings",
   upcomingFutureEventCountdownTitle: "Upcoming Countdown Milestones",
-  upcomingPastEventMilestoneTitle: "Upcoming \'Time Since\' Milestones",
+  upcomingPastEventMilestoneTitle: "Upcoming Time Passed Milestones",
   timeSinceEventTitle: 'Time Since {{someValue}}',
   timeUntilEventTitle: 'Time Until {{someValue}}',
   quarters: '{{someValue}} quarters',

@@ -32,55 +32,42 @@ export default function UpcomingMilestonesList(props) {
     return ('key_' + item.event.title + "_" + item.time + "_" + item.description)
   }
 
-  if (!props.renderEventCardBodyTextOnly) {
-    return (
-      <FlatList
-        data={specials}
-        contentContainerStyle={{ padding: 15 }}
-        keyExtractor={keyExtractor}
-        renderItem={({ item }) => {
-          const event = item.event;
-          const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
-          const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
+  return (
+    <FlatList
+      data={specials}
+      ListHeaderComponent={props.listHeaderComponent}
+      contentContainerStyle={{ padding: 15 }}
+      keyExtractor={keyExtractor}
+      renderItem={({ item }) => {
+        const event = item.event;
+        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
+        const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
+
+        let desc = item.description + " " + item.unit;
+        if (props.verboseDescription) {
           const isEventInFuture = (event.epochMillis > nowTime);
+          // jmr - need to use i18n for this
           const sinceOrUntil = isEventInFuture ? " until " : " since ";
-          const desc = item.description + " " + item.unit + sinceOrUntil + event.title + " (" + eventDisplayDateTime + ")";
-
-          return (<EventCard event={event}>
-            <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
-            <EventCardBodyText event={event} >{desc}</EventCardBodyText>
-          </EventCard>);
+          desc = desc + sinceOrUntil + event.title + " (" + eventDisplayDateTime + ")";
         }
-        }
-      />
-    );
-  } else {
-    return (<React.Fragment>
-      {
-        specials.map((item) => {
-          const event = item.event;
-          const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
-          const desc = specialDisplayDateTime + " -- " + item.description + " " + item.unit;
-          const key = keyExtractor(item);
-
-          return (
-            <EventCardBodyText key={key} event={event} >{desc}</EventCardBodyText>
-          );
-        })
+        return (<EventCard event={event}>
+          <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
+          <EventCardBodyText event={event} >{desc}</EventCardBodyText>
+        </EventCard>);
       }
-    </React.Fragment>
-    );
-  }
+      }
+    />
+  );
+
 }
 
 UpcomingMilestonesList.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object).isRequired,
   /* 
-    This was done this way so EventInfo could use this code too.
-    If true renders a FlatList with EventCard components with headers,
-    else renders EventCardBodyText only
+    If verboseDescription, include more info in the description including the event title.
   */
-  renderEventCardBodyTextOnly: PropTypes.bool.isRequired,
+  verboseDescription: PropTypes.bool.isRequired,
+  listHeaderComponent: PropTypes.element,
 }
 
 

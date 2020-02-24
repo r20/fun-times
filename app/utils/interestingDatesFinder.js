@@ -1,8 +1,7 @@
 import { Decimal } from 'decimal.js-light';
 import * as logger from './logger'
 import moment from 'moment-timezone'
-import { interestingNumbersFinder } from './interestingNumbersFinder'
-import { sortedInterestingNumbers } from './interestingNumbers'
+import { interestingNumberTypes, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
 import * as Utils from './Utils'
 
 /**
@@ -24,6 +23,8 @@ import * as Utils from './Utils'
  */
 export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays) {
 
+    const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
+
     const eventMoment = moment(event.epochMillis);
     const nowMoment = moment(nowTime);
     const futureMoment = nowMoment.clone().add(futureDistanceDays, 'days');
@@ -32,8 +33,8 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
 
     const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     var interestingList = [];
-    for (let idx = 0; idx < units.length; idx++) {
-        const unit = units[idx];
+    for (let unitsIidx = 0; unitsIidx < units.length; unitsIidx++) {
+        const unit = units[unitsIidx];
         let start, end;
         const spanBetweenNowAndEvent = Math.abs(nowMoment.diff(eventMoment, unit));
         const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
@@ -48,46 +49,72 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         }
 
         logger.log(" Unit ", unit, start, end);
-        for (var i = 0; i < sortedInterestingNumbers.length; i++) {
-            const info = sortedInterestingNumbers[i];
-            if (info.tags.indexOf('pi') >= 0 && event.tags.indexOf('pi') < 0) {
-                /* jmr - need to decide which types of interesting numbers to show
-                And if don't usually show all of these, then pi shouldn't be in the sortedInterestingNumbers
-                to begin with. We could have some standard ones in one array, and then have other arrays to concat
-                in according to tags or keywords or whtever mechanism is used. 
-                Also note that having tags on the info and tags on event could be somewhat confusing since they're
-                not the same thing. */
+        const numberTypes = Object.keys(sortedInterestingNumbersMap);
+
+        for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
+            const numberType = numberTypes[numberTypesIdx];
+            if (numberType === interestingNumberTypes.PI && event.tags.indexOf('pi') < 0) {
                 // Don't use pi numbers unless event has pi tag
                 continue;
             }
-            if (info.number > end) {
-                // Since they're sorted, if we get one > end we're done with this loop
-                break;
+
+            if (numberType !== interestingNumberTypes.PI && event.tags.indexOf('pi') >= 0) {
+                // For events tagged with pi, only use pi.
+                // jmr - this should probably change.
+                continue;
             }
-            let interestingTime;
-            if (isEventInFuture) {
-                interestingTime = eventMoment.clone().subtract(info.number, unit).valueOf();
-            } else {
-                interestingTime = eventMoment.clone().add(info.number, unit).valueOf();
-            }
-            if (info.number >= start && info.number <= end) {
-                if (interestingTime > nowTime) {
-                    /* InterestingTime needs to be in the future.
-                    E.g. An interesting time of 10 years ahead of a past event
-                    might be eariler this year but in past.  Don't show it.  */
-                    if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
-                        /* The interestingTime can't be too close to the event.
-                        Must be less than the event - tooCloseMillis,
-                        or greater than event+tooCloseMillis
-                        */
-                        let interestingInfo = {
-                            event: event,
-                            unit: unit,
-                            tags: info.tags,
-                            description: info.descriptor,
-                            time: interestingTime,
-                        };
-                        interestingList.push(interestingInfo);
+
+            const sortedInterestingNumbers = sortedInterestingNumbersMap[numberType];
+            //  logger.warn(" Number of interesting numbers for type ", numberType, sortedInterestingNumbers.length);
+
+            for (var sortedListIndex = 0; sortedListIndex < sortedInterestingNumbers.length; sortedListIndex++) {
+                const info = sortedInterestingNumbers[sortedListIndex];
+
+                /* jmr - need to add in dates using numbers particular to the event (e.g. 12/25)
+                Also note that having tags on the info and tags on event could be somewhat confusing since they're
+                not the same thing. */
+
+                if (unit === "minutes" && numberType === interestingNumberTypes.ROUND) {
+                    // For minutes, only show round numbers that are bigger
+                    if (info.number % 10000 > 0) {
+                        continue;
+                    }
+                } else if (unit === "seconds" && numberType === interestingNumberTypes.ROUND) {
+                    // For minutes, only show round numbers that are bigger
+                    if (info.number % 1000000 > 0) {
+                        continue;
+                    }
+                }
+
+                if (info.number > end) {
+                    // Since they're sorted, if we get one > end we're done with this loop
+                    break;
+                }
+                let interestingTime;
+                if (isEventInFuture) {
+                    interestingTime = eventMoment.clone().subtract(info.number, unit).valueOf();
+                } else {
+                    interestingTime = eventMoment.clone().add(info.number, unit).valueOf();
+                }
+                if (info.number >= start && info.number <= end) {
+                    if (interestingTime > nowTime) {
+                        /* InterestingTime needs to be in the future.
+                        E.g. An interesting time of 10 years ahead of a past event
+                        might be eariler this year but in past.  Don't show it.  */
+                        if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
+                            /* The interestingTime can't be too close to the event.
+                            Must be less than the event - tooCloseMillis,
+                            or greater than event+tooCloseMillis
+                            */
+                            let interestingInfo = {
+                                event: event,
+                                unit: unit,
+                                tags: info.tags,
+                                description: info.descriptor,
+                                time: interestingTime,
+                            };
+                            interestingList.push(interestingInfo);
+                        }
                     }
                 }
             }

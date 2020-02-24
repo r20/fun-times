@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons'
 
 import EventComparedToNow from '../components/EventComparedToNow'
@@ -54,26 +54,27 @@ function EventInfo(props) {
   const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
   const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getDisplayStringDateTimeForEvent(event) });
 
+  const header = (
+    <React.Fragment>
+      <View style={{ alignSelf: 'flex-end', paddingBottom: 10, }}>
+        {event.isCustom &&
+          <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
+            <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
+          </TouchableOpacity>
+        }
+      </View>
+      <EventCard event={event}>
+        <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>
+        <EventComparedToNow event={event} nowMillis={nowMillis} />
+      </EventCard>
+
+      <Text style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</Text>
+    </React.Fragment>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ padding: 15 }}>
-        <View style={{ alignSelf: 'flex-end', paddingBottom: 10, }}>
-          {event.isCustom &&
-            <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
-              <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
-            </TouchableOpacity>
-          }
-        </View>
-        <EventCard event={event}>
-          <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>
-          <EventComparedToNow event={event} nowMillis={nowMillis} />
-        </EventCard>
-
-        <EventCard event={event}>
-          <EventCardHeader event={event}>{cardHeaderTitleUpcoming}</EventCardHeader>
-          <UpcomingMilestonesList events={[event]} renderEventCardBodyTextOnly={true} />
-        </EventCard>
-      </ScrollView>
+      <UpcomingMilestonesList listHeaderComponent={header} events={[event]} verboseDescription={false} />
     </View>
   );
 
@@ -96,4 +97,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.TRASH_BACKGROUND_COLOR,
     borderRadius: 5,
   },
+  upcomingHeader: {
+    fontSize: theme.FONT_SIZE_MEDIUM + 2,
+    padding: 10,
+    marginTop: 20,
+  },
 });
+

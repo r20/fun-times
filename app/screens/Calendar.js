@@ -14,7 +14,7 @@ function Calendar(props) {
   });
 
   return (<View style={styles.container} >
-    <UpcomingMilestonesList events={filtered} renderEventCardBodyTextOnly={false} />
+    <UpcomingMilestonesList events={filtered} verboseDescription={true} />
   </View>
   );
 }
