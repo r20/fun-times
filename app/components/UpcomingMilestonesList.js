@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, FlatList } from 'react-native'
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
+import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import { findInterestingDates } from '../utils/interestingDatesFinder'
 
@@ -40,7 +41,8 @@ export default function UpcomingMilestonesList(props) {
       keyExtractor={keyExtractor}
       renderItem={({ item }) => {
         const event = item.event;
-        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, event.isFullDay);
+        const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
+        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
         const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
 
         let desc = item.description + " " + item.unit;

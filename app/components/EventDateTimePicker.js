@@ -9,14 +9,12 @@ import i18n from '../i18n/i18n'
 
 export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
  
+// jmr - people don't know how to change the year on android's date picker.  Need to help them.
 
 /* 
   Start on a date that makes it convenient for using the spinner.
-  Also, using a time in middle of the day (12:00) because otherwise
-  picking a day, closing the picker, and reopening will sometimes
-  have the previous day (that was true in previous picker library)
  */
-const defaultStartingDate = new Date(2000, 5, 15, 12, 0, 0);
+const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
 
 
 function EventDateTimePicker(props) {

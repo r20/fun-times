@@ -61,6 +61,7 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
             if (numberType !== interestingNumberTypes.PI && event.tags.indexOf('pi') >= 0) {
                 // For events tagged with pi, only use pi.
                 // jmr - this should probably change.
+                // I may want to redo pi code to use all interesting numbers multiplied by pi
                 continue;
             }
 

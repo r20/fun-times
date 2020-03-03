@@ -61,16 +61,6 @@ function AddEvent(props) {
 
   }
 
-  /* jmr- TODOs:
-  Too many time since and upcoming milestones
-  (I could by default not show milestones that are within 4 days of an event
-    to drastically reduce.  I could make this configurable.
-    Perhaps I make a slider thing to show more/less milestones
-    and close days is one thing I adjust and I adjust something else?
-    Need to decide whether to show pi variables and other types of times too.)
-  Improve styling / colors
-  */
-
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
     (such as pressing a button), the keyboard closes.
