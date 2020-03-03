@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
-import { FontAwesome } from '@expo/vector-icons'
+import { MaterialIcons, Feather } from '@expo/vector-icons'
 
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
@@ -18,6 +18,12 @@ function EventInfo(props) {
   const event = props.navigation.getParam("event", '');
   if (!event) {
     return null;
+  }
+
+
+  const onPressEditItem = () => {
+    // jmr
+    logger.warn("Edit event isn't implemented yet.")
   }
 
   const onPressRemoveItem = () => {
@@ -56,11 +62,15 @@ function EventInfo(props) {
 
   const header = (
     <React.Fragment>
-      <View style={{ alignSelf: 'flex-end', paddingBottom: 10, }}>
+      <View style={styles.buttonsWrapper}>
         {event.isCustom &&
-          <TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
-            <FontAwesome name="trash" size={30} style={{ color: theme.TRASH_ICON_COLOR }} />
+          <React.Fragment><TouchableOpacity onPress={onPressRemoveItem} style={styles.deleteButton}>
+            <Feather name="x" size={30} style={{ color: theme.PRIMARY_TEXT_COLOR }} />
           </TouchableOpacity>
+            <TouchableOpacity onPress={onPressEditItem} style={styles.editButton}>
+              <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_TEXT_COLOR }} />
+            </TouchableOpacity>
+          </React.Fragment>
         }
       </View>
       <EventCard event={event}>
@@ -94,11 +104,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  buttonsWrapper: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 10,
+  },
   deleteButton: {
     // padding is so touching close to it works too
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: theme.TRASH_BACKGROUND_COLOR,
+    backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
+    borderRadius: 5,
+  },
+  editButton: {
+    // padding is so touching close to it works too
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
     borderRadius: 5,
   },
   upcomingHeader: {
