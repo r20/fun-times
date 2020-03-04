@@ -39,17 +39,18 @@ const AppStackNavigator = createStackNavigator({
         title: eventTitle,
         headerStyle: {
           backgroundColor: headerColor,
-
         },
         headerTintColor: headerContrastColor,
-        headerLeft: ( // jmr - this was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
+        headerLeft: (
+          // This was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
+          // On my Android back isn't needed. On iphone 7 it is.  I suppose just leave it.
           <Ionicons
             name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
             size={Platform.OS === "ios" ? 35 : 24}
             color={headerContrastColor}
             style={
               Platform.OS === "ios"
-                ? { marginBottom: -4, width: 25, marginLeft: 9 }
+                ? { marginBottom: -4, width: 25, marginLeft: 20 }
                 : { marginBottom: -4, width: 25, marginLeft: 20 }
             }
             onPress={() => {
@@ -72,14 +73,16 @@ const AppStackNavigator = createStackNavigator({
       backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
     },
     headerTintColor: theme.PRIMARY_TEXT_COLOR,
-    headerLeft: ( // jmr - this was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
+    headerLeft: (
+      // This was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
+      // On my Android back isn't needed. On iphone 7 it is.  I suppose just leave it.
       <Ionicons
         name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
         size={Platform.OS === "ios" ? 35 : 24}
         color={theme.PRIMARY_TEXT_COLOR}
         style={
           Platform.OS === "ios"
-            ? { marginBottom: -4, width: 25, marginLeft: 9 }
+            ? { marginBottom: -4, width: 25, marginLeft: 20 }
             : { marginBottom: -4, width: 25, marginLeft: 20 }
         }
         onPress={() => {

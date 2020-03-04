@@ -8,7 +8,7 @@ import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 
 export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
- 
+
 // jmr - people don't know how to change the year on android's date picker.  Need to help them.
 
 /* 
@@ -19,11 +19,16 @@ const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
 
 function EventDateTimePicker(props) {
 
+  const startingDate = props.date ? props.date : defaultStartingDate;
+  
+  const [date, setDate] = useState(startingDate);
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
+
   const onChange = (event, selectedDate) => {
-    setShow(Platform.OS === 'ios' ? true : false);
+
+    setShow(Platform.OS === 'ios');
     if (selectedDate) {
       const theDate = props.date || defaultStartingDate;
       const newDate = new Date(theDate.getTime());
@@ -40,6 +45,7 @@ function EventDateTimePicker(props) {
       }
       props.onSelectDate(newDate);
     }
+    
   };
 
   const showMode = currentMode => {
@@ -61,21 +67,22 @@ function EventDateTimePicker(props) {
   /*
   For prototype, this supports only within a certain range.
   jmr - The DateTimePicker library crashes if value is 2039 or beyond.
-  Until I figure that out, restruct selecting date to end of 2038.
+  Until I figure that out, restrict selecting date to end of 2038.
+  It also crashes if less than Jan 1, 1900.
   (However, right now nothing is stopping code from using this component and 
     passing a props.date past that.)
 */
   const theMaxDate = new Date(2038, 11, 31);
 
-  const theMinDate = new Date();
-  theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
-
+  // const theMinDate = new Date();
+  // theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
+  const theMinDate = new Date(1900,0,1); // app crashes when date older than this
+  
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 
   const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
 
 
-  const startingDate = props.date ? props.date : defaultStartingDate;
 
   /* I tried using DeviceContext and a 3rd party library to get the device setting for
     this, but it didn't work.  Probably won't work in Expo without ejecting.

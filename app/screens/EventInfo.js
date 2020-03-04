@@ -84,6 +84,7 @@ function EventInfo(props) {
 
   /* jmr - if event is within N days (see other code that sets that limit and get it from there),
     then have a message "Event within N days
+    Use i18n
     If there are no upcoming milestones within the time range, have another message for that
     OR show later in the future?? */
   return (
