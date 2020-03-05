@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons'
 
 import AppBottomTabNavigator from '../navigation/AppBottomTabNavigator'
 
-import AddEvent from '../screens/AddEvent'
+import AddOrEditEvent from '../screens/AddOrEditEvent'
 import EventInfo from '../screens/EventInfo'
 import theme, { getContrastFontColor } from '../style/theme'
 
@@ -25,7 +25,13 @@ const AppStackNavigator = createStackNavigator({
     navigationOptions: {
       title: i18n.t('headerAddEventTitle'),
     },
-    screen: AddEvent
+    screen: AddOrEditEvent
+  },
+  EditEvent: {
+    navigationOptions: {
+      title: i18n.t('headerEditEventTitle'),
+    },
+    screen: AddOrEditEvent
   },
   EventInfo: {
     navigationOptions: ({ navigation }) => {

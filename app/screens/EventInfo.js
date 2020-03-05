@@ -22,8 +22,7 @@ function EventInfo(props) {
 
 
   const onPressEditItem = () => {
-    // jmr
-    logger.warn("Edit event isn't implemented yet.")
+    props.navigation.navigate("EditEvent", { oldEvent: event });
   }
 
   const onPressRemoveItem = () => {

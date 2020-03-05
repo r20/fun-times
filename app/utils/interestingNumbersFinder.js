@@ -308,6 +308,7 @@ export function getSortedInterestingNumbersMap() {
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const power = somenums[sIdx];
     const num = Math.pow(power, power);
+    // TODO: should i18n this and other descriptors
     var interestingInfo = {
       tags: [interestingNumberTypes.SUPER_POWER],
       descriptor: "Super power!! " + power + "^" + power + " (" + numberWithCommas(Math.pow(power, power)) + ")",

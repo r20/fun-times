@@ -12,16 +12,20 @@ import { colors, getRandomColor } from '../style/theme'
 
 import { withEventListContext } from '../context/EventListContext'
 import * as Utils from '../utils/Utils'
-import Event from '../utils/Event'
+import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 
-function AddEvent(props) {
+function AddOrEditEvent(props) {
 
-  const [title, setTitle] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [useFullDay, setUseFullDay] = useState(true);
-  const [selectedColor, setSelectedColor] = useState(getRandomColor);
+  const oldEvent = props.navigation.getParam("oldEvent", null);
+  const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
+  const isCreate = !oldEvent;
+
+  const [title, setTitle] = useState(newEvent ? newEvent.title : '');
+  const [selectedDate, setSelectedDate] = useState(newEvent ? (new Date(newEvent.epochMillis)) : null);
+  const [useFullDay, setUseFullDay] = useState(newEvent ? newEvent.isFullDay : true);
+  const [selectedColor, setSelectedColor] = useState(newEvent ? newEvent.color : getRandomColor);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
 
   const eventPlaceholders = {
@@ -37,13 +41,23 @@ function AddEvent(props) {
 
     Keyboard.dismiss();
 
-    const event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false });
+    let event;
+    if (isCreate) {
+      event = new Event({ title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay, color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false });
+    } else {
+      event = newEvent;
+      event.title = title;
+      event.epochMillis = selectedDate.getTime();
+      event.isFullDay = useFullDay;
+      event.color = selectedColor;
+    }
 
-    if (props.eventListContext.getCustomEventWithTitle(title)) {
+    if (props.eventListContext.getCustomEventWithTitle(title)
+      && (isCreate || event.title !== oldEvent.title)) {
 
       Alert.alert(
-        i18n.t("eventUnableToAddTitle"),
-        i18n.t("eventUnableToAddAlreadyExists", { someValue: title }),
+        i18n.t("eventUnableToSaveTitle"),
+        i18n.t("eventUnableToSaveAlreadyExists", { someValue: title }),
         [
           { text: i18n.t("ok") },
         ],
@@ -51,12 +65,20 @@ function AddEvent(props) {
       )
     } else {
 
+
       logger.log("Saving event ", title, "--", selectedDate);
 
-      props.eventListContext.addCustomEvent(event);
+      if (isCreate) {
+        props.eventListContext.addCustomEvent(event);
+        // Go back to events screen when push save
+        props.navigation.navigate("EventsScreen");
+      } else {
+        props.eventListContext.modifyEvent(oldEvent, event);
+        // Go back to EventInfo with the new event
+        props.navigation.navigate("EventInfo", { event: event });
+      }
 
-      // Go back to events screen when push save
-      props.navigation.navigate("EventsScreen");
+
     }
 
   }
@@ -112,9 +134,9 @@ function AddEvent(props) {
   );
 }
 
-export default withEventListContext(AddEvent);
+export default withEventListContext(AddOrEditEvent);
 
-AddEvent.propTypes = {
+AddOrEditEvent.propTypes = {
   navigation: PropTypes.object.isRequired,
 }
 
