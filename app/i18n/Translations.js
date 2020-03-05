@@ -15,10 +15,12 @@ export const en = {
   headerTodayTitle: "Today",
   headerUpcomingCalendarScreenTitle: "Upcoming Milestones",
   headerMoreTitle: "Settings",
-  upcomingFutureEventCountdownTitle: "Upcoming Countdown Milestones",
-  upcomingPastEventMilestoneTitle: "Upcoming Time Passed Milestones",
-  timeSinceEventTitle: 'Time Since {{someValue}}',
-  timeUntilEventTitle: 'Time Until {{someValue}}',
+  upcomingFutureEventCountdownTitle: "Upcoming Milestones",
+  upcomingPastEventMilestoneTitle: "Upcoming Milestones",
+  milestoneDescriptionFuture: "{{milestoneDesciption}} until {{eventTitle}} ({{eventDateTime}})",
+  milestoneDescriptionPast: "{{milestoneDesciption}} since {{eventTitle}} ({{eventDateTime}})",
+  timeSinceEventTitle: 'Time Elapsed Since {{someValue}}',
+  timeUntilEventTitle: 'Time Remaining Until {{someValue}}',
   quarters: '{{someValue}} quarters',
   months: '{{someValue}} months',
   weeks: '{{someValue}} weeks',
@@ -37,6 +39,7 @@ export const en = {
   fullDay: 'Full Day',
   selectTime: 'Select Time',
   selectDate: 'Select Date',
+  eventNameInputPlaceholder: "Title (e.g. Maria's Birthday)",
 };
 
 /**

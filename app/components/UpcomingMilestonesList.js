@@ -48,10 +48,10 @@ export default function UpcomingMilestonesList(props) {
         let desc = item.description + " " + item.unit;
         if (props.verboseDescription) {
           const isEventInFuture = (event.epochMillis > nowTime);
-          // jmr - need to use i18n for this
-          const sinceOrUntil = isEventInFuture ? " until " : " since ";
-          desc = desc + sinceOrUntil + event.title + " (" + eventDisplayDateTime + ")";
+          const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
+          desc = i18n.t(i18nKey, { milestoneDesciption: desc, eventTitle: event.title, eventDateTime: eventDisplayDateTime });
         }
+
         return (<EventCard event={event}>
           <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
           <EventCardBodyText event={event} >{desc}</EventCardBodyText>

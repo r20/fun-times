@@ -24,9 +24,9 @@ function Today(props) {
           return null;
         }
         const nowTime = (new Date()).getTime();
-        const isEventInFuture = (item.epochMillis > nowTime);
-        const sinceOrUntil = isEventInFuture ? "until" : "since";
-        const title = "Time " + sinceOrUntil + " " + item.title;
+        const i18nKey = (item.epochMillis < nowTime) ? "timeSinceEventTitle" : "timeUntilEventTitle";
+        const title = i18n.t(i18nKey, { someValue: item.title });
+
         const now = new Date();
         const nowMillis = now.getTime();
 

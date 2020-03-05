@@ -64,8 +64,8 @@ export class EventListProvider extends React.Component {
 
   /* If make a code change that would break old stored events, put stuff in this function
     to upgrade them. 
-    jmr- I could change code to store the event object version (or code version) and
-    do update only if needed. */
+    TODO - I could change code to store the event object version (or code version) and
+    look at its curestion compared to current cersion and do update only if needed. */
   updateCustomEventsForAppUpdate = (customEvents) => {
     try {
       let needsSaved = false;

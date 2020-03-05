@@ -25,7 +25,7 @@ function AddEvent(props) {
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
 
   const eventPlaceholders = {
-    title: "Title (e.g. Maria's birthday)",
+    title: i18n.t("eventNameInputPlaceholder"),
   }
 
 
