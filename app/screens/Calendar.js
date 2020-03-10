@@ -1,27 +1,30 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View } from 'react-native'
 
-import { withEventListContext } from '../context/EventListContext'
+import EventListContext from '../context/EventListContext'
+import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
 import i18n from '../i18n/i18n'
 
 function Calendar(props) {
 
-  let filtered = props.eventListContext.allEvents.filter(function (value, index, arr) {
-    return props.eventListContext.isEventSelected(value);
+  const eventListContext = useContext(EventListContext);
+  let filtered = eventListContext.allEvents.filter(function (value, index, arr) {
+    return eventListContext.isEventSelected(value);
   });
 
   return (<View style={styles.container} >
+    <ScreenHeader
+      centerComponent={<ScreenHeaderTitle>{i18n.t("headerUpcomingCalendarScreenTitle")}</ScreenHeaderTitle>}
+    />
     <UpcomingMilestonesList events={filtered} verboseDescription={true} />
   </View>
   );
 }
 
-const CalendarWithContext = withEventListContext(Calendar);
 
-export default withSingleScreenInStackNavigator(CalendarWithContext, i18n.t("headerUpcomingCalendarScreenTitle"));
+export default Calendar;
 
 
 const styles = StyleSheet.create({

@@ -388,13 +388,4 @@ export class EventListProvider extends React.Component {
   }
 }
 
-/** 
- * A HOC to add eventListContext as a prop
- */
-export const withEventListContext = ChildComponent => props => (
-  <EventListContext.Consumer>
-    {
-      context => <ChildComponent {...props} eventListContext={context} />
-    }
-  </EventListContext.Consumer>
-);
+export default EventListContext;

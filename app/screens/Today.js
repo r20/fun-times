@@ -1,26 +1,31 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 
 import i18n from '../i18n/i18n'
-import { withEventListContext } from '../context/EventListContext'
+import EventListContext from '../context/EventListContext'
 import EventComparedToNow from '../components/EventComparedToNow'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
+import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import theme, { getEventStyle } from '../style/theme'
-import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
+import EventCard, { EventCardHeader } from '../components/EventCard'
 
 
 function Today(props) {
 
+  const eventListContext = useContext(EventListContext);
+
   return (<View style={styles.container} >
 
+    <ScreenHeader
+      centerComponent={<ScreenHeaderTitle>{i18n.t("headerTodayTitle")}</ScreenHeaderTitle>}
+    />
     <FlatList
       contentContainerStyle={{ padding: 15 }}
-      data={props.eventListContext.allEvents}
+      data={eventListContext.allEvents}
       keyExtractor={item => item.title}
       renderItem={({ item }) => {
 
-        if (!props.eventListContext.isEventSelected(item)) {
+        if (!eventListContext.isEventSelected(item)) {
           return null;
         }
         const nowTime = (new Date()).getTime();
@@ -42,9 +47,7 @@ function Today(props) {
   );
 }
 
-const TodayWithContext = withEventListContext(Today);
-export default withSingleScreenInStackNavigator(TodayWithContext, i18n.t("headerTodayTitle"));
-
+export default Today;
 
 const styles = StyleSheet.create({
   container: {

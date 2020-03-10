@@ -1,19 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
 
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
-import { withEventListContext } from '../context/EventListContext'
+import EventListContext from '../context/EventListContext'
 import * as logger from '../utils/logger'
 
 function StandardEvents(props) {
+
+  const eventListContext = useContext(EventListContext);
   return (
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={{ padding: 15 }}
-        data={props.eventListContext.standardEvents}
+        data={eventListContext.standardEvents}
         keyExtractor={item => item.title}
         renderItem={({ item }) =>
           <EventListItem event={item} />
@@ -23,8 +25,7 @@ function StandardEvents(props) {
   );
 }
 
-const StandardEventsWithContext = withEventListContext(StandardEvents);
-export default StandardEventsWithContext;
+export default StandardEvents;
 
 
 const styles = StyleSheet.create({
@@ -32,10 +33,4 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center'
   },
-  emptyText: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
-    padding: 15,
-  }
 });

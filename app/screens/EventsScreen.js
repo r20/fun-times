@@ -6,9 +6,8 @@ import { ButtonGroup } from 'react-native-elements'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import StandardEvents from '../screens/StandardEvents'
+import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import CustomEvents from '../screens/CustomEvents'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
-
 
 function EventsScreen(props) {
 
@@ -16,8 +15,11 @@ function EventsScreen(props) {
 
   const buttons = [i18n.t('custom'), i18n.t('standard')];
   return (
-    <View style={styles.container}>
 
+    <View style={styles.container}>
+      <ScreenHeader
+        centerComponent={<ScreenHeaderTitle>{i18n.t("headerEventsTitle")}</ScreenHeaderTitle>}
+      />
       <ButtonGroup
         onPress={setSelectedIndex}
         selectedIndex={selectedIndex}
@@ -31,7 +33,7 @@ function EventsScreen(props) {
   );
 }
 
-export default withSingleScreenInStackNavigator(EventsScreen, i18n.t("headerEventsTitle"));
+export default EventsScreen;
 
 const styles = StyleSheet.create({
   container: {

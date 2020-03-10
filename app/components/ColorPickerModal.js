@@ -44,6 +44,6 @@ const styles = StyleSheet.create({
     },
     card: {
         width: screenWidth - 40,
-        backgroundColor: theme.SCREEN_BACKGROUND_COLOR,
+        backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
     },
 });

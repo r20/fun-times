@@ -1,11 +1,12 @@
-import React from 'react';
-import { AppLoading } from 'expo';
-import * as Font from 'expo-font';
+import React from 'react'
+import { AppLoading } from 'expo'
+import * as Font from 'expo-font'
+import { MenuProvider } from 'react-native-popup-menu'
+import { Ionicons } from '@expo/vector-icons'
 
-import { Ionicons } from '@expo/vector-icons';
+import { EventListProvider } from './app/context/EventListContext'
 
-import { EventListProvider } from './app/context/EventListContext';
-import AppStackNavigator from './app/navigation/AppStackNavigator';
+import AppStackNavigator from './app/navigation/AppStackNavigator'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -29,6 +30,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <EventListProvider ><AppStackNavigator /></EventListProvider>
+    return <EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider>
   }
 }

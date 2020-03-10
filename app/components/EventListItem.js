@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { withNavigation } from 'react-navigation'
 
-import { withEventListContext } from '../context/EventListContext'
+import EventListContext from '../context/EventListContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
@@ -12,10 +12,12 @@ import * as logger from '../utils/logger'
 
 function EventListItem(props) {
 
+  const eventListContext = useContext(EventListContext);
+
   /* Using state instead of getting it from eventListContext
   because when toggle, it takes a moment for it to update.  When the user presses the star,
   we want the color to change immediately, not a short moment later. */
-  const [isSelected, setIsSelected] = useState(props.eventListContext.isEventSelected(props.event));
+  const [isSelected, setIsSelected] = useState(eventListContext.isEventSelected(props.event));
 
   const title = props.event.title;
 
@@ -29,7 +31,7 @@ function EventListItem(props) {
   const toggleSelected = (event) => {
     setIsSelected(!isSelected);
     // This change is async and takes longer than state update
-    props.eventListContext.toggleEventSelected(event);
+    eventListContext.toggleEventSelected(event);
   }
 
 
@@ -52,10 +54,10 @@ function EventListItem(props) {
 }
 
 
-const EventListItemWithStuff = withEventListContext(withNavigation(EventListItem));
-export default EventListItemWithStuff;
+const EventListItemWithNavigation = withNavigation(EventListItem);
+export default EventListItemWithNavigation;
 
-EventListItemWithStuff.propTypes = {
+EventListItemWithNavigation.propTypes = {
   event: PropTypes.object.isRequired,
   /* If required is specified for navigation, it gives a warning.
   Perhaps it's not hooked up right away when component is created.*/

@@ -1,15 +1,16 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { withSingleScreenInStackNavigator } from '../navigation/NavUtils'
+import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 
 function More(props) {
   return (<View style={styles.container} >
+    <ScreenHeader />
     <Text>More settings, information, etc.</Text>
   </View>
   );
 }
 
-export default withSingleScreenInStackNavigator(More, "");
+export default More;
 
 
 const styles = StyleSheet.create({

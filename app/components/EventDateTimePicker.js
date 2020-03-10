@@ -20,7 +20,7 @@ const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
 function EventDateTimePicker(props) {
 
   const startingDate = props.date ? props.date : defaultStartingDate;
-  
+
   const [date, setDate] = useState(startingDate);
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
@@ -45,7 +45,7 @@ function EventDateTimePicker(props) {
       }
       props.onSelectDate(newDate);
     }
-    
+
   };
 
   const showMode = currentMode => {
@@ -76,8 +76,8 @@ function EventDateTimePicker(props) {
 
   // const theMinDate = new Date();
   // theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
-  const theMinDate = new Date(1900,0,1); // app crashes when date older than this
-  
+  const theMinDate = new Date(1900, 0, 1); // app crashes when date older than this
+
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 
   const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
@@ -92,9 +92,9 @@ function EventDateTimePicker(props) {
 
   return (
     <React.Fragment>
-
-      <Button onPress={showDatepicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
-
+      <View style={{ marginBottom: props.spaceBetweenDateAndTime }}>
+        <Button onPress={showDatepicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
+      </View>
       <View style={styles.fullDaySelection}>
         <Text>{i18n.t("fullDay")}</Text>
         <Switch
@@ -104,7 +104,7 @@ function EventDateTimePicker(props) {
           }}
         />
       </View>
-      <View>
+      <View style={{ marginTop: 20 }}>
         <Button disabled={props.useFullDay} onPress={showTimepicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
       </View>
       {show && (
@@ -130,6 +130,7 @@ EventDateTimePicker.propTypes = {
   onSelectDate: PropTypes.func.isRequired,
   onSetUseFullDay: PropTypes.func.isRequired,
   onShowPicker: PropTypes.func, // If a picker is shown, this gets called
+  spaceBetweenDateAndTime: PropTypes.number.isRequired, // How much space to put between select date button and time controls
 };
 
 export default EventDateTimePicker;
@@ -139,6 +140,6 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 });

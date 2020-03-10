@@ -45,13 +45,4 @@ export class DeviceProvider extends React.Component {
   }
 }
 
-/** 
- * A HOC to add deviceContext as a prop
- */
-export const withDeviceContext = ChildComponent => props => (
-  <DeviceContext.Consumer>
-    {
-      context => <ChildComponent {...props} deviceContext={context} />
-    }
-  </DeviceContext.Consumer>
-);
+export default DeviceContext;
