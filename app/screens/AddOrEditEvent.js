@@ -27,7 +27,7 @@ function AddOrEditEvent(props) {
   const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
   const isCreate = !oldEvent;
 
-  const [isFavorite, setIsFavorite] = useState(newEvent ? newEvent.selected : true);
+
   const [title, setTitle] = useState(newEvent ? newEvent.title : '');
   const [selectedDate, setSelectedDate] = useState(newEvent ? (new Date(newEvent.epochMillis)) : null);
   // If it was undefined, use true
@@ -38,13 +38,6 @@ function AddOrEditEvent(props) {
 
   const eventPlaceholders = {
     title: i18n.t("eventNameInputPlaceholder"),
-  }
-
-  const toggleSelected = () => {
-    if (newEvent) {
-      newEvent.selected = !newEvent.selected;
-      setIsFavorite(newEvent.selected);
-    }
   }
 
 
@@ -60,8 +53,7 @@ function AddOrEditEvent(props) {
     if (isCreate) {
       event = new Event({
         title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
-        color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false,
-        selected: isFavorite
+        color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false
       });
     } else {
       event = newEvent;
@@ -69,7 +61,6 @@ function AddOrEditEvent(props) {
       event.epochMillis = selectedDate.getTime();
       event.isFullDay = useFullDay;
       event.color = selectedColor;
-      event.selected = isFavorite;
     }
 
     if (eventListContext.getCustomEventWithTitle(title)

@@ -31,17 +31,19 @@ function eventSorter(a, b) {
 }
 
 
+
 // These are created with defaults.  The provider sets the real values using value prop.
 const EventListContext = createContext({
   allEvents: [],
   customEvents: [],
   standardEvents: [],
-  addCustomEvent: async () => { },
-  modifyEvent: () => {},
-  removeCustomEvent: async () => { },
-  updateCustomEvents: async () => { },
+  getEventWithTitle: () => { },
+  addCustomEvent: () => { },
+  modifyEvent: () => { },
+  removeCustomEvent: () => { },
+  updateCustomEvents: () => { },
   toggleEventSelected: () => { },
-  removeAllCustomEvents: async () => { },
+  removeAllCustomEvents: () => { },
   isEventSelected: isEventSelected,
   getCustomEventWithTitle: () => { return null; },
 });
@@ -157,11 +159,11 @@ export class EventListProvider extends React.Component {
    * Sorts and updates events, saving to storage
    * and doing setState on the events.
    */
-  updateCustomEvents = async (newEvents) => {
+  updateCustomEvents = (newEvents) => {
     try {
       if (Array.isArray(newEvents)) {
         let newEventsSorted = newEvents.sort(eventSorter);
-        await this.saveCustomEvents(newEventsSorted);
+        this.saveCustomEvents(newEventsSorted);
 
         let newAllEvents = newEventsSorted.concat(this.state.standardEvents);
         newAllEvents = newAllEvents.sort(eventSorter);
@@ -182,14 +184,14 @@ export class EventListProvider extends React.Component {
    * Events should have unique titles. If there's already an event
    * with the same title, this will replace it.
    */
-  addCustomEvent = async (newEvent) => {
+  addCustomEvent = (newEvent) => {
     try {
       // Make sure there's not an event by that title already
       var filtered = this.state.customEvents.filter(function (value, index, arr) {
         return (value.title !== newEvent.title);
       });
       filtered.push(newEvent);
-      await this.updateCustomEvents(filtered);
+      this.updateCustomEvents(filtered);
     } catch (err) {
       logger.warn("Error adding custom event", err);
     }
@@ -200,14 +202,14 @@ export class EventListProvider extends React.Component {
    * Removes the specified event from storage and from the customEvents array,
    * based on its title.
    */
-  removeCustomEvent = async (eventToRemove) => {
+  removeCustomEvent = (eventToRemove) => {
     try {
       if (eventToRemove && eventToRemove.title) {
         var filtered = this.state.customEvents.filter(function (value, index, arr) {
           return (value.title !== eventToRemove.title);
         });
         if (filtered.length !== this.state.customEvents.length) {
-          await this.updateCustomEvents(filtered);
+          this.updateCustomEvents(filtered);
         } else {
           // we didn't find the array to remove
           logger.log("We didn't find a custom event to remove: ", eventToRemove.title);
@@ -240,14 +242,23 @@ export class EventListProvider extends React.Component {
   /**
    * Remove all custom events.
    */
-  removeAllCustomEvents = async () => {
+  removeAllCustomEvents = () => {
     try {
-      await this.updateCustomEvents([]);
+      this.updateCustomEvents([]);
     } catch (e) {
       logger.log('Failed to remove custom events.');
     }
   }
 
+  getEventWithTitle = (title) => {
+    for (let event of this.state.allEvents) {
+      if (event.title === title) {
+        // We found an event with a matching title
+        return event;
+      }
+    }
+    return null;
+  }
 
   /**
    * Finds event according to oldEvent's title and replaces it
@@ -377,6 +388,7 @@ export class EventListProvider extends React.Component {
         removeAllCustomEvents: this.removeAllCustomEvents,
         addCustomEvent: this.addCustomEvent,
         modifyEvent: this.modifyEvent,
+        getEventWithTitle: this.getEventWithTitle,
         removeCustomEvent: this.removeCustomEvent,
         toggleEventSelected: this.toggleEventSelected,
         isEventSelected: isEventSelected,

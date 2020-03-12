@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { withNavigation } from 'react-navigation'
 
 import EventListContext from '../context/EventListContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
+import EventSelectedStar from '../components/EventSelectedStar'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import * as logger from '../utils/logger'
@@ -13,11 +13,6 @@ import * as logger from '../utils/logger'
 function EventListItem(props) {
 
   const eventListContext = useContext(EventListContext);
-
-  /* Using state instead of getting it from eventListContext
-  because when toggle, it takes a moment for it to update.  When the user presses the star,
-  we want the color to change immediately, not a short moment later. */
-  const [isSelected, setIsSelected] = useState(eventListContext.isEventSelected(props.event));
 
   const title = props.event.title;
 
@@ -28,21 +23,9 @@ function EventListItem(props) {
     }
   }
 
-  const toggleSelected = (event) => {
-    setIsSelected(!isSelected);
-    // This change is async and takes longer than state update
-    eventListContext.toggleEventSelected(event);
-  }
-
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.selected} onPress={() => toggleSelected(props.event)}>
-        <MaterialCommunityIcons
-          name="star"
-          style={[{ fontSize: 30 }, isSelected ? { fontSize: 30, color: 'gold', } : { fontSize: 30, color: 'lightgray', }]}
-        />
-      </TouchableOpacity>
+      <EventSelectedStar event={props.event} />
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
         <EventCard event={props.event}>
           <EventCardHeader event={props.event} >{title}</EventCardHeader>
@@ -68,11 +51,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-  },
-  selected: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
   },
   card: {
     flex: 1, // So it will stretch out and take up rest of space

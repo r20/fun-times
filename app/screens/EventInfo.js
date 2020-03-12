@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, Alert, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
-import { MaterialIcons, Feather, Ionicons } from '@expo/vector-icons'
+import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native'
+import { MaterialIcons, FontAwesome, Ionicons } from '@expo/vector-icons'
 
 import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
+import EventSelectedStar from '../components/EventSelectedStar'
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventListContext from '../context/EventListContext'
@@ -18,15 +19,53 @@ import * as logger from '../utils/logger'
 
 function EventInfo(props) {
 
-  const eventListContext = useContext(EventListContext);
 
-  const event = props.navigation.getParam("event", '');
+  const eventListContext = useContext(EventListContext);
+  const navigation = props.navigation;
+
+  /* The passed in event param can get stale.
+    If something about the event changes (such as selected)
+    we need to get the current event object (not what was passed
+      when first navigated to this screen)
+  */
+  const passedEvent = navigation.getParam("event", '');
+  // Use the current version of the event object
+  const event = eventListContext.getEventWithTitle(passedEvent.title);
   if (!event) {
     return null;
   }
 
+
   const onPressEditItem = () => {
-    props.navigation.navigate("EditEvent", { oldEvent: event });
+    navigation.navigate("EditEvent", { oldEvent: event });
+  }
+
+  const onRequestRemove = () => {
+
+    Alert.alert(
+      i18n.t('eventRemoveTitle'),
+      i18n.t('eventRemoveConfirmation', { someValue: event.title }),
+      [
+        {
+          text: i18n.t('cancel'),
+          onPress: () => {
+            logger.log('Cancel Pressed')
+          },
+          style: 'cancel',
+        },
+        {
+          text: i18n.t('ok'), onPress: () => {
+            logger.log('OK Pressed');
+            eventListContext.removeCustomEvent(event);
+            navigation.navigate("EventsScreen");
+
+          }
+        },
+      ],
+      // On Android, cancelable: true allows them to tap outside the box to get rid of alert without doing anything
+      { cancelable: true }
+    );
+
   }
 
 
@@ -49,36 +88,34 @@ function EventInfo(props) {
     </React.Fragment>
   );
 
-  // jmr - look in to when event.title is long. In old header it would get truncated ...
-  // In new it wraps.  What do we want?
-
-  const isFavorite = event.selected;
-  const toggleSelected = () => {
-    //jmr - implement this
-  }
-
   const headerLeft = (
     // This was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
     // On my Android back isn't needed. On iphone 7 it is.  I suppose just leave it.
     <Ionicons
       name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
       size={Platform.OS === "ios" ? 35 : 24}
-      color={theme.PRIMARY_TEXT_COLOR}
+      color={theme.PRIMARY_HEADER_BUTTONS_COLOR}
       style={
         Platform.OS === "ios"
           ? { marginBottom: -4, width: 25, marginLeft: 10 }
           : { marginBottom: -4, width: 25, marginLeft: 10 }
       }
       onPress={() => {
-        props.navigation.goBack();
+        navigation.goBack();
       }}
     />
   )
 
   const headerRight = !event.isCustom ? null : (
     <View style={styles.headerRightComponent}>
-      <TouchableOpacity onPress={onPressEditItem} style={styles.editButton}>
-        <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_TEXT_COLOR }} />
+      <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
+        <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
+        <EventSelectedStar event={event} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
+        <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
       </TouchableOpacity>
     </View>
   );
@@ -92,9 +129,9 @@ function EventInfo(props) {
     <View style={styles.container}>
       <ScreenHeader
         leftComponent={headerLeft}
-        centerComponent={<ScreenHeaderTitle>{event.title}</ScreenHeaderTitle>}
         rightComponent={headerRight}
       />
+      <View style={styles.title}><ScreenHeaderTitle>{event.title}</ScreenHeaderTitle></View>
       <UpcomingMilestonesList listHeaderComponent={header} events={[event]} verboseDescription={false} />
     </View>
   );
@@ -111,13 +148,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  title: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   headerRightComponent: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  editButton: {// jmr - figure out padding
+  headerButton: {// jmr - figure out padding
     // padding is so touching close to it works too
     paddingHorizontal: 10,
     paddingVertical: 5,
