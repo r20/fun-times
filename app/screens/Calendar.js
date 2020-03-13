@@ -5,7 +5,9 @@ import { StyleSheet, Text, View } from 'react-native'
 import EventListContext from '../context/EventListContext'
 import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
+import theme from '../style/theme'
 import i18n from '../i18n/i18n'
+
 
 function Calendar(props) {
 
@@ -14,11 +16,16 @@ function Calendar(props) {
     return eventListContext.isEventSelected(value);
   });
 
+  const empty = !filtered.length;
+
   return (<View style={styles.container} >
     <ScreenHeader
       centerComponent={<ScreenHeaderTitle>{i18n.t("headerUpcomingCalendarScreenTitle")}</ScreenHeaderTitle>}
     />
-    <UpcomingMilestonesList events={filtered} verboseDescription={true} />
+    {!empty &&
+      <UpcomingMilestonesList events={filtered} verboseDescription={true} />
+    }
+    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMesage')}</Text></View>}
   </View>
   );
 }
@@ -31,5 +38,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+  },
+  emptyText: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: theme.FONT_SIZE_LARGE,
+    padding: 15,
   },
 });

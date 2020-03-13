@@ -23,6 +23,7 @@ export default function UpcomingMilestonesList(props) {
   }
   specials.sort((a, b) => { return (a.time - b.time); });
 
+  const empty = !specials.length;
 
   /* 
     Combination of event title and time
@@ -34,31 +35,37 @@ export default function UpcomingMilestonesList(props) {
   }
 
   return (
-    <FlatList
-      data={specials}
-      ListHeaderComponent={props.listHeaderComponent}
-      contentContainerStyle={{ padding: 15 }}
-      keyExtractor={keyExtractor}
-      renderItem={({ item }) => {
-        const event = item.event;
-        const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
-        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
-        const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
+    <React.Fragment>
+      {!empty &&
+        <FlatList
+          data={specials}
+          ListHeaderComponent={props.listHeaderComponent}
+          contentContainerStyle={{ padding: 15 }}
+          keyExtractor={keyExtractor}
+          renderItem={({ item }) => {
+            const event = item.event;
+            const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
+            const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
+            const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
 
-        let desc = item.description + " " + item.unit;
-        if (props.verboseDescription) {
-          const isEventInFuture = (event.epochMillis > nowTime);
-          const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
-          desc = i18n.t(i18nKey, { milestoneDesciption: desc, eventTitle: event.title, eventDateTime: eventDisplayDateTime });
-        }
+            let desc = item.description + " " + item.unit;
+            if (props.verboseDescription) {
+              const isEventInFuture = (event.epochMillis > nowTime);
+              const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
+              desc = i18n.t(i18nKey, { milestoneDesciption: desc, eventTitle: event.title, eventDateTime: eventDisplayDateTime });
+            }
 
-        return (<EventCard event={event}>
-          <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
-          <EventCardBodyText event={event} >{desc}</EventCardBodyText>
-        </EventCard>);
+            return (<EventCard event={event}>
+              <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
+              <EventCardBodyText event={event} >{desc}</EventCardBodyText>
+            </EventCard>);
+
+          }
+          }
+        />
       }
-      }
-    />
+      {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAhead })}</Text></View>}
+    </React.Fragment>
   );
 
 }
@@ -73,3 +80,15 @@ UpcomingMilestonesList.propTypes = {
 }
 
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  emptyText: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: theme.FONT_SIZE_LARGE,
+    padding: 15,
+  },
+});

@@ -1,10 +1,7 @@
 import React, { useContext, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { Text, StyleSheet, FlatList, View, Alert, Animated } from 'react-native'
+import { Text, StyleSheet, FlatList, View } from 'react-native'
 import { withNavigation } from 'react-navigation'
-import Swipeable from 'react-native-gesture-handler/Swipeable'
-import { RectButton } from 'react-native-gesture-handler'
-import { FontAwesome } from '@expo/vector-icons'
 
 import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
@@ -25,11 +22,6 @@ function CustomEvents(props) {
 
   const empty = !eventListContext.customEvents.length;
 
-  /* jmr - might need ref to close open swipeable
-  
-  See https://www.reddit.com/r/reactjs/comments/ay5ace/react_useref_in_map/
-  */
-
   return (
     <View style={styles.container}>
       {!empty &&
@@ -44,7 +36,7 @@ function CustomEvents(props) {
           }}
         />
       }
-      {empty && <Text style={styles.emptyText}>Add birthdays, anniversaries, and other special occasions to discover interesting upcoming milestones.</Text>}
+      {empty && <Text style={styles.emptyText}>{i18n.t('emptyCustomEventsMesage')}</Text>}
       <AddEventButton onPress={onPressAddEvent} />
     </View>
   );

@@ -33,6 +33,7 @@ const events = [];
 events.push(new Event({
     title: "Christmas", // What user might see (later need to localize)
     key: "Christmas", // Each holiday needs unique key.  Specify key if different than title.
+    isSelectedByDefault: false,
     epochMillis: moment("2020-12-25 0:00", 'YYYY-MM-DD HH:mm').valueOf(), // Day and/or time it starts
     ignoreIfPast: true, // don't use this if it's past. (Eventually I'll update code above to do next one)
     keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
@@ -47,6 +48,7 @@ events.push(new Event({
 events.push(new Event({
     title: "Easter",
     key: "Easter",
+    isSelectedByDefault: false,
     epochMillis: moment("2020-04-12 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "purple",

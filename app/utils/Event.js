@@ -29,6 +29,7 @@ export default class Event {
             isFullDay: true,
             specialNumbers: [],
             keywords: [],
+            isSelectedByDefault: false,
             ignoreIfPast: true,
         }, options);
         // If key not specified, set it to title
