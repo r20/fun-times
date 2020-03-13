@@ -5,6 +5,8 @@ import { MenuProvider } from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
 
 import { EventListProvider } from './app/context/EventListContext'
+import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
+
 
 import AppStackNavigator from './app/navigation/AppStackNavigator'
 
@@ -30,6 +32,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider>
+    return <AppSettingsContextProvider><EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider></AppSettingsContextProvider>
   }
 }

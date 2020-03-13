@@ -33,6 +33,7 @@ export const en = {
   save: 'Save',
   cancel: 'Cancel',
   delete: 'Delete',
+  doNotShowAgainMessage: "Don't show again",
   addToFavorites: 'Add To Favorites',
   removeFromFavorites: 'Remove From Favorites',
   eventUnableToSaveTitle: 'Unable To Save Event',
@@ -44,6 +45,9 @@ export const en = {
   selectTime: 'Select Time',
   selectDate: 'Select Date',
   eventNameInputPlaceholder: "Title (e.g. Maria's Birthday)",
+  datePickerHelpTitle: "Setting Year",
+  datePickerHelpMessage: "Press the year at the top of the date picker to change year."
+
 };
 
 /**

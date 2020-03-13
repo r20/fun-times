@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Button, Platform, Switch, Text, Keyboard } from 'react-native';
+import { StyleSheet, View, Button, Platform, Switch, Text } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
+import AppSettingsContext from '../context/AppSettingsContext';
 
 export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
-
-// jmr - people don't know how to change the year on android's date picker.  Need to help them.
 
 /* 
   Start on a date that makes it convenient for using the spinner.
@@ -19,9 +18,9 @@ const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
 
 function EventDateTimePicker(props) {
 
+  const appSettingsContext = useContext(AppSettingsContext);
   const startingDate = props.date ? props.date : defaultStartingDate;
 
-  const [date, setDate] = useState(startingDate);
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
@@ -56,8 +55,10 @@ function EventDateTimePicker(props) {
     setMode(currentMode);
   };
 
+
   const showDatepicker = () => {
     showMode('date');
+    appSettingsContext.helpWithDatePicker(); // Many people don't know how to set year, so help them
   };
 
   const showTimepicker = () => {
