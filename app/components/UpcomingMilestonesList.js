@@ -44,7 +44,7 @@ export default function UpcomingMilestonesList(props) {
           keyExtractor={keyExtractor}
           renderItem={({ item }) => {
             const event = item.event;
-            const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
+            const noShowTimeOfDay = event.isFullDay || (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
             const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
             const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
 
