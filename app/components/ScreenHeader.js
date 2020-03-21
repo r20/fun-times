@@ -9,7 +9,12 @@ import theme from '../style/theme'
 const ScreenHeader = (props) => (
   <Header containerStyle={{
     backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
-  }} {...props} >{props.children}</Header>
+    shadowColor: 'transparent',
+    borderBottomColor: theme.PRIMARY_BACKGROUND_COLOR,
+    borderBottomWidth: 0
+  }}
+
+    {...props} >{props.children}</Header>
 );
 
 export default ScreenHeader;
