@@ -27,6 +27,7 @@ function AddOrEditEvent(props) {
   const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
   const isCreate = !oldEvent;
 
+  const [titleInputHeight, setTitleInputHeight] = useState(50);
 
   const [title, setTitle] = useState(newEvent ? newEvent.title : '');
   const [selectedDate, setSelectedDate] = useState(newEvent ? (new Date(newEvent.epochMillis)) : null);
@@ -49,26 +50,28 @@ function AddOrEditEvent(props) {
 
     Keyboard.dismiss();
 
+    const newTitle = title.trim();
+
     let event;
     if (isCreate) {
       event = new Event({
-        title, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
+        title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
         color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false
       });
     } else {
       event = newEvent;
-      event.title = title;
+      event.title = newTitle;
       event.epochMillis = selectedDate.getTime();
       event.isFullDay = useFullDay;
       event.color = selectedColor;
     }
 
-    if (eventListContext.getCustomEventWithTitle(title)
+    if (eventListContext.getCustomEventWithTitle(newTitle)
       && (isCreate || event.title !== oldEvent.title)) {
 
       Alert.alert(
         i18n.t("eventUnableToSaveTitle"),
-        i18n.t("eventUnableToSaveAlreadyExists", { someValue: title }),
+        i18n.t("eventUnableToSaveAlreadyExists", { someValue: newTitle }),
         [
           { text: i18n.t("ok") },
         ],
@@ -97,7 +100,7 @@ function AddOrEditEvent(props) {
 
   const headerRight = (
     <View style={styles.headerRightComponent}>
-      <Button disabled={!selectedDate || !title} onPress={onPressSave}
+      <Button disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
         title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
     </View>
   )
@@ -120,8 +123,12 @@ function AddOrEditEvent(props) {
         <ScrollView contentContainerStyle={styles.container}>
 
           <TextInput
-            style={styles.titleInput}
+            style={[styles.titleInput, titleInputHeight]}
+            multiline={true}
             onChangeText={text => setTitle(text)}
+            onContentSizeChange={(event) => {
+              setTitleInputHeight(event.nativeEvent.contentSize.height);
+            }}
             placeholder={eventPlaceholders.title}
             maxLength={50}
             value={title ? title : ''}
@@ -173,9 +180,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   titleInput: {
-    height: 50,
+    fontSize: theme.FONT_SIZE_XLARGE,
     borderColor: 'gray',
-    borderWidth: 1,
+    borderWidth: 0,
+    borderRadius: 3,
     padding: 5,
     marginTop: 20,
     marginBottom: spaceAmount,
