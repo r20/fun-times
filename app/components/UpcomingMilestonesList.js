@@ -64,11 +64,17 @@ export default function UpcomingMilestonesList(props) {
           }
         />
       }
-      {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAhead })}</Text></View>}
+      {empty &&
+        <React.Fragment>
+          {props.showHeaderIfListEmpty && props.listHeaderComponent}
+          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAhead })}</Text></View>
+        </React.Fragment>
+      }
     </React.Fragment>
   );
 
 }
+
 
 UpcomingMilestonesList.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -77,6 +83,7 @@ UpcomingMilestonesList.propTypes = {
   */
   verboseDescription: PropTypes.bool.isRequired,
   listHeaderComponent: PropTypes.element,
+  showHeaderIfListEmpty: PropTypes.bool, // still how header even if list is empty
 }
 
 

@@ -3,7 +3,8 @@ import { Decimal } from 'decimal.js-light';
 
 import * as logger from './logger'
 import { numberWithCommas } from './Utils'
-import { maxNumberOfYearsAway } from '../components/EventDateTimePicker'
+
+export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
 
 /*
   This file has useful functions for finding interesting times.

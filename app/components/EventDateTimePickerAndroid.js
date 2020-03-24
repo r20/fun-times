@@ -1,14 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Button, Platform, Switch, Text } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { StyleSheet, View, Button, Platform, Switch, Text } from 'react-native'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
-import AppSettingsContext from '../context/AppSettingsContext';
-
-export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
+import AppSettingsContext from '../context/AppSettingsContext'
+import { maxNumberOfYearsAway } from '../utils/interestingNumbersFinder'
 
 /* 
   Start on a date that makes it convenient for using the spinner.
@@ -16,7 +15,7 @@ export const maxNumberOfYearsAway = 200; // If you ever change this, search for 
 const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
 
 
-function EventDateTimePicker(props) {
+function EventDateTimePickerAndroid(props) {
 
   const appSettingsContext = useContext(AppSettingsContext);
   const startingDate = props.date ? props.date : defaultStartingDate;
@@ -27,7 +26,8 @@ function EventDateTimePicker(props) {
 
   const onChange = (event, selectedDate) => {
 
-    setShow(Platform.OS === 'ios');
+    setShow(false);
+
     if (selectedDate) {
       const theDate = props.date || defaultStartingDate;
       const newDate = new Date(theDate.getTime());
@@ -56,12 +56,12 @@ function EventDateTimePicker(props) {
   };
 
 
-  const showDatepicker = () => {
+  const showDatePicker = () => {
     showMode('date');
     appSettingsContext.helpWithDatePicker(); // Many people don't know how to set year, so help them
   };
 
-  const showTimepicker = () => {
+  const showTimePicker = () => {
     showMode('time');
   };
 
@@ -75,6 +75,7 @@ function EventDateTimePicker(props) {
 */
   const theMaxDate = new Date(2038, 11, 31);
 
+  // NOTE: must have dates within maxNumberOfYearsAway
   // const theMinDate = new Date();
   // theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
   const theMinDate = new Date(1900, 0, 1); // app crashes when date older than this
@@ -87,14 +88,14 @@ function EventDateTimePicker(props) {
 
   /* I tried using DeviceContext and a 3rd party library to get the device setting for
     this, but it didn't work.  Probably won't work in Expo without ejecting.
-    Just don't support 24 hour format for now.  It could be made an app setting
+    Just only support 24 hour format for now.  It could be made an app setting
     later if desired. */
   const is24HourFormat = true;
 
   return (
     <React.Fragment>
       <View style={{ marginBottom: props.spaceBetweenDateAndTime }}>
-        <Button onPress={showDatepicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
+        <Button onPress={showDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
       </View>
       <View style={styles.fullDaySelection}>
         <Text>{i18n.t("fullDay")}</Text>
@@ -106,7 +107,7 @@ function EventDateTimePicker(props) {
         />
       </View>
       <View style={{ marginTop: 20 }}>
-        <Button disabled={props.useFullDay} onPress={showTimepicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
+        <Button disabled={props.useFullDay} onPress={showTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
       </View>
       {show && (
         <DateTimePicker
@@ -125,16 +126,16 @@ function EventDateTimePicker(props) {
   );
 };
 
-EventDateTimePicker.propTypes = {
+EventDateTimePickerAndroid.propTypes = {
   date: PropTypes.object,
   useFullDay: PropTypes.bool.isRequired,
   onSelectDate: PropTypes.func.isRequired,
   onSetUseFullDay: PropTypes.func.isRequired,
-  onShowPicker: PropTypes.func, // If a picker is shown, this gets called
+  onShowAndroidPicker: PropTypes.func, // If picker is shown, this gets called
   spaceBetweenDateAndTime: PropTypes.number.isRequired, // How much space to put between select date button and time controls
 };
 
-export default EventDateTimePicker;
+export default EventDateTimePickerAndroid;
 
 const styles = StyleSheet.create({
   fullDaySelection: {

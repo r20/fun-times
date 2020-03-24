@@ -49,7 +49,7 @@ export const en = {
   datePickerHelpMessage: "Press the year at the top of the date picker to change year.",
   emptyCustomEventsMesage: "Add birthdays, anniversaries, and other special occasions to discover interesting upcoming milestones.",
   emptyTodayMesage: "After marking events with a star, come back to see how long it has been or how much time remaining until each event.",
-  emptyCalendarMesage: "After marking events with a star, come back to see upcoming milestones.  Maybe your sister is turning 1 billion seconds old nex month.  Or, maybe next week it will be 100 days until the big day.",
+  emptyCalendarMesage: "After marking events with a star, come back to see upcoming milestones.  Perhaps your sister is turning 1 billion seconds old next month.  Or, Monday is 100 days until the wedding.",
   emptyMilestoneMesage: "There are no milestones within \{{someValue}}\ days.",
 };
 

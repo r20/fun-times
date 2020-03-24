@@ -77,7 +77,7 @@ function EventInfo(props) {
   const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
   const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getDisplayStringDateTimeForEvent(event) });
 
-  const header = (
+  const upcomingMilestoneListHeader = (
     <React.Fragment>
       <EventCard event={event}>
         <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>
@@ -123,8 +123,7 @@ function EventInfo(props) {
   /* jmr - if event is within N days (see other code that sets that limit and get it from there),
     then have a message "Event within N days
     Use i18n
-    If there are no upcoming milestones within the time range, have another message for that
-    OR show later in the future?? */
+    jmr - if title is really long, looks bad in EventInfo screen */
   return (
     <View style={styles.container}>
       <ScreenHeader
@@ -132,7 +131,8 @@ function EventInfo(props) {
         rightComponent={headerRight}
       />
       <View style={styles.title}><ScreenHeaderTitle>{event.title}</ScreenHeaderTitle></View>
-      <UpcomingMilestonesList listHeaderComponent={header} events={[event]} verboseDescription={false} />
+      <UpcomingMilestonesList listHeaderComponent={upcomingMilestoneListHeader}
+        showHeaderIfListEmpty={true} events={[event]} verboseDescription={false} />
     </View>
   );
 

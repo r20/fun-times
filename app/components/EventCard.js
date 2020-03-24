@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         fontSize: theme.FONT_SIZE_MEDIUM,
     },
     card: {
-        flex: 1,
+        flex: 0,
         padding: 10,
         margin: 5,
         borderRadius: 3,

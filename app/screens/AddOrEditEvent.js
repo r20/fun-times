@@ -9,7 +9,8 @@ import { Button } from 'react-native-elements'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
 import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
-import EventDateTimePicker from '../components/EventDateTimePicker'
+import EventDateTimePickerAndroid from '../components/EventDateTimePickerAndroid'
+import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
 import ColorPickerModal from '../components/ColorPickerModal'
 import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
 
@@ -36,6 +37,8 @@ function AddOrEditEvent(props) {
   const [useFullDay, setUseFullDay] = useState(initialIsFullDay);
   const [selectedColor, setSelectedColor] = useState(newEvent ? newEvent.color : getRandomColor);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
+
+  const isIos = Platform.OS === 'ios';
 
   const eventPlaceholders = {
     title: i18n.t("eventNameInputPlaceholder"),
@@ -133,13 +136,20 @@ function AddOrEditEvent(props) {
             maxLength={50}
             value={title ? title : ''}
           />
-
-          <EventDateTimePicker date={selectedDate} useFullDay={useFullDay}
-            onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
-            onShowPicker={Keyboard.dismiss} spaceBetweenDateAndTime={spaceAmount}
-          />
-
-
+          <View style={styles.eventDateTimePickerWrapper} >
+            {isIos &&
+              <EventDateTimePickerIos date={selectedDate} useFullDay={useFullDay}
+                onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+                spaceBetweenDateAndTime={spaceAmount}
+              />
+            }
+            {!isIos &&
+              <EventDateTimePickerAndroid date={selectedDate} useFullDay={useFullDay}
+                onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+                onShowAndroidPicker={Keyboard.dismiss} spaceBetweenDateAndTime={spaceAmount}
+              />
+            }
+          </View>
           <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
             <Text>{i18n.t("selectColor")}</Text>
             <MaterialCommunityIcons
@@ -174,8 +184,8 @@ const spaceAmount = 60;
 const styles = StyleSheet.create({
   container: {
     flex: 0,
-    paddingRight: 75,
-    paddingLeft: 75,
+    paddingRight: 45,
+    paddingLeft: 45, // Needs to leave enough room for ios picker
     flexDirection: 'column',
     justifyContent: 'flex-start',
   },
@@ -186,7 +196,9 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     padding: 5,
     marginTop: 20,
-    marginBottom: spaceAmount,
+  },
+  eventDateTimePickerWrapper: {
+    marginTop: spaceAmount,
   },
   colorPicker: {
     flex: 0,
