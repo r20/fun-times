@@ -57,7 +57,7 @@ events.push(new Event({
 events.push(new Event({
     title: "New Year's Day",
     key: "New Year's Day",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment().startOf('year').add(1, 'years').valueOf(),
     //        epochMillis: moment("2020-01-01 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     isFullDay: false,
@@ -67,7 +67,7 @@ events.push(new Event({
 events.push(new Event({
     title: "Super Bowl LIV",
     key: "Super Bowl",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment.tz("2020-02-02 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
     color: "brown",
@@ -77,7 +77,7 @@ events.push(new Event({
 events.push(new Event({
     title: "March Madness Tournament Begins",
     key: "March Madness Tournament Begins",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment("2020-03-17 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
@@ -87,7 +87,7 @@ events.push(new Event({
 events.push(new Event({
     title: "March Madness Final Four",
     key: "March Madness Final Four",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment("2020-04-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
@@ -97,7 +97,7 @@ events.push(new Event({
 events.push(new Event({
     title: "Thanksgiving",
     key: "Thanksgiving",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment("2020-11-26 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "brown",
@@ -134,7 +134,7 @@ events.push(new Event({
 events.push(new Event({
     title: "US Presidential Election",
     key: "US Presidential Election",
-    isSelectedByDefault: true,
+    isSelectedByDefault: false,
     epochMillis: moment("2020-11-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "red",
