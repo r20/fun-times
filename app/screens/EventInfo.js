@@ -106,19 +106,21 @@ function EventInfo(props) {
     />
   )
 
-  const headerRight = !event.isCustom ? null : (
+  const headerRight = !event.isCustom ? (
     <View style={styles.headerRightComponent}>
-      <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
-        <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
-      </TouchableOpacity>
-     
-        <EventSelectedStar event={event} containerStyle={styles.headerButton} />
-      
-      <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
-        <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
-      </TouchableOpacity>
+      <EventSelectedStar event={event} containerStyle={styles.headerButton} />
     </View>
-  );
+  ) : (
+      <View style={styles.headerRightComponent}>
+        <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
+          <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+        </TouchableOpacity>
+        <EventSelectedStar event={event} containerStyle={styles.headerButton} />
+        <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
+          <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+        </TouchableOpacity>
+      </View>
+    );
 
   /* jmr - if event is within N days (see other code that sets that limit and get it from there),
     then have a message "Event within N days
