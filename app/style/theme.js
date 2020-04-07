@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native'
 */
 
 export default {
-  FONT_SIZE_SMALL: 9,
+  FONT_SIZE_SMALL: 10,
   FONT_SIZE_MEDIUM: 12,
   FONT_SIZE_LARGE: 14,
   FONT_SIZE_XLARGE: 20,

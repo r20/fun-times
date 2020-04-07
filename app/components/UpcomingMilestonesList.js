@@ -19,7 +19,7 @@ export default function UpcomingMilestonesList(props) {
   let specials = [];
   for (var idx = 0; idx < props.events.length; idx++) {
     const event = props.events[idx];
-    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays));
+    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays, props.maxNumMilestonesPerEvent));
   }
   specials.sort((a, b) => { return (a.time - b.time); });
 
@@ -84,6 +84,7 @@ UpcomingMilestonesList.propTypes = {
   verboseDescription: PropTypes.bool.isRequired,
   listHeaderComponent: PropTypes.element,
   showHeaderIfListEmpty: PropTypes.bool, // still how header even if list is empty
+  maxNumMilestonesPerEvent: PropTypes.number, // If > 0 only show up to this many milestones per event
 }
 
 

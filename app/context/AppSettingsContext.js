@@ -7,6 +7,7 @@ import * as logger from '../utils/logger'
 
 const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 
+const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -17,6 +18,7 @@ const DATEPICKER_YEAR_TIP_STATES = {
 // These are created with defaults.  The provider sets the real values using value prop.
 const AppSettingsContext = createContext({
   helpWithDatePicker: () => { },
+  setCalendarMaxNumberMilestonesPerEvent: (maxNum) => { },
 });
 
 /**
@@ -29,6 +31,7 @@ export class AppSettingsContextProvider extends React.Component {
     this.state = {
       // Default value
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
+      calendarMaxNumberMilestonesPerEvent: 3,
     };
   }
 
@@ -40,8 +43,15 @@ export class AppSettingsContextProvider extends React.Component {
     } catch (e) {
       logger.log("Error from failing to load datePickerYearTipState: ", e);
     }
+    try {
+      let calendarMaxNumberMilestonesPerEvent = await AsyncStorage.getItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent) || 3;
+      this.setState({ calendarMaxNumberMilestonesPerEvent });
+    } catch (e) {
+      logger.log("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
+    }
 
   }
+
 
   /**
  * Save the datePickerYearTipState
@@ -89,12 +99,31 @@ export class AppSettingsContextProvider extends React.Component {
     }
   }
 
+
+  /**
+  * Set and save the calendarMaxNumberMilestonesPerEvent
+  */
+  setCalendarMaxNumberMilestonesPerEvent = async (maxNum) => {
+    if (typeof maxNum === 'number') {
+      this.setState({ calendarMaxNumberMilestonesPerEvent: maxNum });
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent, maxNum);
+      } catch (e) {
+        logger.log("Error from trying to save calendarMaxNumberMilestonesPerEvent: ", maxNum, e);
+      }
+    } else {
+      logger.log("Error. Expected number for calendarMaxNumberMilestonesPerEvent, but received: ", maxNum);
+    }
+  }
+
   render() {
     /* Make some functions available
     */
     return (
       <AppSettingsContext.Provider value={{
+        ...this.state,
         helpWithDatePicker: this.helpWithDatePicker,
+        setCalendarMaxNumberMilestonesPerEvent: this.setCalendarMaxNumberMilestonesPerEvent,
       }}>
         {this.props.children}
       </AppSettingsContext.Provider>

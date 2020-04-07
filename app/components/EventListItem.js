@@ -25,7 +25,7 @@ function EventListItem(props) {
 
   return (
     <View style={styles.container}>
-      <EventSelectedStar event={props.event} />
+      <EventSelectedStar event={props.event} containerStyle={{ paddingRight: 5 }} />
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
         <EventCard event={props.event}>
           <EventCardHeader event={props.event} >{title}</EventCardHeader>

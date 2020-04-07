@@ -41,6 +41,7 @@ export const en = {
   eventRemoveConfirmation: 'Are you sure you want to remove event \'{{someValue}}\'?',
   eventRemoveTitle: 'Remove Event',
   selectColor: 'Select Color',
+  calendarMaxNumMilestonesPerEventLabel: 'Max number of milestones per event: {{someValue}}',
   fullDay: 'Full Day',
   selectTime: 'Select Time',
   selectDate: 'Select Date',

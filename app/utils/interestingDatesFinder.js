@@ -20,8 +20,9 @@ import * as Utils from './Utils'
  * @param {Number} futureDistanceDays - number of days in future to look for interesting numbers
  * @param {Number} tooCloseDays - number of days within the event to ignore interesting dates
  *                        (because looking close to the event, e.g. 4 days, causes LOTS of interesting times)
+ * @param {Number} maxNumMilestones - If > 0, max number of milestones to return
  */
-export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays) {
+export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays, maxNumMilestones) {
 
     const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
 
@@ -51,7 +52,12 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         logger.log(" Unit ", unit, start, end);
         const numberTypes = Object.keys(sortedInterestingNumbersMap);
 
+        let numMilestonesForThisUnit = 0
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
+            if (maxNumMilestones && numMilestonesForThisUnit >= maxNumMilestones) {
+                // We've reached the max
+                break;
+            }
             const numberType = numberTypes[numberTypesIdx];
             if (numberType === interestingNumberTypes.PI && event.tags.indexOf('pi') < 0) {
                 // Don't use pi numbers unless event has pi tag
@@ -115,12 +121,20 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                                 time: interestingTime,
                             };
                             interestingList.push(interestingInfo);
+                            numMilestonesForThisUnit++;
                         }
                     }
                 }
             }
         }
     }
+
+    if (maxNumMilestones) {
+        // Sort it so we can slice it and only get the first maxNumMiletones
+        interestingList = interestingList.sort((a, b) => { return (a.time - b.time); });
+        interestingList = interestingList.slice(0,maxNumMilestones);
+    }
+
     return interestingList;
 
 }

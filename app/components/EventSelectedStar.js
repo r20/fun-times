@@ -15,13 +15,12 @@ function EventSelectedStar(props) {
 
     const toggleSelected = () => {
         if (event) {
-            // This change is async and may take longer than state update
             eventListContext.toggleEventSelected(event);
         }
     }
 
     return (
-        <TouchableOpacity style={styles.selected} onPress={() => toggleSelected()}>
+        <TouchableOpacity style={[props.containerStyle, styles.selected]} onPress={() => toggleSelected()}>
             <MaterialCommunityIcons
                 name="star"
                 style={[{ fontSize: 30 }, isSelected ? { fontSize: 30, color: 'gold', } : { fontSize: 30, color: 'lightgray', }]}
@@ -34,6 +33,7 @@ export default EventSelectedStar;
 
 EventSelectedStar.propTypes = {
     event: PropTypes.object.isRequired,
+    containerStyle: PropTypes.object,
 }
 
 const styles = StyleSheet.create({

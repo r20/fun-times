@@ -111,9 +111,9 @@ function EventInfo(props) {
       <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
         <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
-        <EventSelectedStar event={event} />
-      </TouchableOpacity>
+     
+        <EventSelectedStar event={event} containerStyle={styles.headerButton} />
+      
       <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
         <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
       </TouchableOpacity>

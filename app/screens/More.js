@@ -2,6 +2,8 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 
+import Settings from '../components/Settings'
+
 function More(props) {
   return (<View style={styles.container} >
     <ScreenHeader />
