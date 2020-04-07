@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Platform } from 'react-native'
 import { createAppContainer } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
@@ -18,6 +18,8 @@ getDefaultNavigationOptions = ({ navigation }) => {
 
   const { routeName } = navigation.state;
 
+  const dots = Platform.OS === "ios" ? "more-horiz" : 'more-vert';
+
   const size = 30;
   if (routeName === 'EventsScreen') {
     options.tabBarIcon = ({ focused, tintColor }) => <FontAwesome name="birthday-cake" size={size} color={tintColor} />;
@@ -30,7 +32,7 @@ getDefaultNavigationOptions = ({ navigation }) => {
     options.tabBarIcon = ({ focused, tintColor }) => <MaterialCommunityIcons name="timetable" size={size} color={tintColor} />;
     options.title = i18n.t("menuUpcomingTitle");
   } else {
-    options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name="more-vert" size={size} color={tintColor} />;
+    options.tabBarIcon = ({ focused, tintColor }) => <MaterialIcons name={dots} size={size} color={tintColor} />;
     options.title = i18n.t("menuMoreTitle");
   }
   return options;
