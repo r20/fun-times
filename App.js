@@ -10,6 +10,9 @@ import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 
 import AppStackNavigator from './app/navigation/AppStackNavigator'
 
+/* jmr - need to add crash reporting and aggregation via sentry.
+See https://docs.expo.io/versions/latest/guides/using-sentry/ */
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
