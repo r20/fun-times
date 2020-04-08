@@ -28,6 +28,10 @@ export class AppSettingsContextProvider extends React.Component {
 
   constructor(props) {
     super(props);
+
+    // For debug, this is how to remove keys
+    //AsyncStorage.multiRemove([STORAGE_KEY_calendarMaxNumberMilestonesPerEvent,STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE]);
+
     this.state = {
       // Default value
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
@@ -39,14 +43,19 @@ export class AppSettingsContextProvider extends React.Component {
     try {
       // If first time using app, set to FIRST_TIME
       let datePickerYearTipState = await AsyncStorage.getItem(STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE) || DATEPICKER_YEAR_TIP_STATES.FIRST_TIME;
-      datePickerYearTipState = JSON.parse(datePickerYearTipState);
+      if (typeof datePickerYearTipState !== "string") {
+        datePickerYearTipState = JSON.parse(datePickerYearTipState);
+      }
+     
       this.setState({ datePickerYearTipState });
     } catch (e) {
       logger.warn("Error from failing to load datePickerYearTipState: ", e);
     }
     try {
       let calendarMaxNumberMilestonesPerEvent = await AsyncStorage.getItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent) || 3;
-      calendarMaxNumberMilestonesPerEvent = JSON.parse(calendarMaxNumberMilestonesPerEvent);
+      if (typeof calendarMaxNumberMilestonesPerEvent !== "number") {
+        calendarMaxNumberMilestonesPerEvent = JSON.parse(calendarMaxNumberMilestonesPerEvent);
+      }
       this.setState({ calendarMaxNumberMilestonesPerEvent });
     } catch (e) {
       logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
