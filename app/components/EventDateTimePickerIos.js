@@ -22,27 +22,37 @@ function EventDateTimePickerIos(props) {
   const appSettingsContext = useContext(AppSettingsContext);
   const startingDate = props.date ? props.date : defaultStartingDate;
 
-  const [mode, setMode] = useState('date');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const onChange = (event, selectedDate) => {
+  const onChangeDate = (event, selectedDate) => {
 
     if (selectedDate) {
       const theDate = props.date || defaultStartingDate;
       const newDate = new Date(theDate.getTime());
-      if (mode == 'date') {
-        // keep time and change date
-        newDate.setFullYear(selectedDate.getFullYear());
-        newDate.setMonth(selectedDate.getMonth());
-        newDate.setDate(selectedDate.getDate());
 
-      } else {
-        // keep date and change time
-        newDate.setHours(selectedDate.getHours());
-        newDate.setMinutes(selectedDate.getMinutes());
-      }
+      // keep time and change date
+      newDate.setFullYear(selectedDate.getFullYear());
+      newDate.setMonth(selectedDate.getMonth());
+      newDate.setDate(selectedDate.getDate());
+
+      props.onSelectDate(newDate);
+    }
+
+  };
+
+
+  const onChangeTime = (event, selectedDate) => {
+
+    if (selectedDate) {
+      const theDate = props.date || defaultStartingDate;
+      const newDate = new Date(theDate.getTime());
+
+      // keep date and change time
+      newDate.setHours(selectedDate.getHours());
+      newDate.setMinutes(selectedDate.getMinutes());
+
       props.onSelectDate(newDate);
     }
 
@@ -90,21 +100,23 @@ function EventDateTimePickerIos(props) {
       <View >
         <Button onPress={toggleShowDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
       </View>
-      <Divider />
       {showDatePicker &&
-
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={startingDate}
-          mode='date'
-          is24Hour={is24HourFormat}
-          display="default"
-          onChange={onChange}
-          minuteInterval={1}
-          maximumDate={theMaxDate}
-          minimumDate={theMinDate} />
+        <React.Fragment>
+          <Divider />
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={startingDate}
+            mode='date'
+            is24Hour={is24HourFormat}
+            display="default"
+            onChange={onChangeDate}
+            minuteInterval={1}
+            maximumDate={theMaxDate}
+            minimumDate={theMinDate} />
+          <Divider />
+        </React.Fragment>
       }
-      <Divider />
+
       <View style={[styles.fullDaySelection, { marginTop: props.spaceBetweenDateAndTime }]}>
         <Text>{i18n.t("fullDay")}</Text>
         <Switch
@@ -114,25 +126,29 @@ function EventDateTimePickerIos(props) {
           }}
         />
       </View>
-      <Divider />
       {!props.useFullDay && (
         <React.Fragment>
+
           <View >
             <Button disabled={props.useFullDay} onPress={toggleShowTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
           </View>
-          <Divider /> 
           {showTimePicker &&
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={startingDate}
-              mode='time'
-              is24Hour={is24HourFormat}
-              display="default"
-              onChange={onChange}
-              minuteInterval={1}
-              maximumDate={theMaxDate}
-              minimumDate={theMinDate} />
+            <React.Fragment>
+              <Divider />
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={startingDate}
+                mode='time'
+                is24Hour={is24HourFormat}
+                display="default"
+                onChange={onChangeTime}
+                minuteInterval={1}
+                maximumDate={theMaxDate}
+                minimumDate={theMinDate} />
+              <Divider />
+            </React.Fragment>
           }
+
         </React.Fragment>
       )}
     </React.Fragment>
