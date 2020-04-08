@@ -108,13 +108,9 @@ function AddOrEditEvent(props) {
     </View>
   )
 
-  // jmr - should ScreenHeader be outside of view?  Or should i create another view?
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
     (such as pressing a button), the keyboard closes.
-
-    TBD - React-native's Button doesn't allow much styling, so make own component or
-       use another library for better styled buttons.
    */
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -198,7 +194,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   eventDateTimePickerWrapper: {
-    marginTop: spaceAmount,
+    marginTop: Platform.OS === 'ios' ? 40: spaceAmount,
   },
   colorPicker: {
     flex: 0,
