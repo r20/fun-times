@@ -39,15 +39,17 @@ export class AppSettingsContextProvider extends React.Component {
     try {
       // If first time using app, set to FIRST_TIME
       let datePickerYearTipState = await AsyncStorage.getItem(STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE) || DATEPICKER_YEAR_TIP_STATES.FIRST_TIME;
+      datePickerYearTipState = JSON.parse(datePickerYearTipState);
       this.setState({ datePickerYearTipState });
     } catch (e) {
-      logger.log("Error from failing to load datePickerYearTipState: ", e);
+      logger.warn("Error from failing to load datePickerYearTipState: ", e);
     }
     try {
       let calendarMaxNumberMilestonesPerEvent = await AsyncStorage.getItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent) || 3;
+      calendarMaxNumberMilestonesPerEvent = JSON.parse(calendarMaxNumberMilestonesPerEvent);
       this.setState({ calendarMaxNumberMilestonesPerEvent });
     } catch (e) {
-      logger.log("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
+      logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
     }
 
   }
@@ -59,9 +61,9 @@ export class AppSettingsContextProvider extends React.Component {
   _saveDatePickerYearTipState = async (theState) => {
     this.setState({ datePickerYearTipState: theState });
     try {
-      await AsyncStorage.setItem(STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE, theState);
+      await AsyncStorage.setItem(STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE, JSON.stringify(theState));
     } catch (e) {
-      logger.log("Error from trying to save datePickerYearTipState: ", theState, e);
+      logger.warn("Error from trying to save datePickerYearTipState: ", theState, e);
     }
   }
 
@@ -107,12 +109,12 @@ export class AppSettingsContextProvider extends React.Component {
     if (typeof maxNum === 'number') {
       this.setState({ calendarMaxNumberMilestonesPerEvent: maxNum });
       try {
-        await AsyncStorage.setItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent, maxNum);
+        await AsyncStorage.setItem(STORAGE_KEY_calendarMaxNumberMilestonesPerEvent, JSON.stringify(maxNum));
       } catch (e) {
-        logger.log("Error from trying to save calendarMaxNumberMilestonesPerEvent: ", maxNum, e);
+        logger.warn("Error from trying to save calendarMaxNumberMilestonesPerEvent: ", maxNum, e);
       }
     } else {
-      logger.log("Error. Expected number for calendarMaxNumberMilestonesPerEvent, but received: ", maxNum);
+      logger.warn("Error. Expected number for calendarMaxNumberMilestonesPerEvent, but received: ", maxNum);
     }
   }
 

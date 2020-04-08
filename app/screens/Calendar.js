@@ -27,20 +27,23 @@ function Calendar(props) {
 
   const onSliderValueChange = (newVal) => {
     setSliderValue(newVal);
+  }
+  
+  const onSlidingComplete = (newVal) => {
+    setSliderValue(newVal);
     appSettingsContext.setCalendarMaxNumberMilestonesPerEvent(newVal);
   }
-
   return (<View style={styles.container} >
     <ScreenHeader
       centerComponent={<ScreenHeaderTitle>{i18n.t("headerUpcomingCalendarScreenTitle")}</ScreenHeaderTitle>}
     />
     <View style={styles.sliderWrapper} >
       <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
-      <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20} onValueChange={onSliderValueChange}
-        thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} />
+      <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
+        thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
     {!empty &&
-      <UpcomingMilestonesList maxNumMilestonesPerEvent={sliderValue} events={filtered} verboseDescription={true} />
+      <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
     {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMesage')}</Text></View>}
   </View>
