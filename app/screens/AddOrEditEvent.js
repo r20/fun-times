@@ -5,10 +5,9 @@ import {
   TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert, Platform
 } from 'react-native'
 import { Button } from 'react-native-elements'
-
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
-import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import EventDateTimePickerAndroid from '../components/EventDateTimePickerAndroid'
 import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
 import ColorPickerModal from '../components/ColorPickerModal'
@@ -23,8 +22,10 @@ import i18n from '../i18n/i18n'
 function AddOrEditEvent(props) {
 
   const eventListContext = useContext(EventListContext);
+  const route = useRoute();
+  const navigation = useNavigation();
 
-  const oldEvent = props.navigation.getParam("oldEvent", null);
+  const oldEvent = route.params?.oldEvent ?? null;
   const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
   const isCreate = !oldEvent;
 
@@ -87,26 +88,35 @@ function AddOrEditEvent(props) {
       if (isCreate) {
         eventListContext.addCustomEvent(event);
         // Go back to events screen when push save
-        props.navigation.navigate("EventsScreen");
+        navigation.navigate("EventsScreen");
       } else {
         eventListContext.modifyEvent(oldEvent, event);
         // Go back to EventInfo with the new event
-        props.navigation.navigate("EventInfo", { event: event });
+        navigation.navigate("EventInfo", { event: event });
       }
     }
   }
 
-  const headerLeft = (
-    <Button onPress={() => { props.navigation.goBack(); }}
-      title={i18n.t("cancel")} type="clear" accessibilityLabel="cancel" />
-  )
 
-  const headerRight = (
-    <View style={styles.headerRightComponent}>
-      <Button disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
-        title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
-    </View>
-  )
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View style={styles.headerButton}>
+          <Button onPress={() => { navigation.goBack(); }}
+            title={i18n.t("cancel")} type="clear" accessibilityLabel="cancel" />
+        </View>
+      ),
+      headerRight: () => (
+        <View style={styles.headerButton}>
+          <Button disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
+            title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
+        </View>
+      ),
+    });
+  }, [navigation, title, selectedDate, useFullDay, selectedColor]);
+
+
+
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
@@ -114,57 +124,51 @@ function AddOrEditEvent(props) {
    */
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <React.Fragment>
-        <ScreenHeader
-          leftComponent={headerLeft}
-          rightComponent={headerRight}
-        />
-        <ScrollView contentContainerStyle={styles.container}>
 
-          <TextInput
-            style={[styles.titleInput, titleInputHeight]}
-            multiline={true}
-            onChangeText={text => setTitle(text)}
-            onContentSizeChange={(event) => {
-              setTitleInputHeight(event.nativeEvent.contentSize.height);
-            }}
-            placeholder={eventPlaceholders.title}
-            maxLength={50}
-            value={title ? title : ''}
-          />
-          <View style={styles.eventDateTimePickerWrapper} >
-            {isIos &&
-              <EventDateTimePickerIos date={selectedDate} useFullDay={useFullDay}
-                onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
-                spaceBetweenDateAndTime={spaceAmount}
-              />
-            }
-            {!isIos &&
-              <EventDateTimePickerAndroid date={selectedDate} useFullDay={useFullDay}
-                onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
-                onShowAndroidPicker={Keyboard.dismiss} spaceBetweenDateAndTime={spaceAmount}
-              />
-            }
-          </View>
-          <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
-            <Text>{i18n.t("selectColor")}</Text>
-            <MaterialCommunityIcons
-              name="palette"
-              style={{ fontSize: 50, color: selectedColor }}
+      <ScrollView contentContainerStyle={styles.container}>
+        <TextInput
+          style={[styles.titleInput, titleInputHeight]}
+          multiline={true}
+          onChangeText={text => setTitle(text)}
+          onContentSizeChange={(event) => {
+            setTitleInputHeight(event.nativeEvent.contentSize.height);
+          }}
+          placeholder={eventPlaceholders.title}
+          maxLength={50}
+          value={title ? title : ''}
+        />
+        <View style={styles.eventDateTimePickerWrapper} >
+          {isIos &&
+            <EventDateTimePickerIos date={selectedDate} useFullDay={useFullDay}
+              onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+              spaceBetweenDateAndTime={spaceAmount}
             />
-          </TouchableOpacity>
-          <ColorPickerModal
-            visible={colorPickerVisible}
-            colors={colors}
-            selectedColor={selectedColor}
-            text=""
-            onSelect={newColor => {
-              setSelectedColor(newColor);
-              setColorPickerVisible(false);
-            }}
+          }
+          {!isIos &&
+            <EventDateTimePickerAndroid date={selectedDate} useFullDay={useFullDay}
+              onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+              onShowAndroidPicker={Keyboard.dismiss} spaceBetweenDateAndTime={spaceAmount}
+            />
+          }
+        </View>
+        <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
+          <Text>{i18n.t("selectColor")}</Text>
+          <MaterialCommunityIcons
+            name="palette"
+            style={{ fontSize: 50, color: selectedColor }}
           />
-        </ScrollView>
-      </React.Fragment>
+        </TouchableOpacity>
+        <ColorPickerModal
+          visible={colorPickerVisible}
+          colors={colors}
+          selectedColor={selectedColor}
+          text=""
+          onSelect={newColor => {
+            setSelectedColor(newColor);
+            setColorPickerVisible(false);
+          }}
+        />
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 }
@@ -194,7 +198,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   eventDateTimePickerWrapper: {
-    marginTop: Platform.OS === 'ios' ? 40: spaceAmount,
+    marginTop: Platform.OS === 'ios' ? 40 : spaceAmount,
   },
   colorPicker: {
     flex: 0,
@@ -204,15 +208,11 @@ const styles = StyleSheet.create({
     marginTop: spaceAmount,
     marginBottom: spaceAmount,
   },
-  headerRightComponent: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+  headerButton: {// jmr - figure out padding
+    // padding is so touching close to it works too
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5, // jmr ??
   },
-  headerButtonText: {
-    fontSize: theme.FONT_SIZE_LARGE,
-    fontWeight: 'bold',
-  }
 });
 

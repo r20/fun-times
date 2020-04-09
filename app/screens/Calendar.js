@@ -5,7 +5,6 @@ import { Slider } from "react-native-elements"
 
 import EventListContext from '../context/EventListContext'
 import AppSettingsContext from '../context/AppSettingsContext'
-import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
@@ -28,15 +27,12 @@ function Calendar(props) {
   const onSliderValueChange = (newVal) => {
     setSliderValue(newVal);
   }
-  
+
   const onSlidingComplete = (newVal) => {
     setSliderValue(newVal);
     appSettingsContext.setCalendarMaxNumberMilestonesPerEvent(newVal);
   }
   return (<View style={styles.container} >
-    <ScreenHeader
-      centerComponent={<ScreenHeaderTitle>{i18n.t("headerUpcomingCalendarScreenTitle")}</ScreenHeaderTitle>}
-    />
     <View style={styles.sliderWrapper} >
       <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
       <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
@@ -63,6 +59,7 @@ const styles = StyleSheet.create({
     flex: 0,
     justifyContent: 'center',
     paddingHorizontal: 15,
+    paddingTop: 10,
   },
   emptyText: {
     alignSelf: 'center',

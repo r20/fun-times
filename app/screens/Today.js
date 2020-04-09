@@ -5,7 +5,6 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 import i18n from '../i18n/i18n'
 import EventListContext from '../context/EventListContext'
 import EventComparedToNow from '../components/EventComparedToNow'
-import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 
@@ -18,10 +17,6 @@ function Today(props) {
 
   const empty = !filtered.length;
   return (<View style={styles.container} >
-
-    <ScreenHeader
-      centerComponent={<ScreenHeaderTitle>{i18n.t("headerTodayTitle")}</ScreenHeaderTitle>}
-    />
     {!empty &&
       <FlatList
         contentContainerStyle={{ padding: 15 }}

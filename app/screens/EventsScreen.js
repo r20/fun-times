@@ -6,7 +6,6 @@ import { ButtonGroup } from 'react-native-elements'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import StandardEvents from '../screens/StandardEvents'
-import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import CustomEvents from '../screens/CustomEvents'
 
 function EventsScreen(props) {
@@ -17,9 +16,6 @@ function EventsScreen(props) {
   return (
 
     <View style={styles.container}>
-      <ScreenHeader
-        centerComponent={<ScreenHeaderTitle>{i18n.t("headerEventsTitle")}</ScreenHeaderTitle>}
-      />
       <ButtonGroup
         onPress={setSelectedIndex}
         selectedIndex={selectedIndex}

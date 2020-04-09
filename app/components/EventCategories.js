@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { withNavigation } from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat'
 import { FlatList, StyleSheet, View, Dimensions } from 'react-native'
 import { Tile, Image } from 'react-native-elements'
 

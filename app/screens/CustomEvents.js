@@ -1,7 +1,7 @@
 import React, { useContext, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
-import { withNavigation } from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat'
 
 import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'

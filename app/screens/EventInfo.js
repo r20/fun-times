@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native'
 import { MaterialIcons, FontAwesome, Ionicons } from '@expo/vector-icons'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
-import ScreenHeader, { ScreenHeaderTitle } from '../components/ScreenHeader'
 import EventSelectedStar from '../components/EventSelectedStar'
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
@@ -15,26 +15,23 @@ import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 import * as logger from '../utils/logger'
 
-
-
 function EventInfo(props) {
 
-
   const eventListContext = useContext(EventListContext);
-  const navigation = props.navigation;
+  const route = useRoute();
+  const navigation = useNavigation();
 
   /* The passed in event param can get stale.
     If something about the event changes (such as selected)
     we need to get the current event object (not what was passed
       when first navigated to this screen)
   */
-  const passedEvent = navigation.getParam("event", '');
+  const passedEvent = route.params?.event ?? '';
   // Use the current version of the event object
   const event = eventListContext.getEventWithTitle(passedEvent.title);
   if (!event) {
     return null;
   }
-
 
   const onPressEditItem = () => {
     navigation.navigate("EditEvent", { oldEvent: event });
@@ -68,6 +65,26 @@ function EventInfo(props) {
 
   }
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return !event.isCustom ? (
+          <EventSelectedStar event={event} containerStyle={styles.headerButton} />
+        ) : (
+            <View style={styles.headerRightComponent}>
+              <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
+                <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+              </TouchableOpacity>
+              <EventSelectedStar event={event} containerStyle={styles.headerButton} />
+              <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
+                <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+              </TouchableOpacity>
+            </View>
+          );
+      },
+    });
+  }, [navigation, event]);
+
 
   const now = new Date();
   const nowMillis = now.getTime();
@@ -88,39 +105,7 @@ function EventInfo(props) {
     </React.Fragment>
   );
 
-  const headerLeft = (
-    // This was added because on ios the back arrow was missing. See https://github.com/react-navigation/react-navigation/issues/2918
-    // On my Android back isn't needed. On iphone 7 it is.  I suppose just leave it.
-    <Ionicons
-      name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
-      size={Platform.OS === "ios" ? 35 : 24}
-      color={theme.PRIMARY_HEADER_BUTTONS_COLOR}
-      style={
-        Platform.OS === "ios"
-          ? { marginBottom: -4, width: 25, marginLeft: 10 }
-          : { marginBottom: -4, width: 25, marginLeft: 10 }
-      }
-      onPress={() => {
-        navigation.goBack();
-      }}
-    />
-  )
 
-  const headerRight = !event.isCustom ? (
-    <View style={styles.headerRightComponent}>
-      <EventSelectedStar event={event} containerStyle={styles.headerButton} />
-    </View>
-  ) : (
-      <View style={styles.headerRightComponent}>
-        <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
-          <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
-        </TouchableOpacity>
-        <EventSelectedStar event={event} containerStyle={styles.headerButton} />
-        <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
-          <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
-        </TouchableOpacity>
-      </View>
-    );
 
   /* jmr - if event is within N days (see other code that sets that limit and get it from there),
     then have a message "Event within N days
@@ -128,11 +113,7 @@ function EventInfo(props) {
     jmr - if title is really long, looks bad in EventInfo screen */
   return (
     <View style={styles.container}>
-      <ScreenHeader
-        leftComponent={headerLeft}
-        rightComponent={headerRight}
-      />
-      <View style={styles.title}><ScreenHeaderTitle>{event.title}</ScreenHeaderTitle></View>
+      <View style={styles.titleWrapper}><Text style={styles.title}>{event.title}</Text></View>
       <UpcomingMilestonesList listHeaderComponent={upcomingMilestoneListHeader}
         showHeaderIfListEmpty={true} events={[event]} verboseDescription={false} />
     </View>
@@ -150,11 +131,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  title: {
+  titleWrapper: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  title: {
+    color: theme.PRIMARY_TEXT_COLOR,
+    fontSize: theme.FONT_SIZE_XLARGE,
+    fontWeight: 'bold',
+    paddingTop: 15, // If we make body and header same with no border, we'd change this
+    paddingHorizontal: 10,
   },
   headerRightComponent: {
     flex: 0,

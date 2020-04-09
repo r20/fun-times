@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
-import { withNavigation } from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat'
 
 import EventListContext from '../context/EventListContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
@@ -18,7 +18,7 @@ function EventListItem(props) {
 
   const onPressEventInfo = (event) => {
     if (props.navigation) {
-      // Passed param will be accessible via props.navigation.getParam()
+      // Pass param
       props.navigation.navigate("EventInfo", { event: event });
     }
   }
