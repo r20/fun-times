@@ -45,6 +45,7 @@ function MyTabs(props) {
     });
   }, [navigation, route]);
 
+
   return (
     <Tab.Navigator initialRouteName="EventsScreen" lazy={true}
       tabBarOptions={{
@@ -62,6 +63,7 @@ function MyTabs(props) {
       <Tab.Screen name="EventsScreen" component={EventsScreen} tabBarAccessibilityLabel={i18n.t("menuEventsTitle")}
         options={{ activeTintColor: 'red', tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> }} />
       <Tab.Screen name="Today" component={Today} tabBarAccessibilityLabel={i18n.t("menuTodayTitle")}
+
         options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> }} />
       <Tab.Screen name="Calendar" component={Calendar} tabBarAccessibilityLabel={i18n.t("menuUpcomingTitle")}
         options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="timetable" size={size} color={color} /> }} />
