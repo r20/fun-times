@@ -9,51 +9,57 @@ import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-ic
 
 import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
 
-import EventListContext from '../context/EventListContext'
+import AppSettingsContext from '../context/AppSettingsContext'
 import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
+import Divider from '../components/Divider'
 import i18n from '../i18n/i18n'
 
 function Settings(props) {
 
 
   /*
-  Here's a list of things that could be done to improve app
+  jmr:  Here's a list of things that could be done to improve app
 
   sharing dates (to send text, add to calendar, etc.)
-  Limit types and number of milestones shown. Globally.
-   Do they want to see seconds, minutes, hours, etc. binary, countdown, etc. ?
-   Maybe show next N (e.g. 3) upcoming milestones for each event?? 
-   And they could change N in settings.
-  Headers for milestones list (by date, like Month YYYY)star (explain) what it's for.
-  Sort by favorites?If Today things aren't clickable make them different
+
+  Headers for milestones list (by date, like Month YYYY)
+  star (explain) what it's for.
+  Sort by favorites? If Today things aren't clickable make them different
   color picker colors?
   Event groups, with color? (birthdays, holidays)
   */
 
-  const eventListContext = useContext(EventListContext);
+  const appSettingsContext = useContext(AppSettingsContext);
 
-  const [myBool, setMyBool] = useState(false);
-
-  const onSetMyBool = (isYes) => {
-    setMyBool(isYes);
-
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <React.Fragment>
 
         <ScrollView contentContainerStyle={styles.container}>
+          <Divider style={styles.divider} />
+          <Text style={styles.header}>{i18n.t("settingsHeaderShowAdditionalMilestonesForNumberTypes")}</Text>
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("fullDay")}</Text>
+            <Text>{i18n.t("usePowers")}</Text>
             <Switch
-              value={myBool}
+              value={appSettingsContext.numberTypeUseMap.usePowers}
               onValueChange={isYes => {
-                onSetMyBool(isYes);
+                appSettingsContext.setUsePowers(isYes);
               }}
             />
           </View>
+          <View style={[styles.switchSelection]}>
+            <Text>{i18n.t("useBinary")}</Text>
+            <Switch
+              value={appSettingsContext.numberTypeUseMap.useBinary}
+              onValueChange={isYes => {
+                appSettingsContext.setUseBinary(isYes);
+              }}
+            />
+          </View>
+         
+          <Divider style={styles.divider} />
         </ScrollView>
       </React.Fragment>
     </TouchableWithoutFeedback>
@@ -69,18 +75,22 @@ Settings.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 0,
-    paddingRight: 45,
-    paddingLeft: 45, // jmr - same as AddOrEditEvent. SHould put in common place?
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    backgroundColor: 'yellow',
+    paddingHorizontal: 20, // jmr - this is used in several places.  DRY.
+  },
+  header: {
+    paddingVertical: 10,
+  },
+  divider: {
+    marginVertical: 10,
   },
   switchSelection: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'green',
+    marginVertical: 5,
   },
 });
 

@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons'
 
 import AppBottomTabNavigator from '../navigation/AppBottomTabNavigator'
 
+import { MyReactNavigationBasedTheme } from '../style/theme'
 import AddOrEditEvent from '../screens/AddOrEditEvent'
 import EventInfo from '../screens/EventInfo'
 import theme, { getContrastFontColor } from '../style/theme'
@@ -17,7 +18,13 @@ function MyStack() {
   return (
     <Stack.Navigator
       initialRouteName="AppBottomTabNavigator"
-      screenOptions={{ gestureEnabled: false , headerTitle: ''}}
+      screenOptions={{
+        gestureEnabled: false, headerTitle: '',
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+      }}
     >
       <Stack.Screen
         name="AppBottomTabNavigator"
@@ -39,8 +46,6 @@ function MyStack() {
   );
 }
 
-
-
 export default function AppStackNavigator() {
-  return <NavigationContainer><MyStack /></NavigationContainer>
+  return <NavigationContainer theme={MyReactNavigationBasedTheme}><MyStack /></NavigationContainer>
 }

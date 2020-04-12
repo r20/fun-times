@@ -6,8 +6,8 @@ import * as logger from '../utils/logger'
 
 
 const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
-
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
+const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -19,6 +19,9 @@ const DATEPICKER_YEAR_TIP_STATES = {
 const AppSettingsContext = createContext({
   helpWithDatePicker: () => { },
   setCalendarMaxNumberMilestonesPerEvent: (maxNum) => { },
+  setUsePowers: () => { },
+  setUseBinary: () => { },
+  setUsePi: () => { },
 });
 
 /**
@@ -36,6 +39,7 @@ export class AppSettingsContextProvider extends React.Component {
       // Default value
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
       calendarMaxNumberMilestonesPerEvent: 3,
+      numberTypeUseMap: {}, // has usePowers, useBinary, usePi attributes. All default to false/undefined.
     };
   }
 
@@ -46,7 +50,7 @@ export class AppSettingsContextProvider extends React.Component {
       if (typeof datePickerYearTipState !== "string") {
         datePickerYearTipState = JSON.parse(datePickerYearTipState);
       }
-     
+
       this.setState({ datePickerYearTipState });
     } catch (e) {
       logger.warn("Error from failing to load datePickerYearTipState: ", e);
@@ -59,6 +63,16 @@ export class AppSettingsContextProvider extends React.Component {
       this.setState({ calendarMaxNumberMilestonesPerEvent });
     } catch (e) {
       logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
+    }
+    try {
+      // can have empty object as default since all of these default to false
+      let numberTypeUseMap = await AsyncStorage.getItem(STORAGE_KEY_numberTypeUseMap) || {};
+      if (typeof numberTypeUseMap !== "object") {
+        numberTypeUseMap = JSON.parse(numberTypeUseMap);
+      }
+      this.setState({ numberTypeUseMap });
+    } catch (e) {
+      logger.warn("Error from failing to load use* number types: ", e);
     }
 
   }
@@ -127,6 +141,36 @@ export class AppSettingsContextProvider extends React.Component {
     }
   }
 
+
+  setUsePowers = async (isYes) => {
+    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { usePowers: isYes });
+    this.setState({ numberTypeUseMap });
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
+    } catch (e) {
+      logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
+    }
+  }
+  setUseBinary = async (isYes) => {
+    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { useBinary: isYes });
+    this.setState({ numberTypeUseMap });
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
+    } catch (e) {
+      logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
+    }
+  }
+  setUsePi = async (isYes) => {
+    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { usePi: isYes });
+    this.setState({ numberTypeUseMap });
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
+    } catch (e) {
+      logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
+    }
+  }
+
+
   render() {
     /* Make some functions available
     */
@@ -135,6 +179,9 @@ export class AppSettingsContextProvider extends React.Component {
         ...this.state,
         helpWithDatePicker: this.helpWithDatePicker,
         setCalendarMaxNumberMilestonesPerEvent: this.setCalendarMaxNumberMilestonesPerEvent,
+        setUsePowers: this.setUsePowers,
+        setUseBinary: this.setUseBinary,
+        setUsePi: this.setUsePi,
       }}>
         {this.props.children}
       </AppSettingsContext.Provider>

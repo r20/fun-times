@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native'
+import {DefaultTheme} from '@react-navigation/native'
+
 
 /* TBD - Eventually add theming to allow user to switch between
   style themes (such as white background vs black background
 */
 
-export default {
+const THEME_SETTINGS = {
   FONT_SIZE_SMALL: 10,
   FONT_SIZE_MEDIUM: 12,
   FONT_SIZE_LARGE: 14,
@@ -18,6 +20,18 @@ export default {
   PRIMARY_INACTIVE_TEXT_COLOR: '#c3c3c3', // light gray
   TAB_BAR_BORDER_COLOR: '#c3c3c3', // light gray
   ADD_EVENT_BUTTON_BACKGROUND_COLOR: '#2196F3', // blue
+};
+
+export default THEME_SETTINGS;
+
+export const MyReactNavigationBasedTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: THEME_SETTINGS.PRIMARY_ACTIVE_TEXT_COLOR,
+    text: THEME_SETTINGS.PRIMARY_TEXT_COLOR,
+    background: THEME_SETTINGS.PRIMARY_BACKGROUND_COLOR,
+  },
 };
 
 

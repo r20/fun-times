@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   sliderWrapper: {
     flex: 0,
     justifyContent: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     paddingTop: 10,
   },
   emptyText: {

@@ -52,6 +52,10 @@ export const en = {
   emptyTodayMesage: "After marking events with a star, come back to see how long it has been or how much time remaining until each event.",
   emptyCalendarMesage: "After marking events with a star, come back to see upcoming milestones.  Perhaps your sister is turning 1 billion seconds old next month.  Or, Monday is 100 days until the wedding.",
   emptyMilestoneMesage: "There are no milestones within \{{someValue}}\ days.",
+  settingsHeaderShowAdditionalMilestonesForNumberTypes: "Show additonal milestones using these number types",
+  usePowers: "Super powers (e.g. 4^4 or 11^11)",
+  useBinary: "Binary numbers",
+  usePi: "Pi (3.14159...)",
 };
 
 /**

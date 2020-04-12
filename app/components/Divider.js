@@ -5,7 +5,7 @@ import { Divider } from 'react-native-elements'
 
 
 /* This was created in case need to style all dividers
-(such as based on dark/light themse).  We can just do styling here. */
+(such as based on dark/light theme).  We can just do styling here. */
 export default function (props) {
-    return (<Divider />);
+    return (<Divider {...props} />);
 }

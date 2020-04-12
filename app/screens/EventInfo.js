@@ -65,6 +65,7 @@ function EventInfo(props) {
 
   }
 
+  // jmr - I'm not using ref so why am i using useLayuoutEffect here and other place instead of useEffect??
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {

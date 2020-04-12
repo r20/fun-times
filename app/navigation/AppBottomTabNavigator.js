@@ -38,9 +38,12 @@ function MyTabs(props) {
 
     navigation.setOptions({
       headerTitle: title,
-      headerTintColor: theme.PRIMARY_TEXT_COLOR,
       // this defaults to left android and center on ios
       // headerTitleAlign: 'center' , // jmr on android center makes it too high.
+      headerStyle: {
+        elevation: 0,
+        shadowOpacity: 0,
+      },
 
     });
   }, [navigation, route]);

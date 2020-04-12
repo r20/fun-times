@@ -44,7 +44,7 @@ export default class Event {
 
 
 export function cloneEvent(event) {
-    /* Since not storing Date in objet or anything too unusual, we can do deep clone with stringify */
+    /* Since not storing Date in object or anything too unusual, we can do deep clone with stringify */
     return JSON.parse(JSON.stringify(event));
 }
 

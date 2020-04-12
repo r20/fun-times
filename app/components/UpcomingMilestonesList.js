@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList } from 'react-native'
 
@@ -8,22 +8,48 @@ import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import { findInterestingDates } from '../utils/interestingDatesFinder'
+import { interestingNumberTypes } from '../utils/interestingNumbersFinder'
+
+import AppSettingsContext from '../context/AppSettingsContext'
 
 export default function UpcomingMilestonesList(props) {
 
+  const appSettingsContext = useContext(AppSettingsContext);
+
+  const [specials, setSpecials] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(true);
+  let now = new Date();
+  const [nowTime, setNowTime] = useState(now.getTime());
+
   const howManyDaysAhead = 365;
   const tooCloseDays = 4;
-  const now = new Date();
-  const nowTime = now.getTime();
 
-  let specials = [];
-  for (var idx = 0; idx < props.events.length; idx++) {
-    const event = props.events[idx];
-    specials = specials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays, props.maxNumMilestonesPerEvent));
-  }
-  specials.sort((a, b) => { return (a.time - b.time); });
+  React.useEffect(() => {
+    let now = new Date();
+    setNowTime(now.getTime());
 
-  const empty = !specials.length;
+    let newSpecials = [];
+    for (var idx = 0; idx < props.events.length; idx++) {
+      const event = props.events[idx];
+      newSpecials = newSpecials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays, props.maxNumMilestonesPerEvent));
+    }
+    newSpecials = newSpecials.filter((val, idx) => {
+      if (!appSettingsContext.numberTypeUseMap.usePowers && val.tags.indexOf(interestingNumberTypes.SUPER_POWER) >= 0) {
+        return false;
+      } if (!appSettingsContext.numberTypeUseMap.useBinary && val.tags.indexOf(interestingNumberTypes.BINARY) >= 0) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    newSpecials.sort((a, b) => { return (a.time - b.time); });
+
+    setSpecials(newSpecials);
+    setIsEmpty(newSpecials.length === 0);
+
+  }, [props.events, appSettingsContext.numberTypeUseMap]);
+
+
 
   /* 
     Combination of event title and time
@@ -36,7 +62,7 @@ export default function UpcomingMilestonesList(props) {
 
   return (
     <React.Fragment>
-      {!empty &&
+      {!isEmpty &&
         <FlatList
           data={specials}
           ListHeaderComponent={props.listHeaderComponent}
@@ -64,7 +90,7 @@ export default function UpcomingMilestonesList(props) {
           }
         />
       }
-      {empty &&
+      {isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
           <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAhead })}</Text></View>
