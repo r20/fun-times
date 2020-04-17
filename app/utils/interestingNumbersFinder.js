@@ -145,21 +145,28 @@ function findRoundFactorsInRange(multiplier, start, end) {
     let interesting = firstDigit * base;
     while (interesting <= endFactor) {
       factors.push(interesting);
-      firstDigit++;
-
-      /* We go from 10 to 100 by 10s, and 100 to 1000 by 100s
-        then starting at 1000 (length 4) we allow 2 non zero
-        digits (e.g. 8,000 9,000 10,000 11,000 12,000 ... ) */
-      if (length < 4 && firstDigit > 9) {
-        length++;
-        base = base * 10;
-        firstDigit = 1;
-
-      } else if (length >= 4 && firstDigit > 99) {
-        firstDigit = 1;
-        base = base * 100;
-      }
-      interesting = firstDigit * base;
+      if (interesting < 100) {
+        // Count by 10s to 100
+        interesting = interesting + 10;
+      } else if (interesting < 1000) {
+        // Count by 100s to 1,000
+        interesting = interesting + 100;
+      } else if (interesting < 10000) {
+        // Count by 1,000s to 10,000
+        interesting = interesting + 1000;
+      } else if (interesting < 100000) {
+        // Count by 10,000s to 100,000
+        interesting = interesting + 10000;
+      } else if (interesting < 1000000) {
+        // count by 100,000s to 1,000,000
+        interesting = interesting + 100000;
+      } else if (interesting < 1000000000) {
+        // count by 1,000,000s to 1,000,000,000
+        interesting = interesting + 1000000;
+      } else {
+        // count by 10,000,000s 
+        interesting = interesting + 10000000;
+       }
     }
 
   }
@@ -364,10 +371,10 @@ export function getSortedInterestingNumbersMap() {
   somenums = findExponentsForBaseSoPowerInRange(2, start, end);
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const expo = somenums[sIdx];
-    const num = Math.pow(2,expo);
+    const num = Math.pow(2, expo);
     let interestingInfo = {
       tags: [interestingNumberTypes.BINARY],
-      descriptor: num.toString(2)+" binary (2^" + numberWithCommas(expo) + ", or " + numberWithCommas(Math.pow(2, expo)) + ")",
+      descriptor: num.toString(2) + " binary (2^" + numberWithCommas(expo) + ", or " + numberWithCommas(Math.pow(2, expo)) + ")",
       number: Math.pow(2, expo),
     };
     interestingList.push(interestingInfo);
@@ -402,6 +409,8 @@ export function getSortedInterestingNumbersMap() {
   }
   interestingList.sort(sortFunction);
   sortedInterestingNumbersMap[interestingNumberTypes.REPEATING_DIGITS] = interestingList;
+
+  //logger.warn("JMR == sortedInterestingNumbersMap ", sortedInterestingNumbersMap);
 
   return sortedInterestingNumbersMap;
 }

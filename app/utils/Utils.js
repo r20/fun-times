@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import moment from 'moment-timezone'
 
-import { Decimal } from 'decimal.js-light';
+import { Decimal } from 'decimal.js-light'
 import * as logger from '../utils/logger'
 
 /**
@@ -92,40 +93,35 @@ export function numberWithCommas(x) {
 }
 
 /**
- * Return nicely formatted string for the date
- * object according to locale.
+ * Return nicely formatted string for the date object
  * date - Date object
  */
 export function getDisplayStringForDate(date) {
-  try {
-    if (date && date.toLocaleDateString) {
-      return date.toLocaleDateString();
-    }
-  } catch (err) {
-    logger.warn("Error with date", err);
+  if (date && typeof date === "object") {
+    //   ** If change, this also change getDisplayStringDateTimeForEpoch **
+    return moment(date).format('YYYY-MM-DD');
   }
-
-  logger.log("Something is wrong with the date");
-  return '????/??/??';
+  logger.warn("Something is wrong with the date", date);
+  return '????-??-??';
 }
 
 /**
- * Return nicely formatted string for the date
- * object according to locale.
+ * Return nicely formatted string for the date object
  * date - Date object
  */
 export function getDisplayStringForTime(date) {
-  try {
-    if (date && date.toLocaleTimeString) {
-      /* Would be nice to know if device is using 24 hour format
-    and display accordingly, but that was difficult. */
-      return date.toLocaleTimeString();
-    }
-  } catch (err) {
-    logger.warn("Error with date time", err);
+  if (date && typeof date === "object") {
+    /* Would be nice to know if device is using 24 hour format
+      and display accordingly, but that was difficult. 
+      
+      // 'h:mm:ssa'for am/pm else do 'H:mm:ss' for 24 hr
+      moment(date).format('h:mm:ssa') 
+      */
+    //   ** If change, this also change getDisplayStringDateTimeForEpoch **
+    return moment(date).format('h:mm:ssa');
   }
 
-  logger.log("Something is wrong with the time");
+  logger.log("Something is wrong with the time", date);
   return '????';
 }
 
@@ -133,26 +129,25 @@ export function getDisplayStringForTime(date) {
 export function getDisplayStringDateTimeForEvent(event) {
 
   if (event) {
-      return getDisplayStringDateTimeForEpoch(event.epochMillis, event.isFullDay);
+    return getDisplayStringDateTimeForEpoch(event.epochMillis, event.isFullDay);
   }
   logger.log("Something is wrong with the event");
-  return '????/??/??';
+  return '????-??-?? ????';
 }
 
 export function getDisplayStringDateTimeForEpoch(epochMillis, noShowTimeOfDay = true) {
   try {
-      const date = new Date(epochMillis);
-      if (noShowTimeOfDay) {
-          return date.toLocaleDateString();
-      } else {
-          /* Would be nice to know if device is using 24 hour format
-              and display accordingly, but that was difficult. */
-          return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-      }
+    const date = new Date(epochMillis);
+    if (noShowTimeOfDay) {
+      return getDisplayStringForDate(date);
+    } else {
+      // If change this, also change getDisplayStringForDate and/or getDisplayStringForTime
+      return moment(date).format('YYYY-MM-DD h:mm:ssa');
+    }
 
   } catch (err) {
-      logger.warn("Error while getting display date", err);
+    logger.warn("Error while getting display date", epochMillis, err);
   }
 
-  return '????/??/??';
+  return '????-??-?? ????';
 }
