@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import moment from 'moment-timezone'
 
 import { getMomentFromEvent } from '../context/EventListContext'
-import { numberWithCommas } from '../utils/Utils'
+import { numberToFormattedString } from '../utils/Utils'
 import i18n from '../i18n/i18n'
 import { EventCardBodyText } from './EventCard'
 
@@ -19,7 +19,7 @@ export default function EventComparedToNow(props) {
     {
       timeUnits.map((tu) => {
         const num = Math.abs(eventMoment.diff(nowMoment, tu));
-        return <EventCardBodyText key={tu} event={props.event}>{i18n.t(tu, { someValue: numberWithCommas(num) })}</EventCardBodyText>
+        return <EventCardBodyText key={tu} event={props.event}>{i18n.t(tu, { someValue: numberToFormattedString(num) })}</EventCardBodyText>
       })
     }
   </React.Fragment>

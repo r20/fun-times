@@ -1,8 +1,10 @@
 
 import { Decimal } from 'decimal.js-light';
 
+import i18n from '../i18n/i18n'
 import * as logger from './logger'
-import { numberWithCommas } from './Utils'
+import { numberToFormattedString, capitalize } from './Utils'
+
 
 export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
 
@@ -109,6 +111,56 @@ function findConsecutivesInRange(start, end) {
 
 
 /**
+ * Returns interesting numbers that when multiplied by decimalConstant are withing the specified range.
+ * The interesting numbers are x*10^y where x is an integer 1-9.
+ * (e.g. .01, .02, .03, .... 1, 2, 3, .... 100, 200, 300, etc.)
+ * 
+ * @param {Decimal} decimalConstant - A constant to look for multipliers for
+ * @param {Number|Decimal} start - start of range to look for interesting numbers within
+ * @param {Number|Decimal} end - end of range to look for interesting numbers within
+ */
+function findMultipliersForConstantInRange(decimalConstant, start, end) {
+
+  let startFactorDecimal = (new Decimal(start)).div(decimalConstant);
+  let endFactorDecimal = (new Decimal(end)).div(decimalConstant);
+
+  // Not using floor or ceil. Divide and multiply by 10 to make sure we cover the full range.
+  startFactorDecimal = startFactorDecimal.div(10);
+  endFactorDecimal = endFactorDecimal.mul(10);
+
+  const factors = [];
+  let exponent = startFactorDecimal.exponent();
+  let startsWithOneFactorDecimal = (new Decimal(10)).pow(exponent);
+  while (decimalConstant.mul(startsWithOneFactorDecimal).lte(end)) {
+
+    for (let num of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+
+      const interestingCandidate = startsWithOneFactorDecimal.mul(num);
+      let product = decimalConstant.mul(interestingCandidate);
+      if (product.gte(start)) {
+        if (product.gte(end)) {
+          // We've gone too far. We're done.
+          break;
+        }
+        factors.push(interestingCandidate.toNumber());
+      }
+
+      if (startsWithOneFactorDecimal.lt(1)) {
+        /* Most of these aren't too interesting.  Just consider when it's a constantTenMultiple and has same digits.
+        i.e. We will skip num 2-9 */
+        break;
+      }
+
+    }
+    startsWithOneFactorDecimal = startsWithOneFactorDecimal.mul(10);
+  }
+
+  return factors;
+}
+
+
+
+/**
  * Find interesting numbers that mostly end in zeros (round factors)
  * (like 2000 or 4000000) that when multiplied by the multiplier parameter.
  * are within the range.
@@ -166,12 +218,40 @@ function findRoundFactorsInRange(multiplier, start, end) {
       } else {
         // count by 10,000,000s 
         interesting = interesting + 10000000;
-       }
+      }
     }
 
   }
+
   return factors;
 }
+
+
+
+/**
+ * Find numbers that use the digits from inputDecimal.
+ * E.g. if inputDecimal was 98723.4, and start = 1 and end = 1,000
+ * would return array of Decimal objects [Decimal(9.87324), Decimal(98.7324), Decimal(987.324)]
+ * 
+ * @param {Number} start - start of range to look for numbers
+ * @param {Number} end - end of range
+ */
+function findDecimalsWithDigitsInRange(start, end, inputDecimal) {
+  const found = [];
+  let decimal = inputDecimal;
+  while (decimal.gt(start) && decimal.gt(1)) {
+    decimal = decimal.div(10);
+  }
+  while (decimal.lte(end)) {
+    if (decimal.gte(start)) {
+      found.push(decimal);
+    }
+    decimal = decimal.mul(10);
+  }
+  return found;
+}
+
+
 
 /**
  * Find integer exponents (expo) that are >=2 such that
@@ -241,35 +321,56 @@ function isSuperPowerInRange(power, start, end) {
   return superPowerDecimal.gte(start) && superPowerDecimal.lte(end);
 }
 
-export const interestingNumberTypes = {
-  ROUND: 'round',
-  SUPER_POWER: 'super power',
-  BINARY: 'binary',
-  COUNT: 'count',
-  REPEATING_DIGITS: 'repeating digits',
-  PI: 'pi',
+export const INTERESTING_CONSTANTS = {
+  pi: { defaultUse: 2, decimal: new Decimal(3.141592653589) },
+  euler: { defaultUse: 0, defaultUse: 0, decimal: new Decimal(2.71828182845904523536) },
+  phi: { defaultUse: 0, decimal: new Decimal(1.618033988749895) },
+  pythagoras: { defaultUse: 0, decimal: new Decimal(1.4142135623730950488016887242) }, // square root of 2
+  mole: { defaultUse: 0, decimal: (new Decimal(6.02214076)).mul((new Decimal(10)).toPower(23)), units: "mol-1" },
+  rGas: { defaultUse: 0, decimal: new Decimal(8.31446261815324), units: "J⋅K−1⋅mol−1" },
+  faraday: { defaultUse: 0, decimal: new Decimal(96485.3321233100184), units: "C⋅mol−1" }, //  (magnitude of electrical charge per mole of electrons)
+  gravity: { defaultUse: 0, decimal: (new Decimal(6.67430)).mul((new Decimal(10)).toPower(-11)), units: "m3⋅kg−1⋅s−2" },
+  speedOfLight: { defaultUse: 1, decimal: new Decimal(299792458), units: "m/s" },
+
 }
 
-/* jmr - instead of having these in the map,
-I should have a function that can derive
-interesting numbers from each list.
-So, instead of just the round*pi I could have binary*pi and others too.
-*/
+let temp = {};
+for (let key in INTERESTING_CONSTANTS) {
+  temp[key] = key;
+}
 
-const PI_DECIMAL = new Decimal(3.141592653589);
-const EULERS_DECIMAL = new Decimal(2.71828);
-const PHI_DECIMAL = new Decimal(1.618033988749895);
+// Add these plus what's in the INTERESTING_CONSTANTS to get INTERESTING_TYPES
+export const INTERESTING_TYPES = Object.assign(temp, {
+  round: "round",
+  count: "count",
+  repDigits: "repDigits",
+  superPower: "superPower",
+  binary: "binary",
+});
+
+
+
+/**
+ * Return string for showing the decimal constant, also showing units if it has them.
+ * numKey - string (one of the keys in INTERESTING_CONSTANTS )
+ */
+export const getDecimalDisplayValueForKey = (numKey) => {
+  const units = INTERESTING_CONSTANTS[numKey].units || '';
+  return numberToFormattedString(INTERESTING_CONSTANTS[numKey].decimal, true, units);
+
+}
+
 
 const sortFunction = (a, b) => {
   return (a.number - b.number);
 }
 
-
 let sortedInterestingNumbersMap = {};
 
 /**
- * Returns a map with interestingNumberTypes as keys and an array of interesting number
+ * Returns a map with INTERESTING_TYPES as keys and an array of interesting number
  * objects for that type as the value.
+ * Returns numbers of all types regardless of whether they'll be used according to settings.
  * 
  * The objects have
  *  tags: array, e.g. [ "super power"] or ["pi"]
@@ -278,7 +379,7 @@ let sortedInterestingNumbersMap = {};
  */
 export function getSortedInterestingNumbersMap() {
 
-  if (sortedInterestingNumbersMap[interestingNumberTypes.ROUND]) {
+  if (sortedInterestingNumbersMap[INTERESTING_TYPES.round]) {
     // We've already generated the interestingNumbersMap.  It only needs done once.
     return sortedInterestingNumbersMap;
   }
@@ -299,14 +400,66 @@ export function getSortedInterestingNumbersMap() {
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const num = somenums[sIdx];
     let interestingInfo = {
-      tags: [interestingNumberTypes.ROUND],
-      descriptor: numberWithCommas(num),
+      tags: [INTERESTING_TYPES.round],
+      descriptor: numberToFormattedString(num),
       number: num,
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
-  sortedInterestingNumbersMap[interestingNumberTypes.ROUND] = interestingList;
+  sortedInterestingNumbersMap[INTERESTING_TYPES.round] = interestingList;
+
+
+  /* For each of the constants, find interesting multiplier numbers.  */
+  for (numberKey in INTERESTING_CONSTANTS) {
+
+    const interestingList = [];
+    const decimalConstant = INTERESTING_CONSTANTS[numberKey].decimal;
+    /* Use 1 as start, not zero.  Or else numbers between 0 and 1 may have factors that
+    when multiplied by the decimalConstant are < 1 and they aren't useful for anything */
+    const factors = findMultipliersForConstantInRange(decimalConstant, 1, end);
+
+    for (factor of factors) {
+
+      const decimalInteresting = decimalConstant.mul(factor);
+
+      let translationKey;
+      let descriptor;
+      if (factor === 1) {
+        translationKey = "constantExact";
+        descriptor = i18n.t(translationKey, {
+          numberName: i18n.t("numberName" + capitalize(numberKey)),
+          someValue: numberToFormattedString(decimalInteresting, true), // don't use units for descriptor
+        });
+
+      } else if (Number.isInteger(Math.log10(factor))) {
+        // The factor is in form 10^n (which means the decimalInteresting has the same digits as the constant)
+        translationKey = "constantTenMultiple";
+        descriptor = i18n.t(translationKey, {
+          numberName: i18n.t("numberName" + capitalize(numberKey)),
+          someValue: numberToFormattedString(decimalInteresting, true), // don't use units for descriptor
+        });
+
+      } else {
+        translationKey = "constantOtherMultiple";
+        descriptor = i18n.t(translationKey, {
+          multiplier: numberToFormattedString(factor),
+          numberName: i18n.t("numberName" + capitalize(numberKey)),
+          someValue: numberToFormattedString(decimalInteresting, true), // don't use units for descriptor
+        });
+      }
+
+      let interestingInfo = {
+        tags: [numberKey, translationKey],
+        descriptor: descriptor,
+        number: decimalInteresting.toNumber(),
+      };
+      interestingList.push(interestingInfo);
+    }
+    interestingList.sort(sortFunction);
+    sortedInterestingNumbersMap[numberKey] = interestingList;
+
+  }
 
 
   /* Need to also find super powers using oher numbers, like pi,
@@ -318,51 +471,15 @@ export function getSortedInterestingNumbersMap() {
     const num = Math.pow(power, power);
     // TODO: should i18n this and other descriptors
     var interestingInfo = {
-      tags: [interestingNumberTypes.SUPER_POWER],
-      descriptor: "Super power!! " + power + "^" + power + " (" + numberWithCommas(Math.pow(power, power)) + ")",
+      tags: [INTERESTING_TYPES.superPower],
+      descriptor: "Super power!! " + power + "^" + power + " (" + numberToFormattedString(Math.pow(power, power)) + ")",
       number: num,
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
-  sortedInterestingNumbersMap[interestingNumberTypes.SUPER_POWER] = interestingList;
+  sortedInterestingNumbersMap[INTERESTING_TYPES.superPower] = interestingList;
 
-  const data = [
-    {
-      tag: interestingNumberTypes.PI,
-      multDecimal: PI_DECIMAL
-    },
-    // {
-    //   tag: "e (Euler's number)",
-    //   multDecimal: EULERS_DECIMAL
-    // },
-    // {
-    //   tag: "phi (golden number)",
-    //   multDecimal: PHI_DECIMAL
-    // },
-  ];
-  for (let dIdx = 0; dIdx < data.length; dIdx++) {
-    const tag = data[dIdx].tag;
-    const multDecimal = data[dIdx].multDecimal;
-
-    interestingList = [];
-    somenums = findRoundFactorsInRange(multDecimal, start, end);
-    for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-      const factor = somenums[sIdx];
-
-      const productDecimal = multDecimal.times(factor);
-
-      let interestingInfo = {
-        tags: [tag],
-        descriptor: numberWithCommas(factor) + "*" + tag + " (" + numberWithCommas(productDecimal.toDecimalPlaces(0)) + ")",
-        number: productDecimal.toNumber(),
-      };
-      interestingList.push(interestingInfo);
-    }
-    interestingList.sort(sortFunction);
-    sortedInterestingNumbersMap[tag] = interestingList;
-
-  }
 
   /**
    * If 2^expo is in range, it's an interesting binary number (starting with 1 and ending in all zeros)
@@ -373,179 +490,42 @@ export function getSortedInterestingNumbersMap() {
     const expo = somenums[sIdx];
     const num = Math.pow(2, expo);
     let interestingInfo = {
-      tags: [interestingNumberTypes.BINARY],
-      descriptor: num.toString(2) + " binary (2^" + numberWithCommas(expo) + ", or " + numberWithCommas(Math.pow(2, expo)) + ")",
+      tags: [INTERESTING_TYPES.binary],
+      descriptor: num.toString(2) + " binary (2^" + numberToFormattedString(expo) + ", or " + numberToFormattedString(Math.pow(2, expo)) + ")",
       number: Math.pow(2, expo),
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
-  sortedInterestingNumbersMap[interestingNumberTypes.BINARY] = interestingList;
+  sortedInterestingNumbersMap[INTERESTING_TYPES.binary] = interestingList;
 
   interestingList = [];
   somenums = findConsecutivesInRange(start, end);
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const num = somenums[sIdx];
     let interestingInfo = {
-      tags: [interestingNumberTypes.COUNT],
-      descriptor: numberWithCommas(num),
+      tags: [INTERESTING_TYPES.count],
+      descriptor: numberToFormattedString(num),
       number: num,
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
-  sortedInterestingNumbersMap[interestingNumberTypes.COUNT] = interestingList;
+  sortedInterestingNumbersMap[INTERESTING_TYPES.count] = interestingList;
 
   interestingList = [];
   somenums = findRepdigitsInRange(start, end);
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const num = somenums[sIdx];
     let interestingInfo = {
-      tags: [interestingNumberTypes.REPEATING_DIGITS], // could tag with the digit
-      descriptor: numberWithCommas(num),
+      tags: [INTERESTING_TYPES.repDigits],
+      descriptor: numberToFormattedString(num),
       number: num,
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
-  sortedInterestingNumbersMap[interestingNumberTypes.REPEATING_DIGITS] = interestingList;
-
-  //logger.warn("JMR == sortedInterestingNumbersMap ", sortedInterestingNumbersMap);
+  sortedInterestingNumbersMap[INTERESTING_TYPES.repDigits] = interestingList;
 
   return sortedInterestingNumbersMap;
 }
-
-
-/**
- * This function calls others to get interesting numbers that
- * are within the start and end.
- * 
- * Returns an array of objects that contain info about the interesting numbers.
- * 
- * The objects have
- *  tags: array, e.g. [ "super power", "pi"]
- *  descriptor: A partial description of what was found
- *  number: The number within the range.  It in and of itself might not seem interesting, and the descriptor and tags help explain its interest.
- * 
- * @param {Number} start - start of range to look for interesting numbers within
- * @param {Number} end - end of range to look for interesting numbers within
- */
-export function findInterestingNumbers(start, end) {
-
-  var interestingList = [];
-
-  let somenums;
-
-  somenums = findRoundFactorsInRange(1, start, end);
-  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-    const num = somenums[sIdx];
-    let interestingInfo = {
-      tags: ['round'],
-      descriptor: numberWithCommas(num),
-      number: num,
-    };
-    interestingList.push(interestingInfo);
-  }
-
-  /* Need to also find super powers using oher numbers, like pi,
-    and tag them with both super power and other tag */
-  somenums = findSuperPowersInRange(start, end);
-  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-    const power = somenums[sIdx];
-    const num = Math.pow(power, power);
-    var interestingInfo = {
-      tags: ["super power"],
-      descriptor: "Super power!! " + power + "^" + power + " (" + numberWithCommas(Math.pow(power, power)) + ")",
-      number: num,
-    };
-    interestingList.push(interestingInfo);
-  }
-
-  const data = [
-    {
-      tag: 'pi',
-      multDecimal: PI_DECIMAL
-    },
-    // {
-    //   tag: "e (Euler's number)",
-    //   multDecimal: EULERS_DECIMAL
-    // },
-    // {
-    //   tag: "phi (golden number)",
-    //   multDecimal: PHI_DECIMAL
-    // },
-  ];
-  for (let dIdx = 0; dIdx < data.length; dIdx++) {
-    const tag = data[dIdx].tag;
-    const multDecimal = data[dIdx].multDecimal;
-
-
-    somenums = findRoundFactorsInRange(multDecimal, start, end);
-    for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-      const factor = somenums[sIdx];
-
-      const productDecimal = multDecimal.times(factor);
-
-      let interestingInfo = {
-        tags: [tag],
-        descriptor: numberWithCommas(factor) + "*" + tag + " (" + numberWithCommas(Decimal.round(productDecimal)) + ")",
-        number: productDecimal.toNumber(),
-      };
-      interestingList.push(interestingInfo);
-    }
-  }
-
-  /**
-   * If 2^expo is in range, it's an interesting binary number (starting with 1 and ending in all zeros)
-   */
-  somenums = findExponentsForBaseSoPowerInRange(2, start, end);
-  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-    const expo = somenums[sIdx];
-    let interestingInfo = {
-      tags: ["binary"],
-      descriptor: "Binary! 2^" + numberWithCommas(expo) + " (" + numberWithCommas(Math.pow(2, expo)) + ")",
-      number: Math.pow(2, expo),
-    };
-    interestingList.push(interestingInfo);
-  }
-
-  somenums = findConsecutivesInRange(start, end);
-  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-    const num = somenums[sIdx];
-    let interestingInfo = {
-      tags: ['count'],
-      descriptor: numberWithCommas(num),
-      number: num,
-    };
-    interestingList.push(interestingInfo);
-  }
-
-  somenums = findRepdigitsInRange(start, end);
-  for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
-    const num = somenums[sIdx];
-    let interestingInfo = {
-      tags: ['repdigits'], // could tag with the digit
-      descriptor: numberWithCommas(num),
-      number: num,
-    };
-    interestingList.push(interestingInfo);
-  }
-
-  return interestingList;
-}
-
-/**
- * jmr - the interestingNumbers range end needs to be big enough.
- * Take out pi. Have that as its own list.
- * For each event, allow adding special numbers interested in,
- * including numbers in date by default.
- * (?? have slider for use specific numbers, then have specific numbers with checkbox and
- * have input(s) to let them put in more numbers and they have checkboxes by them )
- *
- * Since 1000 is interesting for days, but not minutes, need to handle that.
- * Perhaps have a min number for each unit?
- *
- * Do I need a sliding scale for showing more numbers?
- * If so, how will that work?
- * My birthday, for example, isn't showing anything.
- */

@@ -1,7 +1,7 @@
 import { Decimal } from 'decimal.js-light';
 import * as logger from './logger'
 import moment from 'moment-timezone'
-import { interestingNumberTypes, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
+import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
 import * as Utils from './Utils'
 
 /**
@@ -11,7 +11,6 @@ import * as Utils from './Utils'
  * The objects have
  *  event: the event that was passed in to generate the array
  *  unit: (e.g. minutes, seconds, etc.)
- *  tags: array(e.g. [ "Super power", "pi"]
  *  description: A partial description of what was found (doesn't have unit)
  *  time: in epoch milliseconds  
  * 
@@ -20,9 +19,10 @@ import * as Utils from './Utils'
  * @param {Number} futureDistanceDays - number of days in future to look for interesting numbers
  * @param {Number} tooCloseDays - number of days within the event to ignore interesting dates
  *                        (because looking close to the event, e.g. 4 days, causes LOTS of interesting times)
+ * @param {Object} appSettingsContext - has appSettingsContext.numberTypeUseMap and other settings to see which number types to use 
  * @param {Number} maxNumMilestones - If > 0, max number of milestones to return
  */
-export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays, maxNumMilestones) {
+export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays, appSettingsContext, maxNumMilestones) {
 
     const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
 
@@ -59,17 +59,13 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                 break;
             }
             const numberType = numberTypes[numberTypesIdx];
-            if (numberType === interestingNumberTypes.PI && event.tags.indexOf('pi') < 0) {
-                // Don't use pi numbers unless event has pi tag
-                continue;
-            }
 
-            if (numberType !== interestingNumberTypes.PI && event.tags.indexOf('pi') >= 0) {
-                // For events tagged with pi, only use pi.
-                // jmr - this should probably change.
-                // I may want to redo pi code to use all interesting numbers multiplied by pi
+            const numberUse = appSettingsContext.numberTypeUseMap[numberType];
+            if (!numberUse) {
+                // We don't want to use this type of number at all
                 continue;
             }
+            const isConstant = INTERESTING_CONSTANTS[numberType] ? true : false;
 
             const sortedInterestingNumbers = sortedInterestingNumbersMap[numberType];
             //  logger.warn(" Number of interesting numbers for type ", numberType, sortedInterestingNumbers.length);
@@ -77,17 +73,28 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
             for (var sortedListIndex = 0; sortedListIndex < sortedInterestingNumbers.length; sortedListIndex++) {
                 const info = sortedInterestingNumbers[sortedListIndex];
 
-                /* jmr - need to add in dates using numbers particular to the event (e.g. 12/25)
-                Also note that having tags on the info and tags on event could be somewhat confusing since they're
-                not the same thing. */
+                if (isConstant) {
+                    if (numberUse === 1 && info.tags.indexOf("constantExact") < 0) {
+                        // This info isn't constantExact, so don't use it
+                        continue;
+                    } else if (numberUse === 2 && info.tags.indexOf("constantTenMultiple") < 0) {
+                        // This info isn't constantTenMultiple, so don't use it
+                        continue;
+                    } else if (numberUse === 3 && info.tags.indexOf("constantOtherMultiple") < 0) {
+                        // This info isn't constantOtherMultiple, so don't use it
+                        continue;
+                    }
+                }
 
-                if (unit === "minutes" && numberType === interestingNumberTypes.ROUND) {
-                    // For minutes, only show round numbers that are bigger
+                /* jmr - need to add in dates using numbers particular to the event (e.g. 12/25) */
+
+                if (unit === "minutes" && numberType === INTERESTING_TYPES.round) {
+                    // Only show round numbers that are bigger
                     if (info.number % 10000 > 0) {
                         continue;
                     }
-                } else if (unit === "seconds" && numberType === interestingNumberTypes.ROUND) {
-                    // For minutes, only show round numbers that are bigger
+                } else if (unit === "seconds" && numberType === INTERESTING_TYPES.round) {
+                    // Only show round numbers that are bigger
                     if (info.number % 1000000 > 0) {
                         continue;
                     }
@@ -116,7 +123,6 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                             let interestingInfo = {
                                 event: event,
                                 unit: unit,
-                                tags: info.tags,
                                 description: info.descriptor,
                                 time: interestingTime,
                             };
@@ -132,7 +138,7 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
     if (maxNumMilestones) {
         // Sort it so we can slice it and only get the first maxNumMiletones
         interestingList = interestingList.sort((a, b) => { return (a.time - b.time); });
-        interestingList = interestingList.slice(0,maxNumMilestones);
+        interestingList = interestingList.slice(0, maxNumMilestones);
     }
 
     return interestingList;

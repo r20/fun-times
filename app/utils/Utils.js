@@ -78,19 +78,54 @@ export function fromUnitToMillis(unit, numberInUnits) {
 
 
 /**
- * Converts number (x) to a string with commas.
- * TBD - It would be nice to convert to a format
- * based on locale because not everyone is used
- * to commas.
+ * Returns string for showing number and if specified the units.
  * 
  * E.g. 12345.67 is changed to "12,345.67"
- * x - number
+ * Really big numbers or numbers less than .01 are shown in exponential format
+ * 
+ * decimal - (Decimal|Number)
+ * showDecimals - optional, whether to show what's after the decimal (if not showing it in exponential format)
+ * units - (String), optional
  */
-export function numberWithCommas(x) {
-  var parts = x.toString().split(".");
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return parts.join(".");
+export const numberToFormattedString = (number, showDecimals, units) => {
+  const dec = new Decimal(number);  // create new because this may be number, but even if Decimal we may change precision for display
+  const exponentialPlaces = 7;
+  const unitsWithSpace = units ? " " + units : '';
+
+  if (dec.eq(0)) {
+    return "0";
+  } else if (dec.lt(.001) || dec.gte(1000000000000)) {
+    if (showDecimals) {
+      return dec.toExponential(exponentialPlaces) + unitsWithSpace;
+    } else {
+      return dec.toExponential(0) + unitsWithSpace;
+    }
+  } else if (dec.isInteger()) {
+    // Add commas
+    return (dec.toString()).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else if (dec.lt(1)) {
+    return dec.toString() + unitsWithSpace;
+  } else {
+    // It is > 1 and < the big number above and is NOT an integer
+
+    var parts = dec.toString().split(".");
+    if (!showDecimals) {
+      // There won't be a decimal here (because of setting precision) but we still want to work with parts array later so do split.
+      parts = dec.toPrecision(parts[0].length).split(".");
+    } else if (parts[0].length > exponentialPlaces) {
+      // just show whole part if it's this big
+      // There won't be a decimal here (because of setting precision) but we still want to work with parts array later so do split.
+      parts = dec.toPrecision(parts[0].length).split(".");
+    } else {
+      parts = dec.toPrecision(exponentialPlaces).split(".");
+    }
+
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".") + unitsWithSpace;
+  }
 }
+
+
 
 /**
  * Return nicely formatted string for the date object
@@ -123,6 +158,13 @@ export function getDisplayStringForTime(date) {
 
   logger.log("Something is wrong with the time", date);
   return '????';
+}
+
+export function capitalize(s) {
+  if (typeof s !== 'string') {
+    return s;
+  }
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 

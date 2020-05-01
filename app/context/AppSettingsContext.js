@@ -3,11 +3,12 @@ import { AsyncStorage, Platform, Alert } from 'react-native'
 
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-
+import { INTERESTING_TYPES, INTERESTING_CONSTANTS } from '../utils/interestingNumbersFinder'
 
 const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
+
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -19,10 +20,25 @@ const DATEPICKER_YEAR_TIP_STATES = {
 const AppSettingsContext = createContext({
   helpWithDatePicker: () => { },
   setCalendarMaxNumberMilestonesPerEvent: (maxNum) => { },
+  // These are on or off
+  setUseRound: () => { },
+  setUseCount: () => { },
+  setUseRepDigits: () => { },
   setUsePowers: () => { },
   setUseBinary: () => { },
+  // These can be 0, 1, 2, or 3
   setUsePi: () => { },
+  setUseEuler: () => { },
+  setUsePhi: () => { },
+  setUsePythagoras: () => { },
+  setUseSpeedOfLight: () => { },
+  setUseGravity: () => { },
+  setUseMole: () => { },
+  setUseRGas: () => { },
+  setUseFaraday: () => { },
 });
+
+
 
 /**
  * Uses AsyncStorage to track things.
@@ -33,13 +49,14 @@ export class AppSettingsContextProvider extends React.Component {
     super(props);
 
     // For debug, this is how to remove keys
-    //AsyncStorage.multiRemove([STORAGE_KEY_calendarMaxNumberMilestonesPerEvent,STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE]);
+    //AsyncStorage.multiRemove([STORAGE_KEY_numberTypeUseMap, STORAGE_KEY_calendarMaxNumberMilestonesPerEvent, STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE]);
+
 
     this.state = {
       // Default value
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
       calendarMaxNumberMilestonesPerEvent: 3,
-      numberTypeUseMap: {}, // has usePowers, useBinary, usePi attributes. All default to false/undefined.
+      numberTypeUseMap: {}, // has usePowers, useBinary, useGravity, etc. attributes. 
     };
   }
 
@@ -65,12 +82,34 @@ export class AppSettingsContextProvider extends React.Component {
       logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
     }
     try {
-      // can have empty object as default since all of these default to false
+      // If not in async storage, use empty object and we'll set defaults  just below
       let numberTypeUseMap = await AsyncStorage.getItem(STORAGE_KEY_numberTypeUseMap) || {};
       if (typeof numberTypeUseMap !== "object") {
         numberTypeUseMap = JSON.parse(numberTypeUseMap);
       }
+
+      /* If defaults weren't saved, set them and save them */
+      let saveToAsyncStorage = false;
+      for (let typeKey in INTERESTING_TYPES) {
+        if (numberTypeUseMap[INTERESTING_TYPES[typeKey]] === undefined) {
+          saveToAsyncStorage = true;
+
+          if (INTERESTING_CONSTANTS[typeKey] !== undefined) {
+            // If this is a constant (e.g. pi), use it's default or 0
+            numberTypeUseMap[INTERESTING_TYPES[typeKey]] = INTERESTING_CONSTANTS[typeKey].defaultUse || 0;
+          } else {
+            // This is not a constant (e.g. round)
+            numberTypeUseMap[INTERESTING_TYPES[typeKey]] = true; // default to true
+          }
+        }
+      }
+
+
       this.setState({ numberTypeUseMap });
+      if (saveToAsyncStorage) {
+        AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
+      }
+
     } catch (e) {
       logger.warn("Error from failing to load use* number types: ", e);
     }
@@ -124,7 +163,6 @@ export class AppSettingsContextProvider extends React.Component {
     }
   }
 
-
   /**
   * Set and save the calendarMaxNumberMilestonesPerEvent
   */
@@ -142,32 +180,65 @@ export class AppSettingsContextProvider extends React.Component {
   }
 
 
-  setUsePowers = async (isYes) => {
-    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { usePowers: isYes });
+
+
+
+  /**
+ * Helper function to set attribute in numberTypeUseMap
+ */
+  _setNumberTypeUseMapAttribute = async (isYes, attr) => {
+    let obj = {};
+    obj[attr] = isYes;
+    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, obj);
     this.setState({ numberTypeUseMap });
     try {
       await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
     } catch (e) {
       logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
     }
+  }
+
+  setUseRound = async (isYes) => {
+    await this._setNumberTypeUseMapAttribute(isYes, INTERESTING_TYPES.round);
+  }
+  setUseCount = async (isYes) => {
+    await this._setNumberTypeUseMapAttribute(isYes, INTERESTING_TYPES.count);
+  }
+  setUseRepDigits = async (isYes) => {
+    await this._setNumberTypeUseMapAttribute(isYes, INTERESTING_TYPES.repDigits);
+  }
+  setUsePowers = async (isYes) => {
+    await this._setNumberTypeUseMapAttribute(isYes, INTERESTING_TYPES.superPower);
   }
   setUseBinary = async (isYes) => {
-    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { useBinary: isYes });
-    this.setState({ numberTypeUseMap });
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
-    } catch (e) {
-      logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
-    }
+    await this._setNumberTypeUseMapAttribute(isYes, INTERESTING_TYPES.binary);
   }
-  setUsePi = async (isYes) => {
-    const numberTypeUseMap = Object.assign({}, this.state.numberTypeUseMap, { usePi: isYes });
-    this.setState({ numberTypeUseMap });
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY_numberTypeUseMap, JSON.stringify(numberTypeUseMap));
-    } catch (e) {
-      logger.warn("Error from trying to save numberTypeUseMap: ", numberTypeUseMap, e);
-    }
+  setUsePi = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.pi);
+  }
+  setUseEuler = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.euler);
+  }
+  setUsePhi = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.phi);
+  }
+  setUsePythagoras = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.pythagoras);
+  }
+  setUseSpeedOfLight = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.speedOfLight);
+  }
+  setUseGravity = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.gravity);
+  }
+  setUseMole = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.mole);
+  }
+  setUseRGas = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.rGas);
+  }
+  setUseFaraday = async (howMuch) => {
+    await this._setNumberTypeUseMapAttribute(howMuch, INTERESTING_TYPES.faraday);
   }
 
 
@@ -179,9 +250,20 @@ export class AppSettingsContextProvider extends React.Component {
         ...this.state,
         helpWithDatePicker: this.helpWithDatePicker,
         setCalendarMaxNumberMilestonesPerEvent: this.setCalendarMaxNumberMilestonesPerEvent,
+        setUseRound: this.setUseRound,
+        setUseCount: this.setUseCount,
+        setUseRepDigits: this.setUseRepDigits,
         setUsePowers: this.setUsePowers,
         setUseBinary: this.setUseBinary,
         setUsePi: this.setUsePi,
+        setUseEuler: this.setUseEuler,
+        setUsePhi: this.setUsePhi,
+        setUsePythagoras: this.setUsePythagoras,
+        setUseSpeedOfLight: this.setUseSpeedOfLight,
+        setUseGravity: this.setUseGravity,
+        setUseMole: this.setUseMole,
+        setUseRGas: this.setUseRGas,
+        setUseFaraday: this.setUseFaraday,
       }}>
         {this.props.children}
       </AppSettingsContext.Provider>

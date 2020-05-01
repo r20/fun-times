@@ -116,10 +116,11 @@ events.push(new Event({
     title: "Pi Day",
     key: "Pi Day",
     isSelectedByDefault: false,
-    epochMillis: moment("2020-03-14 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    epochMillis: moment("2021-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss').valueOf(),
     ignoreIfPast: true,
+    isFullDay: false, // Let's calculate times to 1:59:25
     color: "orange",
-    specialNumbers: undefined, // TBD: How should we tell it to use pi??
+    specialNumbers: undefined, // jmr: How should we tell it to use pi??  In other code or here?  And, should we tell it to *only* use specialNumbers?
     tags: [TAGS.QUIRKY, 'pi'],
 }));
 events.push(new Event({
@@ -142,6 +143,11 @@ events.push(new Event({
     tags: [TAGS.QUIRKY],
 }));
 
+/*
+October 23, denoted 10/23 in the US, is recognized by some as Mole Day.[24] It is an informal holiday in honor of the unit among chemists. 
+The date is derived from the Avogadro number, which is approximately 6.022×1023. It starts at 6:02 a.m. and ends at 6:02 p.m. 
+Alternatively, some chemists celebrate June 2 (06/02), June 22 (6/22), or 6 February (06.02), a reference to the 6.02 or 6.022 part of the constant
+*/
 
 
 export const standardEventsData = events;

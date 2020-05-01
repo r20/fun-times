@@ -8,7 +8,7 @@ import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import { findInterestingDates } from '../utils/interestingDatesFinder'
-import { interestingNumberTypes } from '../utils/interestingNumbersFinder'
+import { INTERESTING_TYPES } from '../utils/interestingNumbersFinder'
 
 import AppSettingsContext from '../context/AppSettingsContext'
 
@@ -31,17 +31,9 @@ export default function UpcomingMilestonesList(props) {
     let newSpecials = [];
     for (var idx = 0; idx < props.events.length; idx++) {
       const event = props.events[idx];
-      newSpecials = newSpecials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays, props.maxNumMilestonesPerEvent));
+      newSpecials = newSpecials.concat(findInterestingDates(event, nowTime, howManyDaysAhead, tooCloseDays, appSettingsContext, props.maxNumMilestonesPerEvent));
     }
-    newSpecials = newSpecials.filter((val, idx) => {
-      if (!appSettingsContext.numberTypeUseMap.usePowers && val.tags.indexOf(interestingNumberTypes.SUPER_POWER) >= 0) {
-        return false;
-      } if (!appSettingsContext.numberTypeUseMap.useBinary && val.tags.indexOf(interestingNumberTypes.BINARY) >= 0) {
-        return false;
-      } else {
-        return true;
-      }
-    });
+
     newSpecials.sort((a, b) => { return (a.time - b.time); });
 
     setSpecials(newSpecials);
