@@ -28,7 +28,7 @@ export const en = {
   days: '{{someValue}} days',
   hours: '{{someValue}} hours',
   minutes: '{{someValue}} minutes',
-  seconds: '{{someValue}} seconds',
+  seconds: '{{someValue}} seconds', // For these times, someValue could be a number but might also be more, e.g. "60,000 * R (ideal gas constant)"
   ok: 'OK',
   save: 'Save',
   cancel: 'Cancel',

@@ -66,7 +66,8 @@ export default function UpcomingMilestonesList(props) {
             const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
             const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
 
-            let desc = item.description + " " + item.unit;
+            let desc = i18n.t(item.unit, {someValue:item.description});
+            
             if (props.verboseDescription) {
               const isEventInFuture = (event.epochMillis > nowTime);
               const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";

@@ -4,6 +4,8 @@ import moment from 'moment-timezone'
 import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
 import * as Utils from './Utils'
 
+
+
 /**
  * This function calls others to get the interesting milestones.
  * Returns an array of objects that contain interesting info
@@ -25,6 +27,7 @@ import * as Utils from './Utils'
 export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays, appSettingsContext, maxNumMilestones) {
 
     const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
+    const numberTypes = Object.keys(sortedInterestingNumbersMap);
 
     const eventMoment = moment(event.epochMillis);
     const nowMoment = moment(nowTime);
@@ -32,11 +35,56 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
     const tooCloseMillis = tooCloseDays ? tooCloseDays * 24 * 3600 * 1000 : 0;
     const isEventInFuture = (event.epochMillis > nowTime);
 
-    const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     var interestingList = [];
+    // For upcoming events, show exact moment as a milestone
+    if (isEventInFuture) {
+        if (eventMoment.isBefore(futureMoment)) {
+            let interestingInfo = {
+                event: event,
+                unit: "seconds",
+                description: "0",
+                time: event.epochMillis,
+            };
+            interestingList.push(interestingInfo);
+        }
+    }
+
+    const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     for (let unitsIidx = 0; unitsIidx < units.length; unitsIidx++) {
         const unit = units[unitsIidx];
         let start, end;
+
+        /* Create a helper function that is used in multiple places */
+        const getInterestingInfoItem = (num, descriptor) => {
+            let interestingTime;
+            if (isEventInFuture) {
+                interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
+            } else {
+                interestingTime = eventMoment.clone().add(num, unit).valueOf();
+            }
+            if (num >= start && num <= end) {
+                if (interestingTime > nowTime) {
+                    /* InterestingTime needs to be in the future.
+                    E.g. An interesting time of 10 years ahead of a past event
+                    might be eariler this year but in past.  Don't show it.  */
+                    if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
+                        /* The interestingTime can't be too close to the event.
+                        Must be less than the event - tooCloseMillis,
+                        or greater than event+tooCloseMillis
+                        */
+                        let interestingInfo = {
+                            event: event,
+                            unit: unit,
+                            description: descriptor,
+                            time: interestingTime,
+                        };
+                        return interestingInfo;
+                    }
+                }
+            }
+            return null;
+        };
+
         const spanBetweenNowAndEvent = Math.abs(nowMoment.diff(eventMoment, unit));
         const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
         logger.log(" spanBetweenNowAndEvent ", spanBetweenNowAndEvent);
@@ -50,9 +98,18 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         }
 
         logger.log(" Unit ", unit, start, end);
-        const numberTypes = Object.keys(sortedInterestingNumbersMap);
 
-        let numMilestonesForThisUnit = 0
+        if (unit === 'years') {
+            // Add in aniversaries
+            for (var yr = start; yr <= end; yr++) {
+                const interestingInfo = getInterestingInfoItem(yr, yr);
+                if (interestingInfo) {
+                    interestingList.push(interestingInfo);
+                }
+            }
+        }
+
+        let numMilestonesForThisUnit = 0;
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
             if (maxNumMilestones && numMilestonesForThisUnit >= maxNumMilestones) {
                 // We've reached the max
@@ -72,6 +129,12 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
 
             for (var sortedListIndex = 0; sortedListIndex < sortedInterestingNumbers.length; sortedListIndex++) {
                 const info = sortedInterestingNumbers[sortedListIndex];
+
+                if (unit === "years" && Number.isInteger(info.number)) {
+                    // We add in years already.  We only need to do years if it's not a non-integer like our constants
+                    // jmr - what about event based numbers like 6/26 or 6.26 ??
+                    continue;
+                }
 
                 if (isConstant) {
                     if (numberUse === 1 && info.tags.indexOf("constantExact") < 0) {
@@ -104,33 +167,12 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                     // Since they're sorted, if we get one > end we're done with this loop
                     break;
                 }
-                let interestingTime;
-                if (isEventInFuture) {
-                    interestingTime = eventMoment.clone().subtract(info.number, unit).valueOf();
-                } else {
-                    interestingTime = eventMoment.clone().add(info.number, unit).valueOf();
+
+                const interestingInfo = getInterestingInfoItem(info.number, info.descriptor);
+                if (interestingInfo) {
+                    interestingList.push(interestingInfo);
                 }
-                if (info.number >= start && info.number <= end) {
-                    if (interestingTime > nowTime) {
-                        /* InterestingTime needs to be in the future.
-                        E.g. An interesting time of 10 years ahead of a past event
-                        might be eariler this year but in past.  Don't show it.  */
-                        if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
-                            /* The interestingTime can't be too close to the event.
-                            Must be less than the event - tooCloseMillis,
-                            or greater than event+tooCloseMillis
-                            */
-                            let interestingInfo = {
-                                event: event,
-                                unit: unit,
-                                description: info.descriptor,
-                                time: interestingTime,
-                            };
-                            interestingList.push(interestingInfo);
-                            numMilestonesForThisUnit++;
-                        }
-                    }
-                }
+
             }
         }
     }
