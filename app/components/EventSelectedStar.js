@@ -23,7 +23,7 @@ function EventSelectedStar(props) {
         <TouchableOpacity style={[props.containerStyle, styles.selected]} onPress={() => toggleSelected()}>
             <MaterialCommunityIcons
                 name="star"
-                style={[{ fontSize: 30 }, isSelected ? { fontSize: 30, color: 'gold', } : { fontSize: 30, color: 'lightgray', }]}
+                style={isSelected ? styles.starSelected : styles.starUnselected}
             />
         </TouchableOpacity>
     );
@@ -41,5 +41,13 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    starSelected: {
+        fontSize: 30, 
+        color: 'gold',
+    },
+    starUnselected: {
+        fontSize: 30, 
+        color: 'lightgray',
     },
 });

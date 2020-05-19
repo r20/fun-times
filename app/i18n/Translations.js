@@ -1,7 +1,6 @@
 
 /**
- * This is a start for using i18n.
- * More needs added.
+ * This is for using i18n.
  */
 export const en = {
   menuEventsTitle: "Events",
@@ -14,14 +13,18 @@ export const en = {
   headerAddEventTitle: "Add Event",
   headerEditEventTitle: "Edit Event",
   headerTodayTitle: "Today",
-  headerUpcomingCalendarScreenTitle: "Upcoming Milestones",
+  headerUpcomingCalendarScreenTitle: "Milestones for Starred Events",
   headerMoreTitle: "Settings",
-  upcomingFutureEventCountdownTitle: "Upcoming Milestones",
-  upcomingPastEventMilestoneTitle: "Upcoming Milestones",
+  upcomingFutureEventCountdownTitle: "Milestones",
+  upcomingPastEventMilestoneTitle: "Milestones",
   milestoneDescriptionFuture: "{{milestoneDesciption}} until {{eventTitle}} ({{eventDateTime}})",
   milestoneDescriptionPast: "{{milestoneDesciption}} since {{eventTitle}} ({{eventDateTime}})",
   timeSinceEventTitle: 'Time Elapsed Since {{someValue}}',
   timeUntilEventTitle: 'Time Remaining Until {{someValue}}',
+  milestonesAll: 'All',
+  milestonesNotOnCalendar: 'Not Calendared',
+  milestonesOnCalendar: 'On Calendar',
+  years: '{{someValue}} years',
   quarters: '{{someValue}} quarters',
   months: '{{someValue}} months',
   weeks: '{{someValue}} weeks',
@@ -41,8 +44,10 @@ export const en = {
   eventRemoveConfirmation: 'Are you sure you want to remove event \'{{someValue}}\'?',
   eventRemoveTitle: 'Remove Event',
   selectColor: 'Select Color',
-  calendarMaxNumMilestonesPerEventLabel: 'Max number of milestones per event: {{someValue}}',
+  calendarMaxNumMilestonesPerEventLabel: 'Max number suggested milestones per event: {{someValue}}',
   fullDay: 'Full Day',
+  useNumbersLikeThese: 'Use numbers like these: {{someValue}}',
+  ownNumbersForMilestones: "Enter own numbers to be used in milestones",
   selectTime: 'Select Time',
   selectDate: 'Select Date',
   eventNameInputPlaceholder: "Title (e.g. Maria's Birthday)",
@@ -87,7 +92,7 @@ export const es = {
   headerStandardEventsTitle: "Standard Events",
   headerCustomEventsTitle: "Custom Events",
   headerTodayTitle: "Today",
-  headerUpcomingCalendarScreenTitle: "Upcoming Milestons",
+  headerUpcomingCalendarScreenTitle: "Milestones for Starred Events",
   headerMoreTitle: "Settings",
   upcomingFutureEventCountdownTitle: "Upcoming Milestones",
   upcomingPastEventMilestoneTitle: "Upcoming Milestones",

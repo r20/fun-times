@@ -7,7 +7,7 @@ import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } 
 
 import EventsScreen from '../screens/EventsScreen'
 import Today from '../screens/Today'
-import Calendar from '../screens/Calendar'
+import MilestoneCalendar from '../screens/MilestoneCalendar'
 import More from '../screens/More'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
@@ -29,7 +29,7 @@ function MyTabs(props) {
       const stateName = route.state.routeNames[route.state.index];
       if (stateName === "Today") {
         title = i18n.t("headerTodayTitle");
-      } else if (stateName === "Calendar") {
+      } else if (stateName === "MilestoneCalendar") {
         title = i18n.t("headerUpcomingCalendarScreenTitle");
       } else if (stateName === "More") {
         title = i18n.t("headerMoreTitle");
@@ -39,7 +39,7 @@ function MyTabs(props) {
     navigation.setOptions({
       headerTitle: title,
       // this defaults to left android and center on ios
-      // headerTitleAlign: 'center' , // jmr on android center makes it too high.
+      // headerTitleAlign: 'center' , // on android center makes it too high. So keep it left.
       headerStyle: {
         elevation: 0,
         shadowOpacity: 0,
@@ -68,8 +68,8 @@ function MyTabs(props) {
       <Tab.Screen name="Today" component={Today} tabBarAccessibilityLabel={i18n.t("menuTodayTitle")}
 
         options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> }} />
-      <Tab.Screen name="Calendar" component={Calendar} tabBarAccessibilityLabel={i18n.t("menuUpcomingTitle")}
-        options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="timetable" size={size} color={color} /> }} />
+      <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuUpcomingTitle")}
+        options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> }} />
       <Tab.Screen name="More" component={More} tabBarAccessibilityLabel={i18n.t("menuMoreTitle")}
         options={{ tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> }} />
     </Tab.Navigator>

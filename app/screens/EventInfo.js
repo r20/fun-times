@@ -65,7 +65,7 @@ function EventInfo(props) {
 
   }
 
-  // jmr - I'm not using ref so why am i using useLayuoutEffect here and other place instead of useEffect??
+  // jmr - I'm not using ref so why am i using useLayoutEffect here and other place instead of useEffect??
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {
@@ -151,12 +151,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  headerButton: {// jmr - figure out padding
+  headerButton: {
     // padding is so touching close to it works too
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
-    borderRadius: 5, // jmr ??
+    borderRadius: 5, // In case we show background in future
   },
   upcomingHeader: {
     fontSize: theme.FONT_SIZE_MEDIUM + 2,

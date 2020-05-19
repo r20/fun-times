@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, Text, View, ScrollView, TextInput, DatePickerAndroid, DatePickerIOS,
+  StyleSheet, Text, View, ScrollView, TextInput, Switch,
   TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert, Platform
 } from 'react-native'
 import { Button } from 'react-native-elements'
@@ -18,6 +18,11 @@ import * as Utils from '../utils/Utils'
 import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
+
+/* After move function, move this */
+import moment from 'moment-timezone'
+import Decimal from 'decimal.js-light'
+
 
 function AddOrEditEvent(props) {
 
@@ -38,6 +43,10 @@ function AddOrEditEvent(props) {
   const [useFullDay, setUseFullDay] = useState(initialIsFullDay);
   const [selectedColor, setSelectedColor] = useState(newEvent ? newEvent.color : getRandomColor);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
+
+  const [useDateAndTimeInMilestones, setUseDateAndTimeInMilestones] = useState(newEvent ? newEvent.useDateAndTimeInMilestones : false);
+
+  const [extraNumbersForMilestones, setExtraNumbersForMilesteons] = useState(newEvent ? (newEvent.extraNumbersForMilestones || []) : []);
 
   const isIos = Platform.OS === 'ios';
 
@@ -60,7 +69,8 @@ function AddOrEditEvent(props) {
     if (isCreate) {
       event = new Event({
         title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
-        color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false
+        color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false,
+        useDateAndTimeInMilestones: useDateAndTimeInMilestones, extraNumbersForMilestones: extraNumbersForMilestones
       });
     } else {
       event = newEvent;
@@ -68,6 +78,8 @@ function AddOrEditEvent(props) {
       event.epochMillis = selectedDate.getTime();
       event.isFullDay = useFullDay;
       event.color = selectedColor;
+      event.useDateAndTimeInMilestones = useDateAndTimeInMilestones;
+      event.extraNumbersForMilestones = extraNumbersForMilestones;
     }
 
     if (eventListContext.getCustomEventWithTitle(newTitle)
@@ -113,9 +125,42 @@ function AddOrEditEvent(props) {
         </View>
       ),
     });
-  }, [navigation, title, selectedDate, useFullDay, selectedColor]);
+  }, [navigation, title, selectedDate, useFullDay, selectedColor, useDateAndTimeInMilestones, extraNumbersForMilestones]);
 
 
+  const getSampleNumbers = (isFullDay, epochTime) => {
+    let theMoment = moment(epochTime);
+    const month = theMoment.month() + 1; // moment is zero based so add one
+    const day = theMoment.date()
+    const yyyy = theMoment.year();
+    const yy = theMoment.format('YY');
+    const hh = theMoment.format('hh');
+    const HH = theMoment.format('HH');
+    const mm = theMoment.format('mm');
+    const ss = theMoment.format('ss');
+
+    let extraDecimals = {};
+    /* Some of these might be unneeded for some months and days
+      (e.g. MDYYYY and MMDYYYY and MDDYYYY could all be 10192020),
+      but to get all possibilities we try everything and store it in a 
+      map so duplicates are not present.
+    */
+    extraDecimals[theMoment.format('MDYYYY')] = new Decimal(parseInt(theMoment.format('MDYYYY')));
+    extraDecimals[theMoment.format('MDYY')] = new Decimal(parseInt(theMoment.format('MDYY')));
+    extraDecimals[theMoment.format('YYYY/M/D')] = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D'))) ;
+    extraDecimals[theMoment.format('M.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add( parseInt(theMoment.format('M'))) ;
+    extraDecimals[theMoment.format('MM.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add( parseInt(theMoment.format('MM'))) ;
+ 
+    
+    extraDecimals[theMoment.format('MDYYYYhhmm')] = new Decimal(parseInt(theMoment.format('MDYYYYhhmm')));
+    extraDecimals[theMoment.format('MDYYYYHmm')] = new Decimal(parseInt(theMoment.format('MDYYYYHmm')));
+
+    return "jmr " + Object.keys(extraDecimals);
+  }
+
+
+    const sampleNumbers = selectedDate? getSampleNumbers(useFullDay, selectedDate.getTime()) : "JMR: Enter date to find out";
+  
 
 
   /* 
@@ -168,10 +213,26 @@ function AddOrEditEvent(props) {
             setColorPickerVisible(false);
           }}
         />
+
+        <View style={styles.switch}>
+          <Text>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</Text>
+          <Switch
+            value={useDateAndTimeInMilestones}
+            onValueChange={isYes => {
+              setUseDateAndTimeInMilestones(isYes);
+            }}
+          />
+        </View>
+
       </ScrollView>
     </TouchableWithoutFeedback>
   );
 }
+/*
+  useNumbersLikeThese: 'Use numbers like these: {{someValue}}',
+  ownNumbersForMilestones: "Enter own numbers to be used in milestones",
+  */
+
 
 export default AddOrEditEvent;
 
@@ -208,11 +269,17 @@ const styles = StyleSheet.create({
     marginTop: spaceAmount,
     marginBottom: spaceAmount,
   },
-  headerButton: {// jmr - figure out padding
+  headerButton: {
     // padding is so touching close to it works too
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 5, // jmr ??
+    borderRadius: 5,
+  },
+  switch: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

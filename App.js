@@ -6,7 +6,16 @@ import { Ionicons } from '@expo/vector-icons'
 
 import { EventListProvider } from './app/context/EventListContext'
 import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
+import { CalendarProvider } from './app/context/CalendarContext'
 
+
+if (process.env.NODE_ENV === 'development') {
+  console.warn("Using whydidyourender");
+  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+  whyDidYouRender(React, {
+    trackAllPureComponents: true,
+  });
+}
 
 import AppStackNavigator from './app/navigation/AppStackNavigator'
 
@@ -35,6 +44,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <AppSettingsContextProvider><EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider></AppSettingsContextProvider>
+    return <CalendarProvider><AppSettingsContextProvider><EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider></AppSettingsContextProvider></CalendarProvider>
   }
 }

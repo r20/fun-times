@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   StyleSheet, Text, View, ScrollView, Switch,
-  TouchableWithoutFeedback, Keyboard, Alert, Platform
+  TouchableWithoutFeedback, Keyboard, Alert, Platform, Button
 } from 'react-native'
 import { Slider } from 'react-native-elements'
 
@@ -11,6 +11,7 @@ import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-ic
 import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
 
 import AppSettingsContext from '../context/AppSettingsContext'
+import CalendarContext from '../context/CalendarContext'
 import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import Divider from '../components/Divider'
@@ -34,9 +35,11 @@ function Settings(props) {
   */
 
   const appSettingsContext = useContext(AppSettingsContext);
+  const calendarContext = useContext(CalendarContext);
+
 
   /* Things seem a little more responsive if I use local state and then update appSettingsContext
-  when the slider is done changing rahter than only use appSettingsContext for
+  when the slider is done changing rather than only use appSettingsContext for
   value and onValueChange in the slider */
   const [howMuchPi, setHowMuchPi] = useState(appSettingsContext.numberTypeUseMap.pi);
   const [howMuchEuler, setHowMuchEuler] = useState(appSettingsContext.numberTypeUseMap.euler);
@@ -191,12 +194,16 @@ function Settings(props) {
           />
 
           <Divider style={styles.divider} />
+
+
+          <Button onPress={()=> {logger.warn("jmr == Not deleting calendar"); /*calendarContext.removeFunTimesCalendar();*/}} title="Remove All Calendar Entries" ></Button>
         </ScrollView>
       </React.Fragment>
     </TouchableWithoutFeedback>
   );
 }
 
+/* jmr - should get confirmation first before deleting calendar */
 
 export default Settings;
 
@@ -209,7 +216,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    paddingHorizontal: 20, // jmr - this is used in several places.  DRY.
+    paddingHorizontal: 20,
   },
   header: {
     paddingVertical: 10,
