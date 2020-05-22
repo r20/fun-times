@@ -44,7 +44,7 @@ function Settings(props) {
   const [howMuchPi, setHowMuchPi] = useState(appSettingsContext.numberTypeUseMap.pi);
   const [howMuchEuler, setHowMuchEuler] = useState(appSettingsContext.numberTypeUseMap.euler);
   const [howMuchPhi, setHowMuchPhi] = useState(appSettingsContext.numberTypeUseMap.phi);
-  const [howMuchPythagoras, setHowMuchPythagoras] = useState(appSettingsContext.numberTypeUseMap.Pythagoras);
+  const [howMuchPythagoras, setHowMuchPythagoras] = useState(appSettingsContext.numberTypeUseMap.pythagoras);
   const [howMuchSpeedOfLight, setHowMuchSpeedOfLight] = useState(appSettingsContext.numberTypeUseMap.speedOfLight);
   const [howMuchGravity, setHowMuchGravity] = useState(appSettingsContext.numberTypeUseMap.gravity);
   const [howMuchMole, setHowMuchMole] = useState(appSettingsContext.numberTypeUseMap.mole);
@@ -61,6 +61,32 @@ function Settings(props) {
     } else {
       translationKeyMap[numberKey] = i18n.t("numberName" + capitalKey) + " = " + getDecimalDisplayValueForKey(numberKey);
     }
+  }
+
+  const onRequestRemoveCalendar = () => {
+
+    Alert.alert(
+      i18n.t('calendarRemoveTitle'),
+      i18n.t('calendarRemoveConfirmation'),
+      [
+        {
+          text: i18n.t('cancel'),
+          onPress: () => {
+            logger.log('Cancel Pressed');
+          },
+          style: 'cancel',
+        },
+        {
+          text: i18n.t('ok'), onPress: () => {
+            logger.log('OK Pressed');
+            calendarContext.removeFunTimesCalendar();
+          }
+        },
+      ],
+      // On Android, cancelable: true allows them to tap outside the box to get rid of alert without doing anything
+      { cancelable: true }
+    );
+
   }
 
   return (
@@ -196,7 +222,7 @@ function Settings(props) {
           <Divider style={styles.divider} />
 
 
-          <Button onPress={()=> {logger.warn("jmr == Not deleting calendar"); /*calendarContext.removeFunTimesCalendar();*/}} title="Remove All Calendar Entries" ></Button>
+          <Button onPress={onRequestRemoveCalendar} title="Remove All Calendar Entries" ></Button>
         </ScrollView>
       </React.Fragment>
     </TouchableWithoutFeedback>

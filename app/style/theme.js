@@ -20,6 +20,8 @@ const THEME_SETTINGS = {
   PRIMARY_INACTIVE_TEXT_COLOR: '#c3c3c3', // light gray
   TAB_BAR_BORDER_COLOR: '#c3c3c3', // light gray
   ADD_EVENT_BUTTON_BACKGROUND_COLOR: '#2196F3', // blue
+  DEFAULT_CALENDAR_COLOR: '#add8e6',
+  DEFAULT_EVENTINFO_COLOR: '#add8e6',
 };
 
 export default THEME_SETTINGS;
@@ -61,16 +63,3 @@ export const getContrastFontColor = hexcolor => {
   return yiq >= 180 ? '#444' : '#fff';
 };
 
-/**
- * Get a style object that sets color and backgroundColor
- * based on the event's color.
- */
-export function getEventStyle(event) {
-  const styles = StyleSheet.create({
-    eventStyle: {
-      color: getContrastFontColor(event.color),
-      backgroundColor: event.color,
-    },
-  });
-  return styles.eventStyle;
-}

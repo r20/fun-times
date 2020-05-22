@@ -1,8 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, Button } from 'react-native'
 import { Slider, ButtonGroup } from "react-native-elements"
 import * as Calendar from 'expo-calendar'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import EventListContext from '../context/EventListContext'
 import AppSettingsContext from '../context/AppSettingsContext'
@@ -13,17 +14,21 @@ import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 
 
-
-
 function MilestoneCalendar(props) {
 
   const eventListContext = useContext(EventListContext);
   const appSettingsContext = useContext(AppSettingsContext);
   const calendarContext = useContext(CalendarContext);
 
-  // jmr - should store which button used last
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
-  const buttons = [i18n.t('milestonesAll'), i18n.t('milestonesNotOnCalendar'), i18n.t('milestonesOnCalendar')];
+
+  
+  const NoFilterIcon = <MaterialCommunityIcons name="filter-remove" size={20} />
+  const RemoveFromCalendarIcon = <MaterialCommunityIcons name="calendar-check" size={20} />
+  const AddToCalendarIcon = <MaterialCommunityIcons name="calendar-blank" size={20} />
+
+
+  const buttons = [NoFilterIcon, AddToCalendarIcon, RemoveFromCalendarIcon];
 
   let filtered = eventListContext.allEvents.filter(function (value, index, arr) {
     return eventListContext.isEventSelected(value);
@@ -45,19 +50,16 @@ function MilestoneCalendar(props) {
 
   // jmr - move slider to settings, or have slider and 3 buttons on a filter icon
   return (<View style={styles.container} >
-
+    <View style={styles.sliderWrapper} >
+      <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
+      <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
+        thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
+    </View>
     <ButtonGroup
       onPress={setSelectedButtonIndex}
       selectedIndex={selectedButtonIndex}
       buttons={buttons}
     />
-    {!selectedButtonIndex &&
-      <View style={styles.sliderWrapper} >
-        <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
-        <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
-          thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
-      </View>
-    }
     {!empty &&
       <UpcomingMilestonesList filterNumber={selectedButtonIndex} maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }

@@ -64,8 +64,8 @@ function EventInfo(props) {
     );
 
   }
-
-  // jmr - I'm not using ref so why am i using useLayoutEffect here and other place instead of useEffect??
+  /* We get event from route.  An attribute on the event may change, and
+  we want to re-render */
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {

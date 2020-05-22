@@ -8,14 +8,14 @@ import { EventListProvider } from './app/context/EventListContext'
 import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 import { CalendarProvider } from './app/context/CalendarContext'
 
-
-if (process.env.NODE_ENV === 'development') {
-  console.warn("Using whydidyourender");
-  const whyDidYouRender = require('@welldone-software/why-did-you-render');
-  whyDidYouRender(React, {
-    trackAllPureComponents: true,
-  });
-}
+// jmr - for optimization
+// if (process.env.NODE_ENV === 'development') {
+//   console.warn("Using whydidyourender");
+//   const whyDidYouRender = require('@welldone-software/why-did-you-render');
+//   whyDidYouRender(React, {
+//     trackAllPureComponents: true,
+//   });
+// }
 
 import AppStackNavigator from './app/navigation/AppStackNavigator'
 

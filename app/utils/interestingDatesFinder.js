@@ -5,10 +5,40 @@ import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMa
 import * as Utils from './Utils'
 
 
+/*
+    Get a key for the milestone.
+    Combination of event title and time would NOT be unique if a time had more than one representation
+    that was interesting. Adding unit to that still isn't unique (e.g. 22 days and 3*pi days).
+    So, add numtype also.
+*/
+export function getMilestoneKey(milestoneItem) {
+    // jmr - if numtype is custom, remember there could be more than one custom numtype that results in a milestone at same time.
+    // remember this when adding custom numtypes
+    const theKey = "" + milestoneItem.time + "_" + milestoneItem.numtype + "_" + milestoneItem.unit + "_" + milestoneItem.event.title;
+    return theKey;
+}
+
+/*
+    Create milestone object (and set key using getMilestoneKey).
+    time - milliseconds
+    numtype - usually one of INTERESTING_TYPES, but could be custom too
+*/
+function createMilestone(event, unit, description, numtype, time) {
+    //: "event", // At event time.  This isn't in the INTERESTING_TYPES
+    const milestone = {
+        event: event,
+        unit: unit,
+        description: description,
+        numtype: numtype, // At event time.  This isn't in the INTERESTING_TYPES
+        time: time,
+    };
+    milestone.key = getMilestoneKey(milestone);
+    return milestone;
+}
 
 /**
  * This function calls others to get the interesting milestones.
- * Returns an array of objects that contain interesting info
+ * Returns a sorted (by time) array of objects that contain interesting info
  * to be used to report interesting milestone dates.
  * The objects have
  *  event: the event that was passed in to generate the array
@@ -18,34 +48,32 @@ import * as Utils from './Utils'
  * 
  * @param {Object} event - object with info about the event, like epochMillis
  * @param {Number} nowTime - in epoch milliseconds
- * @param {Number} futureDistanceDays - number of days in future to look for interesting numbers
- * @param {Number} tooCloseDays - number of days within the event to ignore interesting dates
- *                        (because looking close to the event, e.g. 4 days, causes LOTS of interesting times)
+ * @param {Number} pastDays - number of days in past to look for interesting numbers (but limited to maxNumMilestonesPast)
+ * @param {Number} futureDays - number of days in future to look for interesting numbers
+ * @param {Number} maxNumMilestonesPast - Max number of past milestones to return (but must be within the pastDays)
+ * @param {Number} maxNumMilestonesFuture - Max number of future milestones to return
  * @param {Object} appSettingsContext - has appSettingsContext.numberTypeUseMap and other settings to see which number types to use 
- * @param {Number} maxNumMilestones - If > 0, max number of milestones to return
  */
-export function findInterestingDates(event, nowTime, futureDistanceDays, tooCloseDays, appSettingsContext, maxNumMilestones) {
+export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNumMilestonesPast, maxNumMilestonesFuture, appSettingsContext) {
+
+
 
     const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
     const numberTypes = Object.keys(sortedInterestingNumbersMap);
 
     const eventMoment = moment(event.epochMillis);
     const nowMoment = moment(nowTime);
-    const futureMoment = nowMoment.clone().add(futureDistanceDays, 'days');
-    const tooCloseMillis = tooCloseDays ? tooCloseDays * 24 * 3600 * 1000 : 0;
+    const futureMoment = nowMoment.clone().add(futureDays, 'days');
+    const pastMoment = nowMoment.clone().subtract(pastDays, "days");
+    const tooCloseDays = 4; // jmr - redo this ??
+    const tooCloseMillis = tooCloseDays * 24 * 3600 * 1000;
     const isEventInFuture = (event.epochMillis > nowTime);
 
     var interestingList = [];
     // For upcoming events, show exact moment as a milestone
     if (isEventInFuture) {
         if (eventMoment.isBefore(futureMoment)) {
-            let interestingInfo = {
-                event: event,
-                unit: "seconds",
-                description: "0",
-                time: event.epochMillis,
-            };
-            interestingList.push(interestingInfo);
+            interestingList.push(createMilestone(event, "seconds", "0", "event", event.epochMillis));
         }
     }
 
@@ -55,16 +83,18 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         let start, end;
 
         /* Create a helper function that is used in multiple places */
-        const getInterestingInfoItem = (num, descriptor) => {
-            let interestingTime;
-            if (isEventInFuture) {
-                interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
-            } else {
-                interestingTime = eventMoment.clone().add(num, unit).valueOf();
-            }
+        const getInterestingInfoItem = (num, numtype, descriptor) => {
+
             if (num >= start && num <= end) {
-                if (interestingTime > nowTime) {
-                    /* InterestingTime needs to be in the future.
+                let interestingTime;
+                if (isEventInFuture) {
+                    interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
+                } else {
+                    interestingTime = eventMoment.clone().add(num, unit).valueOf();
+                }
+
+                if (interestingTime >= pastMoment.valueOf()) {
+                    /* InterestingTime needs to be after our pastMoment.
                     E.g. An interesting time of 10 years ahead of a past event
                     might be eariler this year but in past.  Don't show it.  */
                     if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
@@ -72,28 +102,22 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                         Must be less than the event - tooCloseMillis,
                         or greater than event+tooCloseMillis
                         */
-                        let interestingInfo = {
-                            event: event,
-                            unit: unit,
-                            description: descriptor,
-                            time: interestingTime,
-                        };
-                        return interestingInfo;
+                        return createMilestone(event, unit, descriptor, numtype, interestingTime);
                     }
                 }
             }
             return null;
         };
 
-        const spanBetweenNowAndEvent = Math.abs(nowMoment.diff(eventMoment, unit));
+        const spanBetweenPastAndEvent = Math.abs(pastMoment.diff(eventMoment, unit));
         const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
-        logger.log(" spanBetweenNowAndEvent ", spanBetweenNowAndEvent);
+        logger.log(" spanBetweenPastAndEvent ", spanBetweenPastAndEvent);
         logger.log(" spanBetweenFutureAndEvent ", spanBetweenFutureAndEvent);
         if (isEventInFuture) {
             start = futureMoment.isBefore(eventMoment) ? spanBetweenFutureAndEvent : 0;
-            end = spanBetweenNowAndEvent;
+            end = spanBetweenPastAndEvent;
         } else {
-            start = spanBetweenNowAndEvent;
+            start = spanBetweenPastAndEvent;
             end = spanBetweenFutureAndEvent;
         }
 
@@ -102,19 +126,15 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         if (unit === 'years') {
             // Add in aniversaries
             for (var yr = start; yr <= end; yr++) {
-                const interestingInfo = getInterestingInfoItem(yr, yr);
+                const interestingInfo = getInterestingInfoItem(yr, INTERESTING_TYPES.round, yr);
                 if (interestingInfo) {
                     interestingList.push(interestingInfo);
                 }
             }
         }
 
-        let numMilestonesForThisUnit = 0;
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
-            if (maxNumMilestones && numMilestonesForThisUnit >= maxNumMilestones) {
-                // We've reached the max
-                break;
-            }
+
             const numberType = numberTypes[numberTypesIdx];
 
             const numberUse = appSettingsContext.numberTypeUseMap[numberType];
@@ -168,7 +188,7 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
                     break;
                 }
 
-                const interestingInfo = getInterestingInfoItem(info.number, info.descriptor);
+                const interestingInfo = getInterestingInfoItem(info.number, numberType, info.descriptor);
                 if (interestingInfo) {
                     interestingList.push(interestingInfo);
                 }
@@ -177,10 +197,28 @@ export function findInterestingDates(event, nowTime, futureDistanceDays, tooClos
         }
     }
 
-    if (maxNumMilestones) {
-        // Sort it so we can slice it and only get the first maxNumMiletones
-        interestingList = interestingList.sort((a, b) => { return (a.time - b.time); });
-        interestingList = interestingList.slice(0, maxNumMilestones);
+    // Sort it
+    interestingList = interestingList.sort((a, b) => { return (a.time - b.time); });
+
+    /* Get the index where the current or future milestones happen
+        Declare the variable before the for loop so it's in scope when we use it below
+    */
+    let afterPastIdx = 0;
+    for (afterPastIdx = 0; afterPastIdx <= interestingList.length; afterPastIdx++) {
+        if (interestingList[afterPastIdx].time >= nowTime) {
+            break;
+        }
+    }
+
+    // First, take out those in future at end of array
+    if (maxNumMilestonesFuture) {
+        interestingList.splice(afterPastIdx + maxNumMilestonesFuture);
+    }
+
+    // After taking out future at end, take out some from beginning if needed
+    const numToRemove = afterPastIdx - maxNumMilestonesPast;
+    if (numToRemove > 0) {
+        interestingList.splice(0, numToRemove); // splice removes from original array
     }
 
     return interestingList;

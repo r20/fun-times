@@ -14,7 +14,7 @@ function StandardEvents(props) {
   return (
     <View style={styles.container}>
       <FlatList
-        contentContainerStyle={{ padding: 15 }}
+        contentContainerStyle={styles.contentContainerStyle}
         data={eventListContext.standardEvents}
         keyExtractor={item => item.title}
         renderItem={({ item }) =>
@@ -32,5 +32,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center'
+  },
+  contentContainerStyle: {
+    padding: 15,
   },
 });

@@ -22,18 +22,22 @@ function CustomEvents(props) {
 
   const empty = !eventListContext.customEvents.length;
 
+  const renderItem = ({ item }) => {
+    return (
+      <SwipeableEventListItem event={item} />
+    );
+  }
+  const keyExtractor = item => item.title;
+
   return (
     <View style={styles.container}>
       {!empty &&
         <FlatList
-          contentContainerStyle={{ padding: 15, paddingBottom: 100, }}
+          contentContainerStyle={styles.contentContainerStyle}
           data={eventListContext.customEvents}
-          keyExtractor={item => item.title}
-          renderItem={({ item }) => {
-            return (
-              <SwipeableEventListItem event={item} />
-            );
-          }}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          initialNumToRender={10}
         />
       }
       {empty && <Text style={styles.emptyText}>{i18n.t('emptyCustomEventsMesage')}</Text>}
@@ -53,6 +57,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center'
+  },
+  contentContainerStyle: {
+    padding: 15,
+    paddingBottom: 100,
   },
   emptyText: {
     alignSelf: 'center',

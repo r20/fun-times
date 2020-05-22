@@ -1,12 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
-
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
-import theme, { getEventStyle } from '../style/theme'
-import CalendarContext, {howManyDaysAheadToCalendar} from '../context/CalendarContext'
+import theme from '../style/theme'
+import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
@@ -14,76 +13,89 @@ import { findInterestingDates } from '../utils/interestingDatesFinder'
 
 import AppSettingsContext from '../context/AppSettingsContext'
 
+/* jmr - maybe use unit and numtype in key, making key more simple */
+
 
 export default function UpcomingMilestonesList(props) {
 
   const appSettingsContext = useContext(AppSettingsContext);
   const calendarContext = useContext(CalendarContext);
 
-  const [calendarReady, setCalendarReady] = useState(calendarContext.isCalendarReady);
-
-
-  const [specials, setSpecials] = useState([]);
-  const [isEmpty, setIsEmpty] = useState(true);
-  const howManyDaysAgo = 4; // Let's show a little before today
   const nowDate = new Date();
-  const startTime = nowDate.getTime() - howManyDaysAgo * 24 * 60 * 60000;
+  const nowTime = nowDate.getTime();
 
+  const maxNumPastMilestonesPerEvent = 2; // jmr - where to keep this?
 
-  const tooCloseDays = 4; // jmr - redo this
+  let specials = [];
+  for (var idx = 0; idx < props.events.length; idx++) {
+    const event = props.events[idx];
+    let specialsForEvent = findInterestingDates(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent, props.maxNumMilestonesPerEvent, appSettingsContext);
+    specials = specials.concat(specialsForEvent);
+  }
+  specials.sort((a, b) => { return (a.time - b.time); });
+  const isEmpty = specials.length === 0;
 
-
-
-  React.useEffect(() => {
-
-    let newSpecials = [];
-    for (var idx = 0; idx < props.events.length; idx++) {
-      const event = props.events[idx];
-      newSpecials = newSpecials.concat(findInterestingDates(event, startTime, howManyDaysAheadToCalendar, tooCloseDays, appSettingsContext, props.maxNumMilestonesPerEvent));
-    }
-
-    newSpecials.sort((a, b) => { return (a.time - b.time); });
-
-    setSpecials(newSpecials);
-    setIsEmpty(newSpecials.length === 0);
-
-  }, [props.events, appSettingsContext.numberTypeUseMap]);
-
-
-  React.useEffect(() => {
-    setCalendarReady(calendarContext.isCalendarReady);
-  }, [calendarContext.isCalendarReady]);
-
-
-  const getShouldShowMilestone = (milestoneItem) => {
+  const getShouldShowMilestone = (isOnCalendar) => {
     const selectedButtonIndex = props.filterNumber;
     if (!selectedButtonIndex) {
       return true;
-    } else if (selectedButtonIndex === 1 && !calendarContext.getIsMilestoneInCalendar(milestoneItem)) {
+    } else if (selectedButtonIndex === 1 && !isOnCalendar) {
       return true;
-    } else if (selectedButtonIndex === 2 && calendarContext.getIsMilestoneInCalendar(milestoneItem)) {
+    } else if (selectedButtonIndex === 2 && isOnCalendar) {
       return true;
     }
     return false;
   }
 
 
-  /* 
-    Combination of event title and time
-    would NOT be unique if a time had more than one representation
-    that was interesting. So, description is also added.
-  */
-  const keyExtractor = (item) => {
-    return ('key_' + item.event.title + "_" + item.time + "_" + item.description)
-  }
+  /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
+    And it says it needs getItemLayout to be implemented. */
+  // Find starting index position (don't show a bunch of past events when first go to screen)
 
-  // Find starting index position (don't show past)
-  let startIdx = 0;
-  for (let specialIdx in specials) {
-    if (specials[specialIdx].time >= nowDate.getTime()) {
-      startIdx = specialIdx;
-      break;
+  // let initialScrollIndexOnlyIfGreaterThanZero = {};
+  // for (let idx = 0; idx < specials.length; idx++) {
+  //   if (specials[idx].time >= nowTime) {
+  //     initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
+  //     break;
+  //   }
+  // }
+  // jmr- tried putting in   {...initialScrollIndexOnlyIfGreaterThanZero} but still not working
+
+  const renderItem = ({ item, index, separators }) => {
+    const event = item.event;
+    const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
+    const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
+
+    const desc = props.verboseDescription ? calendarContext.getMilestoneVerboseDescription(item) : i18n.t(item.unit, { someValue: item.description });
+
+    const isOnCalendar = calendarContext.getIsMilestoneInCalendar(item);
+    const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
+    const opacityStyle = (item.time < nowTime) ? styles.lessOpacity : styles.fullOpacity;
+
+    const colorStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarColorStyle() : calendarContext.getMilestoneNotOnCalendarColorStyle();
+    const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
+
+    if (getShouldShowMilestone(isOnCalendar)) {
+      //logger.warn("jmr ==== rendering item ", item.description);
+
+      return (<EventCard event={event} style={[styles.card, cardStyle]}>
+        <View style={[styles.eventCardTextWrapper, opacityStyle]}>
+          <EventCardHeader event={event} style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
+          <EventCardBodyText event={event} style={colorStyle}>{desc}</EventCardBodyText>
+        </View>
+        {calendarContext.isCalendarReady &&
+          <View style={opacityStyle}>
+            <TouchableOpacity onPress={() => calendarContext.toggleCalendarMilestoneEvent(item)} style={styles.calendarButton}>
+              <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
+            </TouchableOpacity>
+          </View>
+        }
+      </EventCard>);
+    } else {
+      //logger.warn("jmr ==== not rendering item ", item.description);
+      return null;
     }
+
   }
 
   return (
@@ -93,47 +105,15 @@ export default function UpcomingMilestonesList(props) {
         <FlatList
           data={specials}
           ListHeaderComponent={props.listHeaderComponent}
-          contentContainerStyle={{ padding: 15 }}
-          keyExtractor={keyExtractor}
-          initialScrollIndex={startIdx}
-          renderItem={({ item, index, separators }) => {
-            const event = item.event;
-            const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
-            const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
-
-            // If in past, use less than full opacity
-            const opacityStyle = (index < startIdx) ? { opacity: 0.4 } : {};
-
-            const desc = props.verboseDescription ? calendarContext.getMilestoneVerboseDescription(item) : i18n.t(item.unit, { someValue: item.description });
-
-            const btnType = calendarContext.getIsMilestoneInCalendar(item) ? "calendar-remove" : "calendar-import";
-
-            if (getShouldShowMilestone(item)) {
-              return (<EventCard event={event} style={styles.card}>
-                <View style={[styles.eventCardTextWrapper, opacityStyle]}>
-                  <EventCardHeader event={event}>{specialDisplayDateTime}</EventCardHeader>
-                  <EventCardBodyText event={event} >{desc}</EventCardBodyText>
-                </View>
-                {calendarReady &&
-                  <View style={opacityStyle}>
-                    <TouchableOpacity onPress={() => calendarContext.toggleCalendarMilestoneEvent(item)} style={styles.calendarButton}>
-                      <MaterialCommunityIcons name={btnType} size={17} style={getEventStyle(event)} />
-                    </TouchableOpacity>
-                  </View>
-                }
-              </EventCard>);
-            } else {
-              return null;
-            }
-
-          }
-          }
+          contentContainerStyle={styles.contentContainerStyle}
+          renderItem={renderItem}
+          initialNumToRender={10}
         />
       }
       {isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
-          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAheadToCalendar })}</Text></View>
+          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAheadCalendar })}</Text></View>
         </React.Fragment>
       }
     </React.Fragment>
@@ -160,8 +140,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  contentContainerStyle: {
+    padding: 15,
+  },
   eventCardTextWrapper: {
     flex: 1,
+  },
+  lessOpacity: {
+    opacity: 0.5,
+  },
+  fullOpacity: {
+    opacity: 1,
   },
   emptyText: {
     alignSelf: 'center',

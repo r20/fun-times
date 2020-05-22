@@ -30,24 +30,28 @@ function Today(props) {
   });
   const empty = !filtered.length;
 
+  const renderItem = ({ item }) => {
+
+    const i18nKey = (item.epochMillis < nowMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
+    const title = i18n.t(i18nKey, { someValue: item.title });
+
+    return (<EventCard event={item}>
+      <EventCardHeader event={item}>{title}</EventCardHeader>
+      <EventComparedToNow event={item} nowMillis={nowMillis} />
+    </EventCard>
+    );
+  }
+
+  const keyExtractor = item => item.title + nowMillis;
+
   return (<View style={styles.container} >
     {!empty &&
       <FlatList
-        contentContainerStyle={{ padding: 15 }}
+        contentContainerStyle={styles.contentContainerStyle}
         data={filtered}
-        keyExtractor={item => item.title + nowMillis}
-        renderItem={({ item }) => {
-
-          const i18nKey = (item.epochMillis < nowMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
-          const title = i18n.t(i18nKey, { someValue: item.title });
-
-          return (<EventCard event={item}>
-            <EventCardHeader event={item}>{title}</EventCardHeader>
-            <EventComparedToNow event={item} nowMillis={nowMillis} />
-          </EventCard>
-          );
-        }
-        }
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        initialNumToRender={4}
       />
     }
     {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyTodayMesage')}</Text></View>}
@@ -61,6 +65,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+  },
+  contentContainerStyle: {
+    padding: 15,
   },
   emptyText: {
     alignSelf: 'center',
