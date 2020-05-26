@@ -87,10 +87,34 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
 
             if (num >= start && num <= end) {
                 let interestingTime;
-                if (isEventInFuture) {
-                    interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
+
+                if (Number.isInteger(num)) {
+                    if (isEventInFuture) {
+                        interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
+                    } else {
+                        interestingTime = eventMoment.clone().add(num, unit).valueOf();
+                    }
                 } else {
-                    interestingTime = eventMoment.clone().add(num, unit).valueOf();
+                    /* Before I was handling decimals, I saw a case where 40,000,000,000 * G (2.669720 months)
+                        and 50,000,000,000 * G (3.337150 months) were both at the same time (it added 3 months).
+                        moment rounds decimals because adding dates is complex.
+                        So instead, add/subtract the integer part normally with moment and the time units 
+                        (to account for months of different lengths, daylight savings, leap year, etc.)
+                        then convert the decimal part to ms and add/subtract that. */
+
+                    let integerPart = Math.trunc(num);
+                    let decimalPart = num % 1; // Since this is javascript, it may lose some precision but that's ok.
+
+                    const ms = moment.duration(decimalPart, unit).asMilliseconds();
+
+                    if (isEventInFuture) {
+                        const tmpMoment = eventMoment.clone().subtract(integerPart, unit);
+                        interestingTime = tmpMoment.clone().subtract(ms, "ms").valueOf();
+                    } else {
+                        const tmpMoment = eventMoment.clone().add(integerPart, unit);
+                        interestingTime = tmpMoment.clone().add(ms, "ms").valueOf();
+
+                    }
                 }
 
                 if (interestingTime >= pastMoment.valueOf()) {

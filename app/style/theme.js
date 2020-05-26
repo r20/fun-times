@@ -20,8 +20,8 @@ const THEME_SETTINGS = {
   PRIMARY_INACTIVE_TEXT_COLOR: '#c3c3c3', // light gray
   TAB_BAR_BORDER_COLOR: '#c3c3c3', // light gray
   ADD_EVENT_BUTTON_BACKGROUND_COLOR: '#2196F3', // blue
-  DEFAULT_CALENDAR_COLOR: '#add8e6',
-  DEFAULT_EVENTINFO_COLOR: '#add8e6',
+  DEFAULT_CALENDAR_COLOR: '#A5F2F3',
+  DEFAULT_EVENTINFO_COLOR: '#A5F2F3', // This is in app.json in splash background too.  Other light blue was #add8e6
 };
 
 export default THEME_SETTINGS;

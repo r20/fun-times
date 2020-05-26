@@ -147,11 +147,11 @@ function AddOrEditEvent(props) {
     */
     extraDecimals[theMoment.format('MDYYYY')] = new Decimal(parseInt(theMoment.format('MDYYYY')));
     extraDecimals[theMoment.format('MDYY')] = new Decimal(parseInt(theMoment.format('MDYY')));
-    extraDecimals[theMoment.format('YYYY/M/D')] = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D'))) ;
-    extraDecimals[theMoment.format('M.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add( parseInt(theMoment.format('M'))) ;
-    extraDecimals[theMoment.format('MM.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add( parseInt(theMoment.format('MM'))) ;
- 
-    
+    extraDecimals[theMoment.format('YYYY/M/D')] = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D')));
+    extraDecimals[theMoment.format('M.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add(parseInt(theMoment.format('M')));
+    extraDecimals[theMoment.format('MM.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add(parseInt(theMoment.format('MM')));
+
+
     extraDecimals[theMoment.format('MDYYYYhhmm')] = new Decimal(parseInt(theMoment.format('MDYYYYhhmm')));
     extraDecimals[theMoment.format('MDYYYYHmm')] = new Decimal(parseInt(theMoment.format('MDYYYYHmm')));
 
@@ -159,8 +159,8 @@ function AddOrEditEvent(props) {
   }
 
 
-    const sampleNumbers = selectedDate? getSampleNumbers(useFullDay, selectedDate.getTime()) : "JMR: Enter date to find out";
-  
+  const sampleNumbers = selectedDate ? getSampleNumbers(useFullDay, selectedDate.getTime()) : "JMR: Enter date to find out";
+
 
 
   /* 
@@ -196,23 +196,27 @@ function AddOrEditEvent(props) {
             />
           }
         </View>
-        <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
-          <Text>{i18n.t("selectColor")}</Text>
-          <MaterialCommunityIcons
-            name="palette"
-            style={{ fontSize: 50, color: selectedColor }}
-          />
-        </TouchableOpacity>
-        <ColorPickerModal
-          visible={colorPickerVisible}
-          colors={colors}
-          selectedColor={selectedColor}
-          text=""
-          onSelect={newColor => {
-            setSelectedColor(newColor);
-            setColorPickerVisible(false);
-          }}
-        />
+        {false && /*Can get rid of color code */
+          <React.Fragment>
+            <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
+              <Text>{i18n.t("selectColor")}</Text>
+              <MaterialCommunityIcons
+                name="palette"
+                style={{ fontSize: 50, color: selectedColor }}
+              />
+            </TouchableOpacity>
+            <ColorPickerModal
+              visible={colorPickerVisible}
+              colors={colors}
+              selectedColor={selectedColor}
+              text=""
+              onSelect={newColor => {
+                setSelectedColor(newColor);
+                setColorPickerVisible(false);
+              }}
+            />
+          </React.Fragment>
+        }
 
         <View style={styles.switch}>
           <Text>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</Text>

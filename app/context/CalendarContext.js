@@ -64,6 +64,7 @@ function createMilestoneNotOnCalendarCardStyle(colorToUse) {
   }
 }
 
+
 // jmr- I may be able to get rid of the notoncalendar versions. Still deciding styling.
 
 
@@ -191,6 +192,12 @@ function MyCalendarProvider(props) {
   }
 
 
+  async function getDefaultCalendarSource() {
+    const calendars = await Calendar.getCalendarsAsync();
+    const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+    return defaultCalendars[0].source;
+  }
+
   async function createCalendar() {
     const defaultCalendarSource =
       Platform.OS === 'ios'
@@ -279,7 +286,7 @@ function MyCalendarProvider(props) {
 
     const eventId = await Calendar.createEventAsync(calendarId, {
       alarms: [{ relativeOffset: offsetMinutes }],
-      notes: verboseDesc + "\n\nThis event was created by the Fun Times app."+getCalendarNotesLineWithMilestoneKey(milestoneItem),
+      notes: verboseDesc + "\n\nThis event was created by the Fun Times app." + getCalendarNotesLineWithMilestoneKey(milestoneItem),
       title: verboseDesc,
       startDate: start,
       endDate: end,
