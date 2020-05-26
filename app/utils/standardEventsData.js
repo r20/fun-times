@@ -29,12 +29,22 @@ especially the ones that will be on by default. */
 
 const events = [];
 
+const nowMoment = moment(new Date());
+
+/* If theMoment is in past, set it to the future by modifying the year (which may or may not be this year) */
+function getNextMomentForDate(theMoment) {
+    let futureMoment = theMoment.clone();
+    while (futureMoment.isBefore(nowMoment, "minute")) {
+        futureMoment = futureMoment.year(futureMoment.year() + 1);
+    }
+    return futureMoment;
+}
 
 events.push(new Event({
     title: "Christmas", // What user might see (later need to localize)
     key: "Christmas", // Each holiday needs unique key.  Specify key if different than title.
     isSelectedByDefault: false,
-    epochMillis: moment("2020-12-25 0:00", 'YYYY-MM-DD HH:mm').valueOf(), // Day and/or time it starts
+    epochMillis: getNextMomentForDate(moment("2019-12-25 0:00", 'YYYY-MM-DD HH:mm')).valueOf(), // Day and/or time it starts
     ignoreIfPast: true, // don't use this if it's past. (Eventually I'll update code above to do next one)
     keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
     isFullDay: true, // If event is whole day, not a specific time
@@ -46,39 +56,79 @@ events.push(new Event({
     tags: [TAGS.HOLIDAY, TAGS.RELIGION],
 }));
 events.push(new Event({
-    title: "Easter",
-    key: "Easter",
-    isSelectedByDefault: false,
-    epochMillis: moment("2020-04-12 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-    ignoreIfPast: true,
-    color: "purple",
-    tags: [TAGS.HOLIDAY, TAGS.RELIGION],
-}));
-events.push(new Event({
     title: "New Year's Day",
     key: "New Year's Day",
     isSelectedByDefault: false,
-    epochMillis: moment().startOf('year').add(1, 'years').valueOf(),
-    //        epochMillis: moment("2020-01-01 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    // If don't clone it will modify nowMoment and mess up other calculations
+    epochMillis: nowMoment.clone().startOf('year').add(1, 'years').valueOf(),
     isFullDay: false,
     color: "silver",
     tags: [TAGS.HOLIDAY],
 }));
 events.push(new Event({
-    title: "Super Bowl LIV",
+    title: "Pi Day",
+    key: "Pi Day",
+    isSelectedByDefault: false,
+    epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss')).valueOf(),
+    ignoreIfPast: true,
+    isFullDay: false, // Let's calculate times to 1:59:25
+    color: "orange",
+    specialNumbers: undefined, // jmr: How should we tell it to use pi??  In other code or here?  And, should we tell it to *only* use specialNumbers?
+    tags: [TAGS.QUIRKY, 'pi'],
+}));
+events.push(new Event({
+    title: "US Independence Day",
+    key: "US Independence Day",
+    isSelectedByDefault: false,
+    epochMillis: getNextMomentForDate(moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
+    ignoreIfPast: true,
+    color: "red",
+    tags: [TAGS.HOLIDAY],
+}));
+events.push(new Event({
+    title: "US Independence Day 1776",
+    key: "US Independence Day 1776",
+    isSelectedByDefault: false,
+    epochMillis: moment("1776-07-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    ignoreIfPast: false,
+    color: "red",
+    tags: [TAGS.HOLIDAY],
+}));
+events.push(new Event({
+    title: "May the Fourth (Star Wars Day)",
+    key: "Star Wars Day",
+    isSelectedByDefault: false,
+    epochMillis: getNextMomentForDate(moment("2020-05-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
+    ignoreIfPast: true,
+    color: "black",
+    tags: [TAGS.QUIRKY],
+}));
+
+// These need updated by hand each year (for now)
+events.push(new Event({
+    title: "Super Bowl LV",
     key: "Super Bowl",
     isSelectedByDefault: false,
-    epochMillis: moment.tz("2020-02-02 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
+    epochMillis: moment.tz("2021-02-07 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
     color: "brown",
-    specialNumbers: [54],
+    specialNumbers: [55],
     tags: [TAGS.SPORTS],
+}));
+events.push(new Event({
+    title: "Easter",
+    key: "Easter",
+    isSelectedByDefault: false,
+    epochMillis: moment("2021-04-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    ignoreIfPast: true,
+    color: "purple",
+    tags: [TAGS.HOLIDAY, TAGS.RELIGION],
 }));
 events.push(new Event({
     title: "March Madness Tournament Begins",
     key: "March Madness Tournament Begins",
     isSelectedByDefault: false,
-    epochMillis: moment("2020-03-17 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    epochMillis: moment("2021-03-16 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
     specialNumbers: [64, 68],
@@ -88,7 +138,7 @@ events.push(new Event({
     title: "March Madness Final Four",
     key: "March Madness Final Four",
     isSelectedByDefault: false,
-    epochMillis: moment("2020-04-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
+    epochMillis: moment("2021-04-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
     specialNumbers: [4, 64, 68],
@@ -103,35 +153,7 @@ events.push(new Event({
     color: "brown",
     tags: [TAGS.HOLIDAY],
 }));
-events.push(new Event({
-    title: "US Independence Day",
-    key: "US Independence Day",
-    isSelectedByDefault: false,
-    epochMillis: moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-    ignoreIfPast: true,
-    color: "red",
-    tags: [TAGS.HOLIDAY],
-}));
-events.push(new Event({
-    title: "Pi Day",
-    key: "Pi Day",
-    isSelectedByDefault: false,
-    epochMillis: moment("2021-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss').valueOf(),
-    ignoreIfPast: true,
-    isFullDay: false, // Let's calculate times to 1:59:25
-    color: "orange",
-    specialNumbers: undefined, // jmr: How should we tell it to use pi??  In other code or here?  And, should we tell it to *only* use specialNumbers?
-    tags: [TAGS.QUIRKY, 'pi'],
-}));
-events.push(new Event({
-    title: "May the Fourth (Star Wars Day)",
-    key: "Star Wars Day",
-    isSelectedByDefault: false,
-    epochMillis: moment("2020-05-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
-    ignoreIfPast: true,
-    color: "black",
-    tags: [TAGS.QUIRKY],
-}));
+
 events.push(new Event({
     title: "US Presidential Election",
     key: "US Presidential Election",
