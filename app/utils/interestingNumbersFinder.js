@@ -212,8 +212,8 @@ function findRoundFactorsInRange(multiplier, start, end) {
       } else if (interesting < 1000000) {
         // count by 100,000s to 1,000,000
         interesting = interesting + 100000;
-      } else if (interesting < 1000000000) {
-        // count by 1,000,000s to 1,000,000,000
+      } else if (interesting < 10000000) {
+        // count by 1,000,000s to 10,000,000
         interesting = interesting + 1000000;
       } else {
         // count by 10,000,000s 
