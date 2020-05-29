@@ -99,8 +99,8 @@ function AddOrEditEvent(props) {
 
       if (isCreate) {
         eventsAndMilestonesContext.addCustomEvent(event);
-        // Go back to events screen when push save
-        navigation.navigate("EventsScreen");
+        // Go to EventInfo with the new event
+        navigation.navigate("EventInfo", { event: event });
       } else {
         eventsAndMilestonesContext.modifyEvent(oldEvent, event);
         // Go back to EventInfo with the new event
