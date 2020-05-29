@@ -30,7 +30,7 @@ function Settings(props) {
   Headers for milestones list (by date, like Month YYYY)
   star (explain) what it's for.
   Sort by favorites? If Today things aren't clickable make them different
-  color picker colors?
+
   Event groups, with color? (birthdays, holidays)
   */
 

@@ -278,8 +278,8 @@ function MyCalendarProvider(props) {
 
     const end = start;
 
-    // 8am on the day of event if full day, else 2 hours before
-    const offsetMinutes = milestoneItem.event.isFullDay ? 8 * 60 : -120;
+    // 9am on the day of event if full day, else 2 hours before
+    const offsetMinutes = milestoneItem.event.isFullDay ? 9 * 60 : -120;
 
 
     const verboseDesc = getMilestoneVerboseDescription(milestoneItem);

@@ -3,24 +3,24 @@ import PropTypes from 'prop-types'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
 
 function EventSelectedStar(props) {
 
-    const eventListContext = useContext(EventListContext);
+    const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
     const event = props.event;
 
-    const isSelected = eventListContext.isEventSelected(event);
+    const isSelected = eventsAndMilestonesContext.isEventSelected(event);
 
     const toggleSelected = () => {
         if (event) {
-            eventListContext.toggleEventSelected(event);
+            eventsAndMilestonesContext.toggleEventSelected(event);
         }
     }
 
     return (
-        <TouchableOpacity style={[props.containerStyle, styles.selected]} onPress={() => toggleSelected()}>
+        <TouchableOpacity style={[props.containerStyle, styles.selected]} onPress={toggleSelected}>
             <MaterialCommunityIcons
                 name="star"
                 style={isSelected ? styles.starSelected : styles.starUnselected}
@@ -43,11 +43,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     starSelected: {
-        fontSize: 30, 
+        fontSize: 30,
         color: 'gold',
     },
     starUnselected: {
-        fontSize: 30, 
+        fontSize: 30,
         color: 'lightgray',
     },
 });

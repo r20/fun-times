@@ -109,6 +109,7 @@ events.push(new Event({
     title: "Super Bowl LV",
     key: "Super Bowl",
     isSelectedByDefault: false,
+    isFullDay: false,
     epochMillis: moment.tz("2021-02-07 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
     color: "brown",

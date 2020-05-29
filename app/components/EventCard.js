@@ -58,6 +58,7 @@ EventCardBodyText.propTypes = {
     style: PropTypes.object, // more style to apply if desired
 };
 
+export const EVENT_CARD_MARGIN = 5;
 
 const myColor = theme.DEFAULT_EVENTINFO_COLOR;
 
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     card: {
         flex: 0,
         padding: 10,
-        margin: 5,
+        margin: EVENT_CARD_MARGIN,
         borderRadius: 3,
         overflow: 'hidden',
     },

@@ -5,7 +5,7 @@ import { Slider, ButtonGroup } from "react-native-elements"
 import * as Calendar from 'expo-calendar'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import AppSettingsContext from '../context/AppSettingsContext'
 import CalendarContext from '../context/CalendarContext'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
@@ -16,13 +16,12 @@ import * as logger from '../utils/logger'
 
 function MilestoneCalendar(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const appSettingsContext = useContext(AppSettingsContext);
-  const calendarContext = useContext(CalendarContext);
 
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
 
-  
+
   const NoFilterIcon = <MaterialCommunityIcons name="filter-remove" size={20} />
   const RemoveFromCalendarIcon = <MaterialCommunityIcons name="calendar-check" size={20} />
   const AddToCalendarIcon = <MaterialCommunityIcons name="calendar-blank" size={20} />
@@ -30,8 +29,8 @@ function MilestoneCalendar(props) {
 
   const buttons = [NoFilterIcon, AddToCalendarIcon, RemoveFromCalendarIcon];
 
-  let filtered = eventListContext.allEvents.filter(function (value, index, arr) {
-    return eventListContext.isEventSelected(value);
+  let filtered = eventsAndMilestonesContext.allEvents.filter(function (value, index, arr) {
+    return eventsAndMilestonesContext.isEventSelected(value);
   });
 
   // It seems a little more responsive to use a local state variable, and then also set the context one.
@@ -48,6 +47,12 @@ function MilestoneCalendar(props) {
     appSettingsContext.setCalendarMaxNumberMilestonesPerEvent(newVal);
   }
 
+  /* The UpcomingMilestoneList is repeated separately for each filter button (all, not calendar, on calendar)
+    because otherwise the rendering was weird.  The FlatList would get re-rendered if the data changed
+    based on the fitler but new items wouldn't be drawn until you scrolled.
+    This also has the benefit of making it go back to the initial scroll index position.
+  */
+
   // jmr - move slider to settings, or have slider and 3 buttons on a filter icon
   return (<View style={styles.container} >
     <View style={styles.sliderWrapper} >
@@ -60,7 +65,13 @@ function MilestoneCalendar(props) {
       selectedIndex={selectedButtonIndex}
       buttons={buttons}
     />
-    {!empty &&
+    {!empty && selectedButtonIndex === 0 &&
+      <UpcomingMilestonesList filterNumber={selectedButtonIndex} maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
+    }
+    {!empty && selectedButtonIndex === 1 &&
+      <UpcomingMilestonesList filterNumber={selectedButtonIndex} maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
+    }
+    {!empty && selectedButtonIndex === 2 &&
       <UpcomingMilestonesList filterNumber={selectedButtonIndex} maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
     {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMesage')}</Text></View>}

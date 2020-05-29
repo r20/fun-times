@@ -8,34 +8,32 @@ import theme from '../style/theme'
 import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
-import { findInterestingDates } from '../utils/interestingDatesFinder'
+import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
+import { shouldShowMilestoneForNumberType } from '../utils/milestones'
 
 import AppSettingsContext from '../context/AppSettingsContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 
-/* jmr - maybe use unit and numtype in key, making key more simple */
 
+// jmr - for memoization I moved this here. SHould I keep it in state? And how often should I update it??
+const nowDate = new Date();
+const nowTime = nowDate.getTime();
 
 export default function UpcomingMilestonesList(props) {
 
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const appSettingsContext = useContext(AppSettingsContext);
   const calendarContext = useContext(CalendarContext);
 
-  const nowDate = new Date();
-  const nowTime = nowDate.getTime();
-
-  const maxNumPastMilestonesPerEvent = 2; // jmr - where to keep this?
-
-  let specials = [];
-  for (var idx = 0; idx < props.events.length; idx++) {
-    const event = props.events[idx];
-    let specialsForEvent = findInterestingDates(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent, props.maxNumMilestonesPerEvent, appSettingsContext);
-    specials = specials.concat(specialsForEvent);
+  // Store which events we want milestones for
+  const eventTitleMap = {};
+  const numMilestonesPerEventMap = {};
+  for (let idx = 0; idx < props.events.length; idx++) {
+    eventTitleMap[props.events[idx].title] = true;
+    numMilestonesPerEventMap[props.events[idx].title] = 0;
   }
-  specials.sort((a, b) => { return (a.time - b.time); });
-  const isEmpty = specials.length === 0;
 
-  const getShouldShowMilestone = (isOnCalendar) => {
+  const shouldShowMilestoneForButtonFilter = (isOnCalendar) => {
     const selectedButtonIndex = props.filterNumber;
     if (!selectedButtonIndex) {
       return true;
@@ -47,18 +45,70 @@ export default function UpcomingMilestonesList(props) {
     return false;
   }
 
+  /* jmr - There's a performance problem if have lots of events and scrol down.  If there are
+    few on the calendar and you click the filter to show only those calendared, it takes
+    too long of a time.  A big mostly empty list is shown first.
+    Maybe having fixed height cards would help??
+     */
+
+  /* Memoize for performance using allMilestones which is already sorted
+  */
+  let specials = useMemo(() => {
+    return eventsAndMilestonesContext.allMilestones.filter(function (milestone, index, arr) {
+      if (milestone.event && eventTitleMap[milestone.event.title]) {
+        // yes this milestone is for one of the events
+        if (shouldShowMilestoneForNumberType(milestone, appSettingsContext.numberTypeUseMap)) {
+          // Yes we should show this type of milestone
+          const isOnCalendar = calendarContext.getIsMilestoneInCalendar(milestone);
+
+          if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
+
+            if (!props.maxNumMilestonesPerEvent) {
+              // No max was specified
+              return true;
+            } else if (numMilestonesPerEventMap[milestone.event.title] <= props.maxNumMilestonesPerEvent) {
+              // A max limit was specified, and we haven't shown too many yet
+              numMilestonesPerEventMap[milestone.event.title] = numMilestonesPerEventMap[milestone.event.title] + 1;
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    });
+  }, [eventsAndMilestonesContext.allMilestones, props.events, props.filterNumber, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap]);
+
+  logger.warn("jmr === num specials is ", specials.length);
+
+  const isEmpty = specials.length === 0;
+
+
+
+  // Don't know how this works, but it's the heigt without margin??
+  const ITEM_HEIGHT = 72;
+
+  const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
+
+  const eventCardHeightStyle = { height: ITEM_HEIGHT };
+
+  /* To optimize and improve FlatList performance, use fixed height
+    items */
+  const getItemLayout = (data, index) => {
+    return { length: heightWithMargin, offset: heightWithMargin * index, index };
+  };
 
   /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
     And it says it needs getItemLayout to be implemented. */
   // Find starting index position (don't show a bunch of past events when first go to screen)
 
-  // let initialScrollIndexOnlyIfGreaterThanZero = {};
-  // for (let idx = 0; idx < specials.length; idx++) {
-  //   if (specials[idx].time >= nowTime) {
-  //     initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-  //     break;
-  //   }
-  // }
+  let initialScrollIndexOnlyIfGreaterThanZero = {};
+  for (let idx = 0; idx < specials.length; idx++) {
+    if (specials[idx].time >= nowTime) {
+      initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
+      logger.warn("jmr == initialScrollIndexOnlyIfGreaterThanZero", idx);
+      break;
+    }
+  }
   // jmr- tried putting in   {...initialScrollIndexOnlyIfGreaterThanZero} but still not working
 
   const renderItem = ({ item, index, separators }) => {
@@ -75,10 +125,8 @@ export default function UpcomingMilestonesList(props) {
     const colorStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarColorStyle() : calendarContext.getMilestoneNotOnCalendarColorStyle();
     const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
 
-    if (getShouldShowMilestone(isOnCalendar)) {
-      //logger.warn("jmr ==== rendering item ", item.description);
-
-      return (<EventCard event={event} style={[styles.card, cardStyle]}>
+  //jmr  if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
+      return (<EventCard event={event} style={[styles.card, cardStyle, eventCardHeightStyle]}>
         <View style={[styles.eventCardTextWrapper, opacityStyle]}>
           <EventCardHeader event={event} style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
           <EventCardBodyText event={event} style={colorStyle}>{desc}</EventCardBodyText>
@@ -91,16 +139,13 @@ export default function UpcomingMilestonesList(props) {
           </View>
         }
       </EventCard>);
-    } else {
-      //logger.warn("jmr ==== not rendering item ", item.description);
-      return null;
-    }
-
+    // } else {
+    //   return null;
+    // }
   }
 
   return (
     <React.Fragment>
-
       {!isEmpty &&
         <FlatList
           data={specials}
@@ -108,6 +153,8 @@ export default function UpcomingMilestonesList(props) {
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={renderItem}
           initialNumToRender={10}
+          getItemLayout={getItemLayout}
+          {...initialScrollIndexOnlyIfGreaterThanZero}
         />
       }
       {isEmpty &&

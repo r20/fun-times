@@ -5,21 +5,22 @@ import { Text, StyleSheet, FlatList, View } from 'react-native'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
 
 function StandardEvents(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
+
+  const renderItem = ({ item }) => <EventListItem event={item} />
+
   return (
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={styles.contentContainerStyle}
-        data={eventListContext.standardEvents}
+        data={eventsAndMilestonesContext.standardEvents}
         keyExtractor={item => item.title}
-        renderItem={({ item }) =>
-          <EventListItem event={item} />
-        }
+        renderItem={renderItem}
       />
     </View>
   );

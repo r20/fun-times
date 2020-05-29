@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { withNavigation } from '@react-navigation/compat'
 
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import EventSelectedStar from '../components/EventSelectedStar'
 import theme from '../style/theme'
@@ -11,8 +11,6 @@ import EventCard, { EventCardHeader, EventCardBodyText } from '../components/Eve
 import * as logger from '../utils/logger'
 
 function EventListItem(props) {
-
-  const eventListContext = useContext(EventListContext);
 
   const title = props.event.title;
 
@@ -25,7 +23,7 @@ function EventListItem(props) {
 
   return (
     <View style={styles.container}>
-      <EventSelectedStar event={props.event} containerStyle={{ paddingRight: 5 }} />
+      <EventSelectedStar event={props.event} containerStyle={styles.starStyle} />
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
         <EventCard event={props.event}>
           <EventCardHeader event={props.event} >{title}</EventCardHeader>
@@ -56,4 +54,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1, // So it will stretch out and take up rest of space
   },
+  starStyle: {
+    paddingRight: 5
+  }
 });

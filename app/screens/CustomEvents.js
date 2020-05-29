@@ -7,7 +7,7 @@ import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
 import theme from '../style/theme'
 import SwipeableEventListItem from '../components/SwipeableEventListItem'
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
 
 
@@ -15,12 +15,12 @@ import * as logger from '../utils/logger'
 function CustomEvents(props) {
 
   const navigation = props.navigation;
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const onPressAddEvent = () => {
     navigation.navigate("AddEvent");
   }
 
-  const empty = !eventListContext.customEvents.length;
+  const empty = !eventsAndMilestonesContext.customEvents.length;
 
   const renderItem = ({ item }) => {
     return (
@@ -34,7 +34,7 @@ function CustomEvents(props) {
       {!empty &&
         <FlatList
           contentContainerStyle={styles.contentContainerStyle}
-          data={eventListContext.customEvents}
+          data={eventsAndMilestonesContext.customEvents}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           initialNumToRender={10}

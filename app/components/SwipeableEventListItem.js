@@ -8,7 +8,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
 
 
@@ -17,7 +17,7 @@ function SwipeableEventListItem(props) {
 
   const swipeableRef = useRef(null);
   const event = props.event;
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
 
   const onRequestRemove = () => {
 
@@ -40,7 +40,7 @@ function SwipeableEventListItem(props) {
         {
           text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
-            eventListContext.removeCustomEvent(event);
+            eventsAndMilestonesContext.removeCustomEvent(event);
           }
         },
       ],
@@ -66,7 +66,7 @@ function SwipeableEventListItem(props) {
             {
               transform: [{ translateX: trans }],
             },
-          ]} ><FontAwesome name="trash-o" size={30} style={{ color: '#ffffff' }} />
+          ]} ><FontAwesome name="trash-o" size={30} style={styles.trashStyle} />
         </Animated.Text>
       </RectButton>
     );
@@ -100,5 +100,8 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: theme.FONT_SIZE_LARGE,
     marginRight: 20,
+  },
+  trashStyle: {
+    color: '#ffffff',
   }
 });

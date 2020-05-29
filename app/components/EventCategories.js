@@ -4,7 +4,7 @@ import { withNavigation } from '@react-navigation/compat'
 import { FlatList, StyleSheet, View, Dimensions } from 'react-native'
 import { Tile, Image } from 'react-native-elements'
 
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 
 import EventListItem from './EventListItem'
 
@@ -18,7 +18,7 @@ For now, it's not needed.
 */
 function EventCategories(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
 
   const tiles = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
   const windowWidth = Dimensions.get('window').width;

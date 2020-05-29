@@ -15,16 +15,19 @@ import i18n from '../i18n/i18n'
 
 const Stack = createStackNavigator();
 function MyStack() {
+
+  const opts = {
+    gestureEnabled: false, headerTitle: '',
+    headerStyle: {
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+  };
+
   return (
     <Stack.Navigator
       initialRouteName="AppBottomTabNavigator"
-      screenOptions={{
-        gestureEnabled: false, headerTitle: '',
-        headerStyle: {
-          elevation: 0,
-          shadowOpacity: 0,
-        },
-      }}
+      screenOptions={opts}
     >
       <Stack.Screen
         name="AppBottomTabNavigator"

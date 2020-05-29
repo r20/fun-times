@@ -6,11 +6,20 @@ import { standardEventsData } from '../utils/standardEventsData'
 import { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 
+import { createMilestones } from '../utils/milestones'
+import { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from './CalendarContext'
+import { INTERESTING_TYPES, INTERESTING_CONSTANTS } from '../utils/interestingNumbersFinder'
+
 /* This is an array of custom events */
 const STORAGE_KEY_CUSTOM_EVENTS_ARRAY = '@save_custom_events_array';
 /* This is an object with standard event keys as keys and true/false as value 
   depending on whether selected */
 const STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP = '@save_standard_events_key_to_selected_map';
+
+const maxNumPastMilestonesPerEvent = 2; // jmr - where to keep this?
+
+// jmr - where should we put this for milestone creation??
+const nowTime = (new Date()).getTime();
 
 
 /**
@@ -30,34 +39,39 @@ function eventSorter(a, b) {
 
 }
 
-
+function milestoneSorter(a, b) {
+  return a.time - b.time;
+}
 
 // These are created with defaults.  The provider sets the real values using value prop.
-const EventListContext = createContext({
+const EventsAndMilestonesContext = createContext({
   allEvents: [],
+  allMilestones: [],
   customEvents: [],
   standardEvents: [],
   getEventWithTitle: () => { },
-  addCustomEvent: () => { },
+  addCustomEvent: () => { }, //jmr - change title of several of thee methods to have "AndMiletones", e.g. addCustomEventAndMilestones
   modifyEvent: () => { },
   removeCustomEvent: () => { },
-  updateCustomEvents: () => { },
   toggleEventSelected: () => { },
   removeAllCustomEvents: () => { },
   isEventSelected: isEventSelected,
   getCustomEventWithTitle: () => { return null; },
 });
 
+
+
 /**
  * Provides a way to see events of interest, including a way to 
  * add and remove custom events.
  * Uses AsyncStorage to track things.
  */
-export class EventListProvider extends React.Component {
+export class EventsAndMilestonesContextProvider extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      allMilestones: [],
       allEvents: [],
       customEvents: [],
       standardEventsSelectedMap: {},
@@ -65,10 +79,12 @@ export class EventListProvider extends React.Component {
     };
   }
 
-  /* If make a code change that would break old stored events, put stuff in this function
+  /* 
+  jmr - i could remove this whole function until needed
+  If make a code change that would break old stored events, put stuff in this function
     to upgrade them. 
     TODO - I could change code to store the event object version (or code version) and
-    look at its curestion compared to current cersion and do update only if needed. */
+    look at its version compared to current version and do update only if needed. */
   updateCustomEventsForAppUpdate = (customEvents) => {
     try {
       let needsSaved = false;
@@ -103,8 +119,6 @@ export class EventListProvider extends React.Component {
       logger.log("Error from failing to load customEvents: ", e);
     }
 
-    customEvents = this.updateCustomEventsForAppUpdate(customEvents);
-
     const nowMillis = (new Date()).getTime();
     let standardEvents = standardEventsData || [];
     standardEvents = standardEvents.filter((val, idx) => {
@@ -115,6 +129,7 @@ export class EventListProvider extends React.Component {
         return true;
       }
     });
+
 
     try {
       let standardEventsSelectedMap = await AsyncStorage.getItem(STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP);
@@ -146,18 +161,40 @@ export class EventListProvider extends React.Component {
       logger.warn("Failed to load or process selected standard events map.");
       logger.log("Error from failing to load selected standard events map: ", e);
     }
+
+    // Generate milestones for all events
+    let allMilestones = [];
+    customEvents = this.updateCustomEventsForAppUpdate(customEvents);
+    for (let event of customEvents) {
+      allMilestones = allMilestones.concat(this.getMilestonesForEvent(event));
+
+    }
+    for (let event of standardEvents) {
+      allMilestones = allMilestones.concat(this.getMilestonesForEvent(event));
+    }
+
+    // Sort everything
+    allMilestones = allMilestones.sort(milestoneSorter);
     customEvents = customEvents.sort(eventSorter);
     standardEvents.sort(eventSorter);
     let allEvents = customEvents.concat(standardEvents);
     allEvents = allEvents.sort(eventSorter);
 
-    this.setState({ allEvents, customEvents, standardEvents });
+    this.setState({ allEvents, customEvents, standardEvents, allMilestones });
   }
 
+  getMilestonesForEvent = (event) => {
+
+     let milestonesForEvent = createMilestones(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent );
+
+    return milestonesForEvent;
+
+  }
 
   /**
    * Sorts and updates events, saving to storage
    * and doing setState on the events.
+   * 
    */
   updateCustomEvents = (newEvents) => {
     try {
@@ -180,7 +217,7 @@ export class EventListProvider extends React.Component {
   }
 
   /**
-   * Add a newly created event to the array (and saves it as well).
+   * Add a newly created event and creats milestones for it.
    * Events should have unique titles. If there's already an event
    * with the same title, this will replace it.
    */
@@ -192,10 +229,45 @@ export class EventListProvider extends React.Component {
       });
       filtered.push(newEvent);
       this.updateCustomEvents(filtered);
+
+      this.replaceOrAddMilestonesForEvent(newEvent);
+
+
     } catch (err) {
       logger.warn("Error adding custom event", err);
     }
   }
+
+  removeMilestonesForEvent = (event) => {
+    if (event) {
+      this.setState((prevState) => {
+        let filtered = prevState.allMilestones.filter(function (value, index, arr) {
+          return (value.event && value.event.title !== event.title);
+        });
+        // After filtering, they should still be sorted
+        return { allMilestones: filtered };
+      })
+    }
+  }
+
+  replaceOrAddMilestonesForEvent = (event) => {
+    if (event) {
+      this.setState((prevState) => {
+        // Remove old ones if there are any in there
+        let filtered = prevState.allMilestones.filter(function (value, index, arr) {
+          return (value.event && value.event.title !== event.title);
+        });
+        // Add new ones
+        const newMilestones = this.getMilestonesForEvent(event);
+        let milestones = filtered.concat(newMilestones);
+
+        // Sort them after new ones added
+        milestones = milestones.sort(milestoneSorter);
+        return { allMilestones: milestones };
+      })
+    }
+  }
+
 
 
   /**
@@ -214,6 +286,7 @@ export class EventListProvider extends React.Component {
           // we didn't find the array to remove
           logger.log("We didn't find a custom event to remove: ", eventToRemove.title);
         }
+        this.removeMilestonesForEvent(eventToRemove);
       } else {
         logger.log("Custom Event to remove doesn't look right");
       }
@@ -241,6 +314,9 @@ export class EventListProvider extends React.Component {
 
   /**
    * Remove all custom events.
+   * 
+   * jmr -if keep this, it needs to modify the milestones too
+   * We could iterate through standard events and make new miletones for those only
    */
   removeAllCustomEvents = () => {
     try {
@@ -263,14 +339,15 @@ export class EventListProvider extends React.Component {
   /**
    * Finds event according to oldEvent's title and replaces it
    * with the newEvent.
-   * Updates state and updates async storage as needed.
+   * Updates state including milestones and updates async storage as needed.
    */
   modifyEvent = (oldEvent, newEvent) => {
     try {
+
       if (newEvent && newEvent.title && oldEvent && oldEvent.title) {
-        // Take out the old version
         let newArray = [];
         if (oldEvent.isCustom) {
+          // Take out the old version
           newArray = this.state.customEvents.filter(function (value, index, arr) {
             return (value.title !== oldEvent.title);
           });
@@ -309,12 +386,14 @@ export class EventListProvider extends React.Component {
           }
         }
 
+        this.replaceOrAddMilestonesForEvent(newEvent);
+
       } else {
-        logger.log("Custom Event to modify doesn't look right");
+        logger.log("Event to modify doesn't look right");
       }
     } catch (e) {
-      logger.warn("Failed to modify custom event.");
-      logger.log("Error from failing to modify custom event: ", e);
+      logger.warn("Failed to modify event.");
+      logger.log("Error from failing to modify event: ", e);
     }
   }
 
@@ -383,7 +462,7 @@ export class EventListProvider extends React.Component {
       and some of the functions available to consumers via the value attribute.
     */
     return (
-      <EventListContext.Provider value={{
+      <EventsAndMilestonesContext.Provider value={{
         ...this.state,
         removeAllCustomEvents: this.removeAllCustomEvents,
         addCustomEvent: this.addCustomEvent,
@@ -395,9 +474,9 @@ export class EventListProvider extends React.Component {
         getCustomEventWithTitle: this.getCustomEventWithTitle,
       }}>
         {this.props.children}
-      </EventListContext.Provider>
+      </EventsAndMilestonesContext.Provider>
     );
   }
 }
 
-export default EventListContext;
+export default EventsAndMilestonesContext;

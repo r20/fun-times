@@ -4,14 +4,14 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { useFocusEffect, usenavigation, useNavigation } from '@react-navigation/native'
 
 import i18n from '../i18n/i18n'
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import EventComparedToNow from '../components/EventComparedToNow'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 
 function Today(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const navigation = useNavigation();
 
   const now = new Date();
@@ -25,8 +25,8 @@ function Today(props) {
     }, [navigation])
   );
 
-  let filtered = eventListContext.allEvents.filter(function (value, index, arr) {
-    return eventListContext.isEventSelected(value);
+  let filtered = eventsAndMilestonesContext.allEvents.filter(function (value, index, arr) {
+    return eventsAndMilestonesContext.isEventSelected(value);
   });
   const empty = !filtered.length;
 

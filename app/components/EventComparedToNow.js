@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { StyleSheet, Text, View } from 'react-native'
 import moment from 'moment-timezone'
 
-import { getMomentFromEvent } from '../context/EventListContext'
+import { getMomentFromEvent } from '../context/EventsAndMilestonesContext'
 import { numberToFormattedString } from '../utils/Utils'
 import i18n from '../i18n/i18n'
 import { EventCardBodyText } from './EventCard'

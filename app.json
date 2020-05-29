@@ -26,6 +26,6 @@
     "ios": {
       "supportsTablet": true
     },
-    "description": "Fun Times is an app for discovering important milestones for birthdays, anniversaries, etc. For example, enter a friend's birthday and you may learn they will be turning 1 billion seconds old in a few weeks. Or, enter an upcoming wedding date and see there will soon be 100 days remaining until the big day.\n\nCalendar integration helps you celebrate and send congratulations to family and friends."
+    "description": "Fun Times is an app for discovering important milestones for birthdays, anniversaries, etc. Enter a friend's birthday and you may learn they will be turning 1 billion seconds old in a few weeks. The app allows adding these milestones to your calendar."
   }
 }

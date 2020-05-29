@@ -1,4 +1,6 @@
 import { Decimal } from 'decimal.js-light';
+import nanomemoize from 'nano-memoize'
+
 import * as logger from './logger'
 import moment from 'moment-timezone'
 import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
@@ -9,32 +11,56 @@ import * as Utils from './Utils'
     Get a key for the milestone.
     Combination of event title and time would NOT be unique if a time had more than one representation
     that was interesting. Adding unit to that still isn't unique (e.g. 22 days and 3*pi days).
-    So, add numtype also.
+    So, add numberType also.
 */
 export function getMilestoneKey(milestoneItem) {
-    // jmr - if numtype is custom, remember there could be more than one custom numtype that results in a milestone at same time.
-    // remember this when adding custom numtypes
-    const theKey = "" + milestoneItem.time + "_" + milestoneItem.numtype + "_" + milestoneItem.unit + "_" + milestoneItem.event.title;
+    // jmr - if numberType is custom, remember there could be more than one custom numberType that results in a milestone at same time.
+    // remember this when adding custom numberTypes
+    const theKey = "" + milestoneItem.time + "_" + milestoneItem.numberType + "_" + milestoneItem.unit + "_" + milestoneItem.event.title;
     return theKey;
 }
 
 /*
     Create milestone object (and set key using getMilestoneKey).
-    time - milliseconds
-    numtype - usually one of INTERESTING_TYPES, but could be custom too
+    event - event this milestone is created for
+    unit - time unit (e.g. years)
+    description - helps describe the milestone, but only partially. jmr - is that right? Explain how ??
+    numberType - usually one of INTERESTING_TYPES, but could be custom too
+    numberCode - used for constants to tell what the interesting number is in relation to the constant (e.g. exact, same digits, other multiple)
+    time - in milliseconds
 */
-function createMilestone(event, unit, description, numtype, time) {
-    //: "event", // At event time.  This isn't in the INTERESTING_TYPES
+function createMilestone(event, unit, description, numberType, numberCode, time) {
     const milestone = {
         event: event,
         unit: unit,
         description: description,
-        numtype: numtype, // At event time.  This isn't in the INTERESTING_TYPES
+        numberType: numberType,
+        numberCode: numberCode,
         time: time,
     };
     milestone.key = getMilestoneKey(milestone);
     return milestone;
 }
+
+
+
+export function shouldShowMilestoneForNumberType(milestone, numberTypeUseMap) {
+
+    const numberType = milestone.numberType;
+
+    const numberTypeUse = numberTypeUseMap[numberType];
+
+    if (numberTypeUse && milestone.numberCode) {
+        /* This isn't just a boolean, there's a code to check.
+            If the numberTypeUse setting is >= the code for this milestone, then show it */
+        return numberTypeUse >= milestone.numberCode;
+    }
+    return numberTypeUse;
+}
+
+
+const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
+const numberTypes = Object.keys(sortedInterestingNumbersMap);
 
 /**
  * This function calls others to get the interesting milestones.
@@ -51,15 +77,8 @@ function createMilestone(event, unit, description, numtype, time) {
  * @param {Number} pastDays - number of days in past to look for interesting numbers (but limited to maxNumMilestonesPast)
  * @param {Number} futureDays - number of days in future to look for interesting numbers
  * @param {Number} maxNumMilestonesPast - Max number of past milestones to return (but must be within the pastDays)
- * @param {Number} maxNumMilestonesFuture - Max number of future milestones to return
- * @param {Object} appSettingsContext - has appSettingsContext.numberTypeUseMap and other settings to see which number types to use 
  */
-export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNumMilestonesPast, maxNumMilestonesFuture, appSettingsContext) {
-
-
-
-    const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
-    const numberTypes = Object.keys(sortedInterestingNumbersMap);
+const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNumMilestonesPast) => {
 
     const eventMoment = moment(event.epochMillis);
     const nowMoment = moment(nowTime);
@@ -69,11 +88,12 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
     const tooCloseMillis = tooCloseDays * 24 * 3600 * 1000;
     const isEventInFuture = (event.epochMillis > nowTime);
 
-    var interestingList = [];
-    // For upcoming events, show exact moment as a milestone
+    var milestoneList = [];
+    /* For upcoming events, show exact moment as a milestone
+        We'll call the type "event" */
     if (isEventInFuture) {
         if (eventMoment.isBefore(futureMoment)) {
-            interestingList.push(createMilestone(event, "seconds", "0", "event", event.epochMillis));
+            milestoneList.push(createMilestone(event, "seconds", "0", "event", undefined, event.epochMillis));
         }
     }
 
@@ -83,7 +103,7 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
         let start, end;
 
         /* Create a helper function that is used in multiple places */
-        const getInterestingInfoItem = (num, numtype, descriptor) => {
+        const createMilestoneIfNeeded = (num, descriptor, numberType, numberCode) => {
 
             if (num >= start && num <= end) {
                 let interestingTime;
@@ -126,7 +146,7 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
                         Must be less than the event - tooCloseMillis,
                         or greater than event+tooCloseMillis
                         */
-                        return createMilestone(event, unit, descriptor, numtype, interestingTime);
+                        return createMilestone(event, unit, descriptor, numberType, numberCode, interestingTime);
                     }
                 }
             }
@@ -150,9 +170,9 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
         if (unit === 'years') {
             // Add in aniversaries
             for (var yr = start; yr <= end; yr++) {
-                const interestingInfo = getInterestingInfoItem(yr, INTERESTING_TYPES.round, yr);
-                if (interestingInfo) {
-                    interestingList.push(interestingInfo);
+                const newMilestone = createMilestoneIfNeeded(yr, yr, INTERESTING_TYPES.round, undefined);
+                if (newMilestone) {
+                    milestoneList.push(newMilestone);
                 }
             }
         }
@@ -160,13 +180,6 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
 
             const numberType = numberTypes[numberTypesIdx];
-
-            const numberUse = appSettingsContext.numberTypeUseMap[numberType];
-            if (!numberUse) {
-                // We don't want to use this type of number at all
-                continue;
-            }
-            const isConstant = INTERESTING_CONSTANTS[numberType] ? true : false;
 
             const sortedInterestingNumbers = sortedInterestingNumbersMap[numberType];
             //  logger.warn(" Number of interesting numbers for type ", numberType, sortedInterestingNumbers.length);
@@ -178,19 +191,6 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
                     // We add in years already.  We only need to do years if it's not a non-integer like our constants
                     // jmr - what about event based numbers like 6/26 or 6.26 ??
                     continue;
-                }
-
-                if (isConstant) {
-                    if (numberUse === 1 && info.tags.indexOf("constantExact") < 0) {
-                        // This info isn't constantExact, so don't use it
-                        continue;
-                    } else if (numberUse === 2 && info.tags.indexOf("constantTenMultiple") < 0) {
-                        // This info isn't constantTenMultiple, so don't use it
-                        continue;
-                    } else if (numberUse === 3 && info.tags.indexOf("constantOtherMultiple") < 0) {
-                        // This info isn't constantOtherMultiple, so don't use it
-                        continue;
-                    }
                 }
 
                 /* jmr - need to add in dates using numbers particular to the event (e.g. 12/25) */
@@ -212,9 +212,23 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
                     break;
                 }
 
-                const interestingInfo = getInterestingInfoItem(info.number, numberType, info.descriptor);
-                if (interestingInfo) {
-                    interestingList.push(interestingInfo);
+                const isConstant = INTERESTING_CONSTANTS[numberType] ? true : false;
+                let numberCode;
+                if (isConstant) {
+                    /* For constants we have a numberCode that lets us know
+                        what this number was in relation to the constant */
+                    if (info.tags.indexOf("constantOtherMultiple") >= 0) {
+                        numberCode = 3;
+                    } else if (info.tags.indexOf("constantTenMultiple") >= 0) {
+                        numberCode = 2;
+                    } else if (info.tags.indexOf("constantExact") >= 0) {
+                        numberCode = 1;
+                    }
+                }
+
+                const newMilestone = createMilestoneIfNeeded(info.number, info.descriptor, numberType, numberCode);
+                if (newMilestone) {
+                    milestoneList.push(newMilestone);
                 }
 
             }
@@ -222,29 +236,26 @@ export function findInterestingDates(event, nowTime, pastDays, futureDays, maxNu
     }
 
     // Sort it
-    interestingList = interestingList.sort((a, b) => { return (a.time - b.time); });
+    milestoneList = milestoneList.sort((a, b) => { return (a.time - b.time); });
 
     /* Get the index where the current or future milestones happen
         Declare the variable before the for loop so it's in scope when we use it below
     */
     let afterPastIdx = 0;
-    for (afterPastIdx = 0; afterPastIdx <= interestingList.length; afterPastIdx++) {
-        if (interestingList[afterPastIdx].time >= nowTime) {
+    for (afterPastIdx = 0; afterPastIdx <= milestoneList.length; afterPastIdx++) {
+        if (milestoneList[afterPastIdx].time >= nowTime) {
             break;
         }
     }
 
-    // First, take out those in future at end of array
-    if (maxNumMilestonesFuture) {
-        interestingList.splice(afterPastIdx + maxNumMilestonesFuture);
-    }
 
-    // After taking out future at end, take out some from beginning if needed
+    // Take out some from beginning if needed
     const numToRemove = afterPastIdx - maxNumMilestonesPast;
     if (numToRemove > 0) {
-        interestingList.splice(0, numToRemove); // splice removes from original array
+        milestoneList.splice(0, numToRemove); // splice removes from original array
     }
 
-    return interestingList;
+    return milestoneList;
 
 }
+export const createMilestones = nanomemoize(unmemoizedCreateMilestones);

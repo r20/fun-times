@@ -13,7 +13,7 @@ import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
 import ColorPickerModal from '../components/ColorPickerModal'
 import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
 
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as Utils from '../utils/Utils'
 import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
@@ -26,7 +26,7 @@ import Decimal from 'decimal.js-light'
 
 function AddOrEditEvent(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const route = useRoute();
   const navigation = useNavigation();
 
@@ -82,7 +82,7 @@ function AddOrEditEvent(props) {
       event.extraNumbersForMilestones = extraNumbersForMilestones;
     }
 
-    if (eventListContext.getCustomEventWithTitle(newTitle)
+    if (eventsAndMilestonesContext.getCustomEventWithTitle(newTitle)
       && (isCreate || event.title !== oldEvent.title)) {
 
       Alert.alert(
@@ -98,11 +98,11 @@ function AddOrEditEvent(props) {
       logger.log("Saving event ", title, "--", selectedDate);
 
       if (isCreate) {
-        eventListContext.addCustomEvent(event);
+        eventsAndMilestonesContext.addCustomEvent(event);
         // Go back to events screen when push save
         navigation.navigate("EventsScreen");
       } else {
-        eventListContext.modifyEvent(oldEvent, event);
+        eventsAndMilestonesContext.modifyEvent(oldEvent, event);
         // Go back to EventInfo with the new event
         navigation.navigate("EventInfo", { event: event });
       }
@@ -173,7 +173,7 @@ function AddOrEditEvent(props) {
       <ScrollView contentContainerStyle={styles.container}>
         <TextInput
           style={[styles.titleInput, titleInputHeight]}
-          multiline={true}
+          multiline={false}
           onChangeText={text => setTitle(text)}
           onContentSizeChange={(event) => {
             setTitleInputHeight(event.nativeEvent.contentSize.height);

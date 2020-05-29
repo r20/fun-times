@@ -48,30 +48,35 @@ function MyTabs(props) {
     });
   }, [navigation, route]);
 
+  const tabBarOptions = {
+    showLabel: false,
+    activeTintColor: theme.PRIMARY_ACTIVE_TEXT_COLOR,
+    inactiveTintColor: theme.PRIMARY_INACTIVE_TEXT_COLOR,
+    activeBackgroundColor: theme.PRIMARY_ACTIVE_BACKGROUND_COLOR,
+    inactiveBackgroundColor: theme.PRIMARY_INACTIVE_BACKGROUND_COLOR,
+    style: {
+      borderTopWidth: 1,
+      borderTopColor: theme.TAB_BAR_BORDER_COLOR,
+    },
+  };
+  const eventsOptions = { activeTintColor: 'red', tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> };
+  const todayOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> };
+  const milestoneOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> };
+  const moreOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> };
 
   return (
     <Tab.Navigator initialRouteName="EventsScreen" lazy={true}
-      tabBarOptions={{
-        showLabel: false,
-        activeTintColor: theme.PRIMARY_ACTIVE_TEXT_COLOR,
-        inactiveTintColor: theme.PRIMARY_INACTIVE_TEXT_COLOR,
-        activeBackgroundColor: theme.PRIMARY_ACTIVE_BACKGROUND_COLOR,
-        inactiveBackgroundColor: theme.PRIMARY_INACTIVE_BACKGROUND_COLOR,
-        style: {
-          borderTopWidth: 1,
-          borderTopColor: theme.TAB_BAR_BORDER_COLOR,
-        },
-      }} >
+      tabBarOptions={tabBarOptions} >
 
       <Tab.Screen name="EventsScreen" component={EventsScreen} tabBarAccessibilityLabel={i18n.t("menuEventsTitle")}
-        options={{ activeTintColor: 'red', tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> }} />
+        options={eventsOptions} />
       <Tab.Screen name="Today" component={Today} tabBarAccessibilityLabel={i18n.t("menuTodayTitle")}
 
-        options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> }} />
+        options={todayOptions} />
       <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuUpcomingTitle")}
-        options={{ tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> }} />
+        options={milestoneOptions} />
       <Tab.Screen name="More" component={More} tabBarAccessibilityLabel={i18n.t("menuMoreTitle")}
-        options={{ tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> }} />
+        options={moreOptions} />
     </Tab.Navigator>
   );
 }

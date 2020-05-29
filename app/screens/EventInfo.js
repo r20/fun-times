@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import EventSelectedStar from '../components/EventSelectedStar'
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
-import EventListContext from '../context/EventListContext'
+import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 
 import theme from '../style/theme'
@@ -17,7 +17,7 @@ import * as logger from '../utils/logger'
 
 function EventInfo(props) {
 
-  const eventListContext = useContext(EventListContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const route = useRoute();
   const navigation = useNavigation();
 
@@ -28,7 +28,7 @@ function EventInfo(props) {
   */
   const passedEvent = route.params?.event ?? '';
   // Use the current version of the event object
-  const event = eventListContext.getEventWithTitle(passedEvent.title);
+  const event = eventsAndMilestonesContext.getEventWithTitle(passedEvent.title);
   if (!event) {
     return null;
   }
@@ -53,7 +53,7 @@ function EventInfo(props) {
         {
           text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
-            eventListContext.removeCustomEvent(event);
+            eventsAndMilestonesContext.removeCustomEvent(event);
             navigation.navigate("EventsScreen");
 
           }

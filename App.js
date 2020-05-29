@@ -4,9 +4,13 @@ import * as Font from 'expo-font'
 import { MenuProvider } from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
 
-import { EventListProvider } from './app/context/EventListContext'
+import { EventsAndMilestonesContextProvider } from './app/context/EventsAndMilestonesContext'
 import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 import { CalendarProvider } from './app/context/CalendarContext'
+
+// Before rendering any navigation stack, to optimize memory usage and performance
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 // jmr - for optimization
 // if (process.env.NODE_ENV === 'development') {
@@ -16,6 +20,12 @@ import { CalendarProvider } from './app/context/CalendarContext'
 //     trackAllPureComponents: true,
 //   });
 // }
+
+if (process.env.NODE_ENV !== 'development') {
+  // get rid of console.log if not in dev
+  console.log = () => { };
+}
+
 
 import AppStackNavigator from './app/navigation/AppStackNavigator'
 
@@ -44,6 +54,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <CalendarProvider><AppSettingsContextProvider><EventListProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventListProvider></AppSettingsContextProvider></CalendarProvider>
+    return <CalendarProvider><AppSettingsContextProvider><EventsAndMilestonesContextProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventsAndMilestonesContextProvider></AppSettingsContextProvider></CalendarProvider>
   }
 }
