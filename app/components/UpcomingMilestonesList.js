@@ -1,7 +1,8 @@
 import React, { useState, useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Clipboard } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
@@ -10,6 +11,7 @@ import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import { shouldShowMilestoneForNumberType } from '../utils/milestones'
+import ClipboardCopyable from '../components/ClipboardCopyable'
 
 import AppSettingsContext from '../context/AppSettingsContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
@@ -111,12 +113,16 @@ export default function UpcomingMilestonesList(props) {
   }
   // jmr- tried putting in   {...initialScrollIndexOnlyIfGreaterThanZero} but still not working
 
+
+
   const renderItem = ({ item, index, separators }) => {
     const event = item.event;
     const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
     const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
 
-    const desc = props.verboseDescription ? calendarContext.getMilestoneVerboseDescription(item) : i18n.t(item.unit, { someValue: item.description });
+    const verboseDesc = calendarContext.getMilestoneVerboseDescription(item);
+    const desc = props.verboseDescription ? verboseDesc : i18n.t(item.unit, { someValue: item.description });
+    const clipboadContent = specialDisplayDateTime + "\n" + verboseDesc;
 
     const isOnCalendar = calendarContext.getIsMilestoneInCalendar(item);
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
@@ -125,20 +131,23 @@ export default function UpcomingMilestonesList(props) {
     const colorStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarColorStyle() : calendarContext.getMilestoneNotOnCalendarColorStyle();
     const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
 
-  //jmr  if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
-      return (<EventCard event={event} style={[styles.card, cardStyle, eventCardHeightStyle]}>
-        <View style={[styles.eventCardTextWrapper, opacityStyle]}>
+
+    //jmr  if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
+    return (<EventCard event={event} style={[styles.card, cardStyle, eventCardHeightStyle]}>
+      <View style={[styles.eventCardTextWrapper, opacityStyle]}>
+        <ClipboardCopyable content={clipboadContent}>
           <EventCardHeader event={event} style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
           <EventCardBodyText event={event} style={colorStyle}>{desc}</EventCardBodyText>
+        </ClipboardCopyable>
+      </View>
+      {calendarContext.isCalendarReady &&
+        <View style={opacityStyle}>
+          <TouchableOpacity onPress={() => calendarContext.toggleCalendarMilestoneEvent(item)} style={styles.calendarButton}>
+            <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
+          </TouchableOpacity>
         </View>
-        {calendarContext.isCalendarReady &&
-          <View style={opacityStyle}>
-            <TouchableOpacity onPress={() => calendarContext.toggleCalendarMilestoneEvent(item)} style={styles.calendarButton}>
-              <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
-            </TouchableOpacity>
-          </View>
-        }
-      </EventCard>);
+      }
+    </EventCard>);
     // } else {
     //   return null;
     // }

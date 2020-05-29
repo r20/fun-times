@@ -33,6 +33,7 @@ export const en = {
   save: 'Save',
   cancel: 'Cancel',
   delete: 'Delete',
+  copiedToClipboard: 'Copied to clipboard',
   doNotShowAgainMessage: "Don't show again",
   addToFavorites: 'Add To Favorites',
   removeFromFavorites: 'Remove From Favorites',
