@@ -8,6 +8,7 @@ import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } 
 import EventsScreen from '../screens/EventsScreen'
 import Today from '../screens/Today'
 import MilestoneCalendar from '../screens/MilestoneCalendar'
+import CalendarScreen from '../screens/CalendarScreen'
 import More from '../screens/More'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
@@ -31,6 +32,8 @@ function MyTabs(props) {
         title = i18n.t("headerTodayTitle");
       } else if (stateName === "MilestoneCalendar") {
         title = i18n.t("headerUpcomingCalendarScreenTitle");
+      } else if (stateName === "CalendarScreen") {
+        title = i18n.t("headerCalendar");
       } else if (stateName === "More") {
         title = i18n.t("headerMoreTitle");
       }
@@ -62,6 +65,7 @@ function MyTabs(props) {
   const eventsOptions = { activeTintColor: 'red', tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> };
   const todayOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> };
   const milestoneOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> };
+  const calendarOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-check" size={size} color={color} /> };
   const moreOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> };
 
   return (
@@ -71,10 +75,11 @@ function MyTabs(props) {
       <Tab.Screen name="EventsScreen" component={EventsScreen} tabBarAccessibilityLabel={i18n.t("menuEventsTitle")}
         options={eventsOptions} />
       <Tab.Screen name="Today" component={Today} tabBarAccessibilityLabel={i18n.t("menuTodayTitle")}
-
         options={todayOptions} />
-      <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuUpcomingTitle")}
+      <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuMilestoneSuggestionsTitle")}
         options={milestoneOptions} />
+              <Tab.Screen name="CalendarScreen" component={CalendarScreen} tabBarAccessibilityLabel={i18n.t("menuCalendarTitle")}
+        options={calendarOptions} />
       <Tab.Screen name="More" component={More} tabBarAccessibilityLabel={i18n.t("menuMoreTitle")}
         options={moreOptions} />
     </Tab.Navigator>

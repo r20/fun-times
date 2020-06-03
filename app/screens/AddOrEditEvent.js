@@ -12,6 +12,8 @@ import EventDateTimePickerAndroid from '../components/EventDateTimePickerAndroid
 import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
 import ColorPickerModal from '../components/ColorPickerModal'
 import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
+import * as Localization from 'expo-localization'
+import moment from 'moment-timezone'
 
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as Utils from '../utils/Utils'
@@ -19,10 +21,8 @@ import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 
-/* After move function, move this */
-import moment from 'moment-timezone'
+/* jmr - After move function, move this ?? */
 import Decimal from 'decimal.js-light'
-
 
 function AddOrEditEvent(props) {
 
@@ -65,7 +65,7 @@ function AddOrEditEvent(props) {
 
     const newTitle = title.trim();
 
-    let event;
+     let event;
     if (isCreate) {
       event = new Event({
         title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,

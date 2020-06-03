@@ -1,5 +1,6 @@
 
 import moment from 'moment-timezone'
+import * as Localization from 'expo-localization'
 
 import Event, { TAGS } from './Event'
 import * as logger from '../utils/logger'
@@ -60,7 +61,7 @@ events.push(new Event({
     key: "New Year's Day",
     isSelectedByDefault: false,
     // If don't clone it will modify nowMoment and mess up other calculations
-    epochMillis: nowMoment.clone().startOf('year').add(1, 'years').valueOf(),
+    epochMillis: nowMoment.clone().tz(Localization.timezone).startOf('year').add(1, 'years').valueOf(),
     isFullDay: false,
     color: "silver",
     tags: [TAGS.HOLIDAY],
@@ -69,7 +70,7 @@ events.push(new Event({
     title: "Pi Day",
     key: "Pi Day",
     isSelectedByDefault: false,
-    epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss')).valueOf(),
+    epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
     ignoreIfPast: true,
     isFullDay: false, // Let's calculate times to 1:59:25
     color: "orange",

@@ -21,6 +21,7 @@ const initialColor = theme.DEFAULT_CALENDAR_COLOR;
 // This created with defaults.  The provider sets the real values using value prop.
 const CalendarContext = createContext({
   isCalendarReady: false,
+  calendarEventsList: [],
   toggleCalendarMilestoneEvent: () => { },
   getMilestoneVerboseDescription: () => { },
   getIsMilestoneInCalendar: () => { },
@@ -75,6 +76,7 @@ function MyCalendarProvider(props) {
 
   [calendarId, setCalendarId] = useState(null);
   [calendarMilestoneEventsMap, setCalendarMilestoneEventsMap] = useState(null);
+  [calendarEventsList, setCalendarEventsList] = useState([]);
   [isCalendarReady, setIsCalendarReady] = useState(false);
 
   [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
@@ -135,15 +137,6 @@ function MyCalendarProvider(props) {
 
       // Get events
       const theCalendarEvents = await getCalendarEventsAsync(theCalendarId);
-      let tmpcalendarMilestoneEventsMap = {};
-
-      for (let calendarEvent of theCalendarEvents) {
-        const theKey = getMilestoneKeyFromCalendarNotes(calendarEvent.notes);
-        if (theKey) {
-          tmpcalendarMilestoneEventsMap[theKey] = calendarEvent.id;
-        }
-      }
-      setCalendarMilestoneEventsMap(tmpcalendarMilestoneEventsMap);
       setIsCalendarReady(true)
       logger.warn("jmr ===== milestones on calendar mapped", tmpcalendarMilestoneEventsMap);
     } else {
@@ -236,6 +229,32 @@ function MyCalendarProvider(props) {
     logger.warn('jmr === searching calendar ', theCalendarId, " between ", startDate.toLocaleDateString(), "and ", endDate.toLocaleDateString());
     const calendarEventObjects = await Calendar.getEventsAsync([theCalendarId], startDate, endDate);
 
+    /* This would mean we only get events in the time span, not all events. But startDate and endDate are required.  This is ok though.
+     Some older events won't show.  There shouldn't be any beyond endDate unless they changed time or created them on their own. */
+
+    let tmpcalendarMilestoneEventsMap = {};
+    let tmpcalendarEventsList = [];
+    if (calendarEventObjects) {
+      for (let calendarEvent of calendarEventObjects) {
+        const theKey = getMilestoneKeyFromCalendarNotes(calendarEvent.notes);
+        if (theKey) {
+          tmpcalendarMilestoneEventsMap[theKey] = calendarEvent.id;
+        }
+        logger.warn("jmr === calendar event is ", calendarEvent);
+        tmpcalendarEventsList.push({
+          calendarEvent: calendarEvent, // hang on to original
+          id: calendarEvent.id,
+          key: theKey, // possible it doesn't exist if the user created an event not with app
+          startTime: (new Date(calendarEvent.startDate)).getTime(),
+          title: calendarEvent.title,
+        });
+      }
+      tmpcalendarEventsList = tmpcalendarEventsList.sort((a, b) => { return (a.startTime - b.startTime); });
+    }
+
+    setCalendarMilestoneEventsMap(tmpcalendarMilestoneEventsMap);
+    setCalendarEventsList(tmpcalendarEventsList);
+
     return calendarEventObjects;
   }
 
@@ -249,13 +268,15 @@ function MyCalendarProvider(props) {
 
   /* Returns the milestone key found in the notes, else undefined */
   const getMilestoneKeyFromCalendarNotes = (notes) => {
-    const lineWithKeyRegex = /^=== id:(.+) ===$/; // This matches what we did in getCalendarNotesLineWithMilestoneKey
-    const lines = notes.split("\n");
-    for (let line of lines) {
-      const m = line.match(lineWithKeyRegex);
-      if (m) {
-        // ,[0] is whole match.  [1] is first group (and we have just one), which should be the key
-        return m[1];
+    if (notes) {
+      const lineWithKeyRegex = /^=== id:(.+) ===$/; // This matches what we did in getCalendarNotesLineWithMilestoneKey
+      const lines = notes.split("\n");
+      for (let line of lines) {
+        const m = line.match(lineWithKeyRegex);
+        if (m) {
+          // ,[0] is whole match.  [1] is first group (and we have just one), which should be the key
+          return m[1];
+        }
       }
     }
     return undefined
@@ -274,9 +295,9 @@ function MyCalendarProvider(props) {
     const milestoneKey = milestoneItem.key;
     // Set to UTC midnight for allday events. Android needs it that way.
     const start = milestoneItem.event.isFullDay ? new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0) : new Date(milestoneItem.time);
-    const tz = milestoneItem.event.isFullDay ? "UTC" : Localization.timezone;
 
-    const end = start;
+    const numMinutesPastStart = 5;
+    const end = milestoneItem.event.isFullDay ? new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0) : new Date(milestoneItem.time + (numMinutesPastStart * 60000));
 
     // 9am on the day of event if full day, else 2 hours before
     const offsetMinutes = milestoneItem.event.isFullDay ? 9 * 60 : -120;
@@ -285,30 +306,37 @@ function MyCalendarProvider(props) {
     const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
 
     const eventId = await Calendar.createEventAsync(calendarId, {
-      alarms: [{ relativeOffset: offsetMinutes }],
+      alarms: [{ relativeOffset: offsetMinutes, method: Calendar.AlarmMethod.ALERT }],
       notes: verboseDesc + "\n\nThis event was created by the Fun Times app." + getCalendarNotesLineWithMilestoneKey(milestoneItem),
       title: verboseDesc,
       startDate: start,
       endDate: end,
       allDay: milestoneItem.event.isFullDay,
-      timeZone: tz, // string, required on Android
-      endTimeZone: tz,
+      timeZone: "UTC", //milestoneItem.event.isFullDay ? "UTC" : Localization.timezone, // string, required on Android
+      endTimeZone: null, // milestoneItem.event.isFullDay ? null : Localization.timezone, // This is how my calendar app on my device creates them for full day
     });
-    const mapEntry = {};
-    mapEntry[milestoneKey] = eventId;
-    const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
-    setCalendarMilestoneEventsMap(newMap);
+    // jmr - is it too slow to query ??
+    // const mapEntry = {};
+    // mapEntry[milestoneKey] = eventId;
+    // const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
+    // setCalendarMilestoneEventsMap(newMap);
+
+    // get new event map and list after adding one
+    await getCalendarEventsAsync(calendarId);
   }
 
-  const removeCalendarMilestonEntry = (milestoneItem) => {
+  const removeCalendarMilestonEntry = async (milestoneItem) => {
     const milestoneKey = milestoneItem.key;
     const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
     if (calendarEventId) {
-      const newMap = Object.assign({}, calendarMilestoneEventsMap);
-      delete newMap[milestoneKey];
-      setCalendarMilestoneEventsMap(newMap);
-      // Not waiting around.  It can happen later.
-      Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
+      // jmr - is it too slow to query
+      // const newMap = Object.assign({}, calendarMilestoneEventsMap);
+      // delete newMap[milestoneKey];
+      // setCalendarMilestoneEventsMap(newMap);
+      await Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
+
+      // get new event list after removing one
+      await getCalendarEventsAsync(calendarId);
     }
   }
 
@@ -328,6 +356,7 @@ function MyCalendarProvider(props) {
   return (
     <CalendarContext.Provider value={{
       isCalendarReady: isCalendarReady,
+      calendarEventsList: calendarEventsList,
       toggleCalendarMilestoneEvent: toggleCalendarMilestoneEvent,
       getMilestoneVerboseDescription: getMilestoneVerboseDescription,
       getIsMilestoneInCalendar: getIsMilestoneInCalendar,

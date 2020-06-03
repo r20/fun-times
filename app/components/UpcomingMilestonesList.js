@@ -35,23 +35,6 @@ export default function UpcomingMilestonesList(props) {
     numMilestonesPerEventMap[props.events[idx].title] = 0;
   }
 
-  const shouldShowMilestoneForButtonFilter = (isOnCalendar) => {
-    const selectedButtonIndex = props.filterNumber;
-    if (!selectedButtonIndex) {
-      return true;
-    } else if (selectedButtonIndex === 1 && !isOnCalendar) {
-      return true;
-    } else if (selectedButtonIndex === 2 && isOnCalendar) {
-      return true;
-    }
-    return false;
-  }
-
-  /* jmr - There's a performance problem if have lots of events and scrol down.  If there are
-    few on the calendar and you click the filter to show only those calendared, it takes
-    too long of a time.  A big mostly empty list is shown first.
-    Maybe having fixed height cards would help??
-     */
 
   /* Memoize for performance using allMilestones which is already sorted
   */
@@ -61,24 +44,19 @@ export default function UpcomingMilestonesList(props) {
         // yes this milestone is for one of the events
         if (shouldShowMilestoneForNumberType(milestone, appSettingsContext.numberTypeUseMap)) {
           // Yes we should show this type of milestone
-          const isOnCalendar = calendarContext.getIsMilestoneInCalendar(milestone);
-
-          if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
-
-            if (!props.maxNumMilestonesPerEvent) {
-              // No max was specified
-              return true;
-            } else if (numMilestonesPerEventMap[milestone.event.title] <= props.maxNumMilestonesPerEvent) {
-              // A max limit was specified, and we haven't shown too many yet
-              numMilestonesPerEventMap[milestone.event.title] = numMilestonesPerEventMap[milestone.event.title] + 1;
-              return true;
-            }
+          if (!props.maxNumMilestonesPerEvent) {
+            // No max was specified
+            return true;
+          } else if (numMilestonesPerEventMap[milestone.event.title] <= props.maxNumMilestonesPerEvent) {
+            // A max limit was specified, and we haven't shown too many yet
+            numMilestonesPerEventMap[milestone.event.title] = numMilestonesPerEventMap[milestone.event.title] + 1;
+            return true;
           }
         }
       }
       return false;
     });
-  }, [eventsAndMilestonesContext.allMilestones, props.events, props.filterNumber, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap]);
+  }, [eventsAndMilestonesContext.allMilestones, props.events, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap]);
 
   logger.warn("jmr === num specials is ", specials.length);
 
@@ -86,7 +64,7 @@ export default function UpcomingMilestonesList(props) {
 
 
 
-  // Don't know how this works, but it's the heigt without margin??
+  // Don't know how this works, but it's the height without margin??
   const ITEM_HEIGHT = 72;
 
   const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
@@ -122,7 +100,7 @@ export default function UpcomingMilestonesList(props) {
 
     const verboseDesc = calendarContext.getMilestoneVerboseDescription(item);
     const desc = props.verboseDescription ? verboseDesc : i18n.t(item.unit, { someValue: item.description });
-    const clipboadContent = specialDisplayDateTime + "\n" + verboseDesc;
+    const clipboadContent = specialDisplayDateTime + "\n" + verboseDesc; // use verbose description for this no matter which screen they're on
 
     const isOnCalendar = calendarContext.getIsMilestoneInCalendar(item);
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
@@ -132,7 +110,6 @@ export default function UpcomingMilestonesList(props) {
     const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
 
 
-    //jmr  if (shouldShowMilestoneForButtonFilter(isOnCalendar)) {
     return (<EventCard event={event} style={[styles.card, cardStyle, eventCardHeightStyle]}>
       <View style={[styles.eventCardTextWrapper, opacityStyle]}>
         <ClipboardCopyable content={clipboadContent}>
@@ -148,9 +125,6 @@ export default function UpcomingMilestonesList(props) {
         </View>
       }
     </EventCard>);
-    // } else {
-    //   return null;
-    // }
   }
 
   return (
@@ -180,7 +154,6 @@ export default function UpcomingMilestonesList(props) {
 
 UpcomingMilestonesList.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object).isRequired,
-  filterNumber: PropTypes.number, // 0=show all, 1=not on calendar, 2=on calendar
   /* 
     If verboseDescription, include more info in the description including the event title.
   */
