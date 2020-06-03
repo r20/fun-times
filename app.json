@@ -3,7 +3,6 @@
     "name": "Fun Times",
     "slug": "fnx",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
       "android",
@@ -26,6 +25,6 @@
     "ios": {
       "supportsTablet": true
     },
-    "description": "Fun Times is an app for discovering important milestones for birthdays, anniversaries, etc. Enter a friend's birthday and you may learn they will be turning 1 billion seconds old in a few weeks. The app allows adding these milestones to your calendar."
+    "description": "Fun Times is an app for discovering quirky milestones for birthdays, anniversaries, etc. Enter a friend's birthday and you may learn they will be turning 1 billion seconds old in a few weeks.  Then, add it to your calendar so you can remember to celebrate."
   }
 }
