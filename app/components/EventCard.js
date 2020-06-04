@@ -28,7 +28,6 @@ const EventCard = (props) => {
 }
 
 EventCard.propTypes = {
-    event: PropTypes.object.isRequired,
     style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]), // more style to apply if desired
 };
 
@@ -42,7 +41,6 @@ export const EventCardHeader = (props) => {
 }
 
 EventCardHeader.propTypes = {
-    event: PropTypes.object.isRequired,
     style: PropTypes.object, // more style to apply if desired
 };
 
