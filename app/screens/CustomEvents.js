@@ -2,6 +2,7 @@ import React, { useContext, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { Text, StyleSheet, FlatList, View } from 'react-native'
 import { withNavigation } from '@react-navigation/compat'
+import { useScrollToTop } from '@react-navigation/native'
 
 import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
@@ -13,6 +14,11 @@ import * as logger from '../utils/logger'
 
 
 function CustomEvents(props) {
+
+  // This allows clicking tab navigator icon causing scroll to top.
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
+
 
   const navigation = props.navigation;
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
@@ -33,6 +39,7 @@ function CustomEvents(props) {
     <View style={styles.container}>
       {!empty &&
         <FlatList
+          ref={ref}
           contentContainerStyle={styles.contentContainerStyle}
           data={eventsAndMilestonesContext.customEvents}
           keyExtractor={keyExtractor}
@@ -40,7 +47,7 @@ function CustomEvents(props) {
           initialNumToRender={10}
         />
       }
-      {empty && <Text style={styles.emptyText}>{i18n.t('emptyCustomEventsMesage')}</Text>}
+      {empty && <Text style={styles.emptyText}>{i18n.t('emptyCustomEventsMessage')}</Text>}
       <AddEventButton onPress={onPressAddEvent} />
     </View>
   );

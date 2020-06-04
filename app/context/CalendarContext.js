@@ -5,7 +5,7 @@ import * as Localization from 'expo-localization'
 
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
+import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme, { getContrastFontColor } from '../style/theme'
 
 export const howManyDaysAheadCalendar = 365; // How far ahead should we calendar things
@@ -21,7 +21,7 @@ const initialColor = theme.DEFAULT_CALENDAR_COLOR;
 // This created with defaults.  The provider sets the real values using value prop.
 const CalendarContext = createContext({
   isCalendarReady: false,
-  calendarEventsList: [],
+  wrappedCalendarEventsList: [],
   toggleCalendarMilestoneEvent: () => { },
   getMilestoneVerboseDescription: () => { },
   getIsMilestoneInCalendar: () => { },
@@ -76,7 +76,7 @@ function MyCalendarProvider(props) {
 
   [calendarId, setCalendarId] = useState(null);
   [calendarMilestoneEventsMap, setCalendarMilestoneEventsMap] = useState(null);
-  [calendarEventsList, setCalendarEventsList] = useState([]);
+  [wrappedCalendarEventsList, setWrappedCalendarEventsList] = useState([]);
   [isCalendarReady, setIsCalendarReady] = useState(false);
 
   [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
@@ -233,7 +233,7 @@ function MyCalendarProvider(props) {
      Some older events won't show.  There shouldn't be any beyond endDate unless they changed time or created them on their own. */
 
     let tmpcalendarMilestoneEventsMap = {};
-    let tmpcalendarEventsList = [];
+    let tmpwrappedCalendarEventsList = [];
     if (calendarEventObjects) {
       for (let calendarEvent of calendarEventObjects) {
         const theKey = getMilestoneKeyFromCalendarNotes(calendarEvent.notes);
@@ -241,19 +241,26 @@ function MyCalendarProvider(props) {
           tmpcalendarMilestoneEventsMap[theKey] = calendarEvent.id;
         }
         logger.warn("jmr === calendar event is ", calendarEvent);
-        tmpcalendarEventsList.push({
+        const startTime = (new Date(calendarEvent.startDate)).getTime();
+        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(startTime, calendarEvent.allDay);
+
+        // Make an object that wraps calendarEvent
+        tmpwrappedCalendarEventsList.push({
           calendarEvent: calendarEvent, // hang on to original
-          id: calendarEvent.id,
           key: theKey, // possible it doesn't exist if the user created an event not with app
-          startTime: (new Date(calendarEvent.startDate)).getTime(),
-          title: calendarEvent.title,
+          header: specialDisplayDateTime,
+          description: calendarEvent.title, // The title is the description
+          isOnCalendar: true,
+          id: calendarEvent.id,
+          startTime: startTime,
+          allDay: calendarEvent.allDay,
         });
       }
-      tmpcalendarEventsList = tmpcalendarEventsList.sort((a, b) => { return (a.startTime - b.startTime); });
+      tmpwrappedCalendarEventsList = tmpwrappedCalendarEventsList.sort((a, b) => { return (a.startTime - b.startTime); });
     }
 
     setCalendarMilestoneEventsMap(tmpcalendarMilestoneEventsMap);
-    setCalendarEventsList(tmpcalendarEventsList);
+    setWrappedCalendarEventsList(tmpwrappedCalendarEventsList);
 
     return calendarEventObjects;
   }
@@ -325,7 +332,7 @@ function MyCalendarProvider(props) {
     await getCalendarEventsAsync(calendarId);
   }
 
-  const removeCalendarMilestonEntry = async (milestoneItem) => {
+  const removeCalendarMilestoneEntry = async (milestoneItem) => {
     const milestoneKey = milestoneItem.key;
     const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
     if (calendarEventId) {
@@ -345,7 +352,7 @@ function MyCalendarProvider(props) {
     const milestoneKey = milestoneItem.key;
     const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
     if (calendarEventId) {
-      removeCalendarMilestonEntry(milestoneItem);
+      removeCalendarMilestoneEntry(milestoneItem);
     } else {
       createCalendarMilestoneEntry(milestoneItem);
     }
@@ -356,7 +363,7 @@ function MyCalendarProvider(props) {
   return (
     <CalendarContext.Provider value={{
       isCalendarReady: isCalendarReady,
-      calendarEventsList: calendarEventsList,
+      wrappedCalendarEventsList: wrappedCalendarEventsList,
       toggleCalendarMilestoneEvent: toggleCalendarMilestoneEvent,
       getMilestoneVerboseDescription: getMilestoneVerboseDescription,
       getIsMilestoneInCalendar: getIsMilestoneInCalendar,

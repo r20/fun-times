@@ -8,16 +8,19 @@ import EventSelectedStar from '../components/EventSelectedStar'
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
+import CalendarContext from '../context/CalendarContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
-
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 import * as logger from '../utils/logger'
 
+
 function EventInfo(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
+  const calendarContext = useContext(CalendarContext);
+
   const route = useRoute();
   const navigation = useNavigation();
 
@@ -95,10 +98,11 @@ function EventInfo(props) {
   const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
   const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getDisplayStringDateTimeForEvent(event) });
 
+
   const upcomingMilestoneListHeader = (
     <React.Fragment>
-      <EventCard event={event}>
-        <EventCardHeader event={event}>{cardHeaderTitleNow}</EventCardHeader>
+      <EventCard >
+        <EventCardHeader >{cardHeaderTitleNow}</EventCardHeader>
         <EventComparedToNow event={event} nowMillis={nowMillis} />
       </EventCard>
 

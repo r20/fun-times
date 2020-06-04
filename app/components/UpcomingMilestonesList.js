@@ -2,7 +2,7 @@ import React, { useState, useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Clipboard } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-
+import { useScrollToTop } from '@react-navigation/native'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
@@ -22,6 +22,10 @@ const nowDate = new Date();
 const nowTime = nowDate.getTime();
 
 export default function UpcomingMilestonesList(props) {
+
+  // This allows clicking tab navigator icon causing scroll to top.
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const appSettingsContext = useContext(AppSettingsContext);
@@ -110,11 +114,11 @@ export default function UpcomingMilestonesList(props) {
     const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
 
 
-    return (<EventCard event={event} style={[styles.card, cardStyle, eventCardHeightStyle]}>
+    return (<EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
       <View style={[styles.eventCardTextWrapper, opacityStyle]}>
         <ClipboardCopyable content={clipboadContent}>
-          <EventCardHeader event={event} style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
-          <EventCardBodyText event={event} style={colorStyle}>{desc}</EventCardBodyText>
+          <EventCardHeader style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
+          <EventCardBodyText style={colorStyle}>{desc}</EventCardBodyText>
         </ClipboardCopyable>
       </View>
       {calendarContext.isCalendarReady &&
@@ -131,6 +135,7 @@ export default function UpcomingMilestonesList(props) {
     <React.Fragment>
       {!isEmpty &&
         <FlatList
+          ref={ref}
           data={specials}
           ListHeaderComponent={props.listHeaderComponent}
           contentContainerStyle={styles.contentContainerStyle}
@@ -143,7 +148,7 @@ export default function UpcomingMilestonesList(props) {
       {isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
-          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAheadCalendar })}</Text></View>
+          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMessage', { someValue: howManyDaysAheadCalendar })}</Text></View>
         </React.Fragment>
       }
     </React.Fragment>

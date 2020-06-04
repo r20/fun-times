@@ -2,12 +2,13 @@ import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
+import { useScrollToTop } from '@react-navigation/native'
 import { Slider, ButtonGroup } from "react-native-elements"
 import * as Calendar from 'expo-calendar'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import AppSettingsContext from '../context/AppSettingsContext'
-import CalendarContext from '../context/CalendarContext'
+import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
 import ClipboardCopyable from '../components/ClipboardCopyable'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import theme from '../style/theme'
@@ -20,57 +21,61 @@ import * as logger from '../utils/logger'
 const nowDate = new Date();
 const nowTime = nowDate.getTime();
 
-  // Don't know how this works, but it's the height without margin??
-  const ITEM_HEIGHT = 72;
+// Don't know how this works, but it's the height without margin??
+const ITEM_HEIGHT = 72;
 
-  const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
+const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
 
-  const eventCardHeightStyle = { height: ITEM_HEIGHT };
+const eventCardHeightStyle = { height: ITEM_HEIGHT };
 
 
 function CalendarScreen(props) {
 
+  // This allows clicking tab navigator icon causing scroll to top.
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
+
+
   const calendarContext = useContext(CalendarContext);
   const appSettingsContext = useContext(AppSettingsContext);
-  [removedCalendarEntries, setRemovedCalendarEntries] = useState([]); // keep track of calendar entries we remove from calendar
 
-  const calendarEvents = calendarContext.calendarEventsList || [];
+  const wrappedCalendarEventsList = calendarContext.wrappedCalendarEventsList || [];
 
-  const isEmpty = calendarEvents.length === 0;
+  const isEmpty = wrappedCalendarEventsList.length === 0;
 
-  const toggleCalendarEvent = (calendarEvent) => {
+  const toggleCalendarEvent = (wrappedCalendarEvent) => {
     logger.warn("jmr == implement calendarJmr");
   }
 
-    /* To optimize and improve FlatList performance, use fixed height
-    items */
-    const getItemLayout = (data, index) => {
-      return { length: heightWithMargin, offset: heightWithMargin * index, index };
-    };
-  
-    /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
-      And it says it needs getItemLayout to be implemented. */
-    // Find starting index position (don't show a bunch of past events when first go to screen)
-  
-    let initialScrollIndexOnlyIfGreaterThanZero = {};
+  /* To optimize and improve FlatList performance, use fixed height
+  items */
+  const getItemLayout = (data, index) => {
+    return { length: heightWithMargin, offset: heightWithMargin * index, index };
+  };
 
-    for (let idx = 0; idx < calendarEvents.length; idx++) {
-      const eventTime = (new Date(calendarEvents[idx].startDate)).getTime();
+  /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
+    And it says it needs getItemLayout to be implemented. */
+  // Find starting index position (don't show a bunch of past events when first go to screen)
 
-      if (eventTime>= nowTime) {
-        initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-        logger.warn("jmr == initialScrollIndexOnlyIfGreaterThanZero", idx);
-        break;
-      }
+  let initialScrollIndexOnlyIfGreaterThanZero = {};
+
+  for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+    const eventTime = wrappedCalendarEventsList[idx].startTime;
+
+    if (eventTime >= nowTime) {
+      initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
+      logger.warn("jmr == initialScrollIndexOnlyIfGreaterThanZero", idx);
+      break;
     }
+  }
 
 
   const renderItem = ({ item, index, separators }) => {
 
-    const calendarEvent = item;
+    const wrappedCalendarEvent = item;
 
-     const isOnCalendar = true; //jmr
-    const eventTime = (new Date(calendarEvent.startDate)).getTime();
+    const isOnCalendar = wrappedCalendarEvent.isOnCalendar;
+    const eventTime = wrappedCalendarEvent.startTime;
 
 
     const colorStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarColorStyle() : calendarContext.getMilestoneNotOnCalendarColorStyle();
@@ -79,21 +84,18 @@ function CalendarScreen(props) {
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
     const opacityStyle = (eventTime < nowTime) ? styles.lessOpacity : styles.fullOpacity;
 
-    const clipboadContent = "jmr";
-    const specialDisplayDateTime = calendarEvent.title;
-    const desc = calendarEvent.title;
+    const clipboadContent = wrappedCalendarEvent.header + "\n" + wrappedCalendarEvent.description; // use verbose description for this no matter which screen they're on
 
-    // jmr- need to change from "event"
 
-    return (<EventCard event={calendarEvent} style={[styles.card, cardStyle, eventCardHeightStyle]}>
+    return (<EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
       <View style={[styles.eventCardTextWrapper, opacityStyle]}>
         <ClipboardCopyable content={clipboadContent}>
-          <EventCardHeader event={calendarEvent} style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
-          <EventCardBodyText event={calendarEvent} style={colorStyle}>{desc}</EventCardBodyText>
+          <EventCardHeader style={colorStyle}>{wrappedCalendarEvent.header}</EventCardHeader>
+          <EventCardBodyText style={colorStyle}>{wrappedCalendarEvent.description}</EventCardBodyText>
         </ClipboardCopyable>
       </View>
       <View style={opacityStyle}>
-        <TouchableOpacity onPress={() => toggleCalendarEvent(calendarEvent)} style={styles.calendarButton}>
+        <TouchableOpacity onPress={() => toggleCalendarEvent(wrappedCalendarEvent)} style={styles.calendarButton}>
           <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
         </TouchableOpacity>
       </View>
@@ -105,10 +107,10 @@ function CalendarScreen(props) {
 
   return (
     <React.Fragment>
-      {!isEmpty &&
+      {calendarContext.isCalendarReady && !isEmpty &&
         <FlatList
-          data={calendarEvents}
-        
+          ref={ref}
+          data={wrappedCalendarEventsList}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={renderItem}
           initialNumToRender={10}
@@ -116,10 +118,10 @@ function CalendarScreen(props) {
           {...initialScrollIndexOnlyIfGreaterThanZero}
         />
       }
-      {isEmpty &&
+      {calendarContext.isCalendarReady && isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
-          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMesage', { someValue: howManyDaysAheadCalendar })}</Text></View>
+          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMessage', { someValue: howManyDaysAheadCalendar })}</Text></View>
         </React.Fragment>
       }
     </React.Fragment>

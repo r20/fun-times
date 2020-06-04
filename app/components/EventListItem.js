@@ -25,9 +25,9 @@ function EventListItem(props) {
     <View style={styles.container}>
       <EventSelectedStar event={props.event} containerStyle={styles.starStyle} />
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
-        <EventCard event={props.event}>
-          <EventCardHeader event={props.event} >{title}</EventCardHeader>
-          <EventCardBodyText event={props.event} >{getDisplayStringDateTimeForEvent(props.event)}</EventCardBodyText>
+        <EventCard>
+          <EventCardHeader >{title}</EventCardHeader>
+          <EventCardBodyText >{getDisplayStringDateTimeForEvent(props.event)}</EventCardBodyText>
         </EventCard>
       </TouchableOpacity>
     </View>

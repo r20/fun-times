@@ -13,13 +13,13 @@ export default function EventComparedToNow(props) {
   const eventMoment = getMomentFromEvent(props.event);
   const nowMoment = moment(props.nowMillis);
 
-  const timeUnits = ['months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
+  const timeUnits = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
 
   return (<React.Fragment>
     {
       timeUnits.map((tu) => {
         const num = Math.abs(eventMoment.diff(nowMoment, tu));
-        return <EventCardBodyText key={tu} event={props.event}>{i18n.t(tu, { someValue: numberToFormattedString(num) })}</EventCardBodyText>
+        return <EventCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(num) })}</EventCardBodyText>
       })
     }
   </React.Fragment>

@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback, Keyboard, Alert, Platform, Button
 } from 'react-native'
 import { Slider } from 'react-native-elements'
+import { useScrollToTop } from '@react-navigation/native'
 
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
@@ -21,6 +22,9 @@ import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../utils/in
 
 function Settings(props) {
 
+  // This allows clicking tab navigator icon causing scroll to top.
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
 
   /*
   jmr:  Here's a list of things that could be done to improve app
@@ -93,7 +97,7 @@ function Settings(props) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <React.Fragment>
 
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView ref={ref} contentContainerStyle={styles.container}>
           <Divider style={styles.divider} />
           <Text style={styles.header}>{i18n.t("settingsHeaderShowAdditionalMilestonesForNumberTypes")}</Text>
 

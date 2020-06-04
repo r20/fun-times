@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import { useFocusEffect, usenavigation, useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useScrollToTop, useNavigation } from '@react-navigation/native'
 
 import i18n from '../i18n/i18n'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
@@ -10,6 +10,10 @@ import theme from '../style/theme'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 
 function Today(props) {
+
+  // This allows clicking tab navigator icon causing scroll to top.
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const navigation = useNavigation();
@@ -35,8 +39,8 @@ function Today(props) {
     const i18nKey = (item.epochMillis < nowMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
     const title = i18n.t(i18nKey, { someValue: item.title });
 
-    return (<EventCard event={item}>
-      <EventCardHeader event={item}>{title}</EventCardHeader>
+    return (<EventCard >
+      <EventCardHeader >{title}</EventCardHeader>
       <EventComparedToNow event={item} nowMillis={nowMillis} />
     </EventCard>
     );
@@ -47,6 +51,7 @@ function Today(props) {
   return (<View style={styles.container} >
     {!empty &&
       <FlatList
+        ref={ref}
         contentContainerStyle={styles.contentContainerStyle}
         data={filtered}
         keyExtractor={keyExtractor}
@@ -54,7 +59,7 @@ function Today(props) {
         initialNumToRender={4}
       />
     }
-    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyTodayMesage')}</Text></View>}
+    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyTodayMessage')}</Text></View>}
   </View>
   );
 }

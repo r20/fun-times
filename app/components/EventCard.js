@@ -54,7 +54,6 @@ export const EventCardBodyText = (props) => {
 }
 
 EventCardBodyText.propTypes = {
-    event: PropTypes.object.isRequired, // jmr - this used to be used in styling for its color, but not currently
     style: PropTypes.object, // more style to apply if desired
 };
 
@@ -67,9 +66,13 @@ const styles = StyleSheet.create({
         fontSize: theme.FONT_SIZE_MEDIUM + 2,
         fontWeight: 'bold',
         paddingBottom: 3,
+        color: getContrastFontColor(myColor),
+        backgroundColor: myColor,
     },
     bodyText: {
         fontSize: theme.FONT_SIZE_MEDIUM,
+        color: getContrastFontColor(myColor),
+        backgroundColor: myColor,
     },
     card: {
         flex: 0,

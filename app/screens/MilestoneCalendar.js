@@ -44,7 +44,7 @@ function MilestoneCalendar(props) {
     {!empty &&
       <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
-    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMesage')}</Text></View>}
+    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneCalendarMessage')}</Text></View>}
   </View>
   );
 }
