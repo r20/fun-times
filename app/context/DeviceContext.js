@@ -1,6 +1,14 @@
 import React, { createContext } from 'react'
 /* TBD - I tried this but it doesn't work. Probably because I'm in Expo environment.
-So this context isn't used currently.  I could remove the library and remove this file.*/
+So this context isn't used currently.  I could remove the library and remove this file.
+
+jmr - Or, could also try https://github.com/react-native-community/react-native-localize
+and its uses24HourClock
+Could also use getNumberFormatSettings
+
+And perhaps don't even need to use a context.
+
+*/
 import DeviceTimeFormat from 'react-native-device-time-format'
 
 import * as logger from '../utils/logger'

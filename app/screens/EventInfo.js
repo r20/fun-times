@@ -8,7 +8,6 @@ import EventSelectedStar from '../components/EventSelectedStar'
 import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
-import CalendarContext from '../context/CalendarContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
@@ -19,7 +18,6 @@ import * as logger from '../utils/logger'
 function EventInfo(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
-  const calendarContext = useContext(CalendarContext);
 
   const route = useRoute();
   const navigation = useNavigation();

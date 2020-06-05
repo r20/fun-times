@@ -65,7 +65,7 @@ function AddOrEditEvent(props) {
 
     const newTitle = title.trim();
 
-     let event;
+    let event;
     if (isCreate) {
       event = new Event({
         title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
@@ -100,7 +100,7 @@ function AddOrEditEvent(props) {
       if (isCreate) {
         eventsAndMilestonesContext.addCustomEvent(event);
         // Go to EventInfo with the new event
-        navigation.navigate("EventInfo", { event: event });
+        navigation.replace("EventInfo", { event: event });
       } else {
         eventsAndMilestonesContext.modifyEvent(oldEvent, event);
         // Go back to EventInfo with the new event

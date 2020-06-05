@@ -31,7 +31,7 @@ function MyTabs(props) {
       if (stateName === "Today") {
         title = i18n.t("headerTodayTitle");
       } else if (stateName === "MilestoneCalendar") {
-        title = i18n.t("headerUpcomingCalendarScreenTitle");
+        title = i18n.t("headerUpcomingMilestonesScreenTitle");
       } else if (stateName === "CalendarScreen") {
         title = i18n.t("headerCalendar");
       } else if (stateName === "More") {
@@ -78,7 +78,7 @@ function MyTabs(props) {
         options={todayOptions} />
       <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuMilestoneSuggestionsTitle")}
         options={milestoneOptions} />
-              <Tab.Screen name="CalendarScreen" component={CalendarScreen} tabBarAccessibilityLabel={i18n.t("menuCalendarTitle")}
+      <Tab.Screen name="CalendarScreen" component={CalendarScreen} tabBarAccessibilityLabel={i18n.t("menuCalendarTitle")}
         options={calendarOptions} />
       <Tab.Screen name="More" component={More} tabBarAccessibilityLabel={i18n.t("menuMoreTitle")}
         options={moreOptions} />
