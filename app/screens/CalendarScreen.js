@@ -3,29 +3,23 @@ import PropTypes from 'prop-types'
 
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import { Slider, ButtonGroup } from "react-native-elements"
-import * as Calendar from 'expo-calendar'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import AppSettingsContext from '../context/AppSettingsContext'
 import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
 import ClipboardCopyable from '../components/ClipboardCopyable'
-import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import * as logger from '../utils/logger'
 
 
-// jmr -  SHould I keep it in state? And how often should I update it??
-const nowDate = new Date();
-const nowTime = nowDate.getTime();
+// This is only used to differentiate between old and new events, so no need to update
+const nowTime = (new Date()).getTime();
 
 // Don't know how this works, but it's the height without margin??
 const ITEM_HEIGHT = 72;
-
 const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
-
 const eventCardHeightStyle = { height: ITEM_HEIGHT };
 
 
@@ -43,9 +37,7 @@ function CalendarScreen(props) {
 
   const isEmpty = wrappedCalendarEventsList.length === 0;
 
-  const toggleCalendarEvent = (wrappedCalendarEvent) => {
-    logger.warn("jmr == implement calendarJmr");
-  }
+
 
   /* To optimize and improve FlatList performance, use fixed height
   items */
@@ -53,18 +45,14 @@ function CalendarScreen(props) {
     return { length: heightWithMargin, offset: heightWithMargin * index, index };
   };
 
-  /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
-    And it says it needs getItemLayout to be implemented. */
-  // Find starting index position (don't show a bunch of past events when first go to screen)
 
+  /* Find starting index position (don't show a bunch of past events when first go to screen)
+  this prop to FlatList also needs getItemLayout */
   let initialScrollIndexOnlyIfGreaterThanZero = {};
-
   for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
     const eventTime = wrappedCalendarEventsList[idx].startTime;
-
     if (eventTime >= nowTime) {
       initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-      logger.warn("jmr == initialScrollIndexOnlyIfGreaterThanZero", idx);
       break;
     }
   }
@@ -95,15 +83,12 @@ function CalendarScreen(props) {
         </ClipboardCopyable>
       </View>
       <View style={opacityStyle}>
-        <TouchableOpacity onPress={() => toggleCalendarEvent(wrappedCalendarEvent)} style={styles.calendarButton}>
+        <TouchableOpacity onPress={() => calendarContext.toggleCalendarScreenCalendarEvent(item)} style={styles.calendarButton}>
           <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
         </TouchableOpacity>
       </View>
     </EventCard>);
   }
-
-
-  // jmr - fix empty thing (noting if calendar not ready, else message that nothign on calendar if empty)
 
   return (
     <React.Fragment>
@@ -128,29 +113,18 @@ function CalendarScreen(props) {
   );
 }
 
-
 export default CalendarScreen;
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
   },
-  sliderWrapper: {
-    flex: 0,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
     fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
-  },
-  maxMilestoneLabel: {
-    fontSize: theme.FONT_SIZE_SMALL,
   },
   contentContainerStyle: {
     padding: 15,
@@ -163,12 +137,6 @@ const styles = StyleSheet.create({
   },
   fullOpacity: {
     opacity: 1,
-  },
-  emptyText: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
-    padding: 15,
   },
   calendarButton: {
     // padding is so touching close to it works too

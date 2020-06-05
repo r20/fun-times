@@ -83,7 +83,7 @@ function Settings(props) {
         {
           text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
-            calendarContext.removeFunTimesCalendar();
+            calendarContext.removeFunTimesCalendarEventsAsync();
           }
         },
       ],

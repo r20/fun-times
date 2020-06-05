@@ -6,7 +6,7 @@ import { useScrollToTop } from '@react-navigation/native'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
-import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
+import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar, getIsMilestoneFullDay } from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
@@ -17,9 +17,14 @@ import AppSettingsContext from '../context/AppSettingsContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 
 
-// jmr - for memoization I moved this here. SHould I keep it in state? And how often should I update it??
-const nowDate = new Date();
-const nowTime = nowDate.getTime();
+// This is only used to differentiate between old and new events, so no need to update
+const nowTime = (new Date()).getTime();
+
+// Don't know how this works, but it's the height without margin??
+const ITEM_HEIGHT = 72;
+const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
+const eventCardHeightStyle = { height: ITEM_HEIGHT };
+
 
 export default function UpcomingMilestonesList(props) {
 
@@ -62,18 +67,9 @@ export default function UpcomingMilestonesList(props) {
     });
   }, [eventsAndMilestonesContext.allMilestones, props.events, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap]);
 
-  logger.warn("jmr === num specials is ", specials.length);
 
   const isEmpty = specials.length === 0;
 
-
-
-  // Don't know how this works, but it's the height without margin??
-  const ITEM_HEIGHT = 72;
-
-  const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
-
-  const eventCardHeightStyle = { height: ITEM_HEIGHT };
 
   /* To optimize and improve FlatList performance, use fixed height
     items */
@@ -81,25 +77,19 @@ export default function UpcomingMilestonesList(props) {
     return { length: heightWithMargin, offset: heightWithMargin * index, index };
   };
 
-  /* jmr - can't use initialScrollIndex. it's breaking when there are no old events??
-    And it says it needs getItemLayout to be implemented. */
-  // Find starting index position (don't show a bunch of past events when first go to screen)
-
+  /* Find starting index position (don't show a bunch of past events when first go to screen)
+  this prop to FlatList also needs getItemLayout */
   let initialScrollIndexOnlyIfGreaterThanZero = {};
   for (let idx = 0; idx < specials.length; idx++) {
     if (specials[idx].time >= nowTime) {
       initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-      logger.warn("jmr == initialScrollIndexOnlyIfGreaterThanZero", idx);
       break;
     }
   }
-  // jmr- tried putting in   {...initialScrollIndexOnlyIfGreaterThanZero} but still not working
-
-
 
   const renderItem = ({ item, index, separators }) => {
-    const event = item.event;
-    const noShowTimeOfDay = event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(item.unit) < 0);
+
+    const noShowTimeOfDay = getIsMilestoneFullDay(item);
     const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
 
     const verboseDesc = calendarContext.getMilestoneVerboseDescription(item);
@@ -123,7 +113,7 @@ export default function UpcomingMilestonesList(props) {
       </View>
       {calendarContext.isCalendarReady &&
         <View style={opacityStyle}>
-          <TouchableOpacity onPress={() => calendarContext.toggleCalendarMilestoneEvent(item)} style={styles.calendarButton}>
+          <TouchableOpacity onPress={() => calendarContext.toggleMilestoneScreenCalendarEvent(item)} style={styles.calendarButton}>
             <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
           </TouchableOpacity>
         </View>

@@ -22,17 +22,19 @@ const initialColor = theme.DEFAULT_CALENDAR_COLOR;
 const CalendarContext = createContext({
   isCalendarReady: false,
   wrappedCalendarEventsList: [],
-  toggleCalendarMilestoneEvent: () => { },
+  toggleMilestoneScreenCalendarEvent: () => { },
+  toggleCalendarScreenCalendarEvent: () => { },
   getMilestoneVerboseDescription: () => { },
   getIsMilestoneInCalendar: () => { },
-  removeFunTimesCalendar: () => { },
+  removeFunTimesCalendarEventsAsync: () => { },
   getMilestoneOnCalendarColorStyle: () => { },
   getMilestoneNotOnCalendarColorStyle: () => { },
   getMilestoneOnCalendarCardStyle: () => { },
   getMilestoneNotOnCalendarCardStyle: () => { },
 });
 
-
+// Assuming not changing timezones while app is open
+const TIMEZONEOFFSET_MILLISECONDS = (new Date()).getTimezoneOffset() * 60000;
 
 function createMilestoneOnCalendarColorStyle(colorToUse) {
   return {
@@ -66,8 +68,40 @@ function createMilestoneNotOnCalendarCardStyle(colorToUse) {
 }
 
 
-// jmr- I may be able to get rid of the notoncalendar versions. Still deciding styling.
+const wrappedCalendarEventListSorter = (a, b) => { return (a.startTime - b.startTime); }
 
+function wrapCalendarEventObject(calendarEvent, isOnCalendar, milestoneKey) {
+
+  let specialDisplayDateTime;
+
+  let startTime = (new Date(calendarEvent.startDate)).getTime();
+  if (calendarEvent.allDay) {
+    // allday events start at 12:00am UTC, so need to add offset so it's in today's date (e.g. if in US)
+    specialDisplayDateTime = getDisplayStringDateTimeForEpoch(startTime + TIMEZONEOFFSET_MILLISECONDS, true);
+  } else {
+    // non allDay events start at the right time for the device's timezone
+    specialDisplayDateTime = getDisplayStringDateTimeForEpoch(startTime, false);
+  }
+
+
+  // Make an object that wraps calendarEvent
+  return {
+    calendarEvent: calendarEvent, // hang on to original
+    header: specialDisplayDateTime,
+    description: calendarEvent.title, // The title is the description
+    isOnCalendar: isOnCalendar,
+    milestoneKey: milestoneKey, // possible it doesn't exist if the user created an event not with app. Use id as a key for React iterables.
+    key: calendarEvent.id,
+    id: calendarEvent.id,
+    startTime: startTime,
+    allDay: calendarEvent.allDay,
+  };
+}
+
+
+export function getIsMilestoneFullDay(milestoneItem) {
+  return milestoneItem.event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(milestoneItem.unit) < 0);
+}
 
 /**
  * Provides a way to see attributes about the device.
@@ -106,7 +140,7 @@ function MyCalendarProvider(props) {
     return milestoneNotOnCalendarCardStyle;
   }
 
-  const getCalendarReady = async () => {
+  const getCalendarReadyAsync = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
     if (status === 'granted') {
 
@@ -119,26 +153,24 @@ function MyCalendarProvider(props) {
           calFound = true;
           theCalendarId = cal.id;
           setStyleStates(cal.color);
-          logger.warn('We found the calendar.', cal);
+          logger.log('We found the calendar.', cal);
           break;
         }
       }
-      logger.warn('Here are all your calendars:', calendars);
+      logger.log('Here are all your calendars:', calendars);
       if (!calFound) {
         /* jmr- we should ask user and get permission before creating.  And, we should let them pick color.
-        And we should allow way to remove calendar and events from settings screen?
         */
 
-        logger.warn("Didn't find calendar, so we'll create one.");
-        theCalendarId = await createCalendar();
+        logger.log("Didn't find calendar, so we'll create one.");
+        theCalendarId = await createCalendarAsync();
 
       }
       setCalendarId(theCalendarId);
 
       // Get events
-      const theCalendarEvents = await getCalendarEventsAsync(theCalendarId);
-      setIsCalendarReady(true)
-      logger.warn("jmr ===== milestones on calendar mapped", tmpcalendarMilestoneEventsMap);
+      await getCalendarEventsAsync(theCalendarId);
+      setIsCalendarReady(true);
     } else {
       logger.warn("Don't have permission to use calendar.");
     }
@@ -146,30 +178,27 @@ function MyCalendarProvider(props) {
 
   /* We set state later asynchronously after query */
   useEffect(() => {
-    getCalendarReady();
+    getCalendarReadyAsync();
   }, []);
 
 
-  /* Remove the calendar, and set isCalendarReady to false to it
-    can be recreated.  This will effectively remove all events.
+  /* Remove the calendar events by removing the calendar
+    and recreating it.
    */
-  async function removeFunTimesCalendar() {
+  async function removeFunTimesCalendarEventsAsync() {
     const calendars = await Calendar.getCalendarsAsync();
     const filtered = calendars.filter(each => each.title === CALENDAR_TITLE);
     logger.warn("Deleting calendar ");
     if (filtered.length) {
       await Calendar.deleteCalendarAsync(filtered[0].id);
       setIsCalendarReady(false);
-      getCalendarReady();
+      await getCalendarReadyAsync();
     }
 
   }
 
   function getIsMilestoneInCalendar(milestoneItem) {
     const milestoneKey = milestoneItem.key;
-    if (!calendarMilestoneEventsMap) {
-      logger.warn("jmr === map not ready");
-    }
     return calendarMilestoneEventsMap && (calendarMilestoneEventsMap[milestoneKey] !== undefined);
   }
 
@@ -185,16 +214,16 @@ function MyCalendarProvider(props) {
   }
 
 
-  async function getDefaultCalendarSource() {
+  async function getDefaultCalendarSourceAsync() {
     const calendars = await Calendar.getCalendarsAsync();
     const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
     return defaultCalendars[0].source;
   }
 
-  async function createCalendar() {
+  async function createCalendarAsync() {
     const defaultCalendarSource =
       Platform.OS === 'ios'
-        ? await getDefaultCalendarSource()
+        ? await getDefaultCalendarSourceAsync()
         : { isLocalAccount: true, name: 'Fun Times Calendar' };
 
     const colorToUse = theme.DEFAULT_CALENDAR_COLOR;
@@ -223,10 +252,12 @@ function MyCalendarProvider(props) {
   const nowTime = nowDate.getTime();
 
 
+
+
   const getCalendarEventsAsync = async (theCalendarId) => {
     const endDate = new Date(nowTime + (howManyDaysAheadCalendar + 1) * numMillisecondsPerDay); // get one more day's worth just in case.
     const startDate = new Date(nowTime - (howManyDaysAgoCalendar + 1) * numMillisecondsPerDay);
-    logger.warn('jmr === searching calendar ', theCalendarId, " between ", startDate.toLocaleDateString(), "and ", endDate.toLocaleDateString());
+    logger.log('Searching calendar ', theCalendarId, " between ", startDate.toLocaleDateString(), "and ", endDate.toLocaleDateString());
     const calendarEventObjects = await Calendar.getEventsAsync([theCalendarId], startDate, endDate);
 
     /* This would mean we only get events in the time span, not all events. But startDate and endDate are required.  This is ok though.
@@ -236,27 +267,16 @@ function MyCalendarProvider(props) {
     let tmpwrappedCalendarEventsList = [];
     if (calendarEventObjects) {
       for (let calendarEvent of calendarEventObjects) {
-        const theKey = getMilestoneKeyFromCalendarNotes(calendarEvent.notes);
-        if (theKey) {
-          tmpcalendarMilestoneEventsMap[theKey] = calendarEvent.id;
+        const milestoneKey = getMilestoneKeyFromCalendarNotes(calendarEvent.notes);
+        if (milestoneKey) {
+          tmpcalendarMilestoneEventsMap[milestoneKey] = calendarEvent.id;
         }
-        logger.warn("jmr === calendar event is ", calendarEvent);
-        const startTime = (new Date(calendarEvent.startDate)).getTime();
-        const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(startTime, calendarEvent.allDay);
+        logger.log("Calendar event is ", calendarEvent);
 
         // Make an object that wraps calendarEvent
-        tmpwrappedCalendarEventsList.push({
-          calendarEvent: calendarEvent, // hang on to original
-          key: theKey, // possible it doesn't exist if the user created an event not with app
-          header: specialDisplayDateTime,
-          description: calendarEvent.title, // The title is the description
-          isOnCalendar: true,
-          id: calendarEvent.id,
-          startTime: startTime,
-          allDay: calendarEvent.allDay,
-        });
+        tmpwrappedCalendarEventsList.push(wrapCalendarEventObject(calendarEvent, true, milestoneKey));
       }
-      tmpwrappedCalendarEventsList = tmpwrappedCalendarEventsList.sort((a, b) => { return (a.startTime - b.startTime); });
+      tmpwrappedCalendarEventsList = tmpwrappedCalendarEventsList.sort(wrappedCalendarEventListSorter);
     }
 
     setCalendarMilestoneEventsMap(tmpcalendarMilestoneEventsMap);
@@ -289,85 +309,167 @@ function MyCalendarProvider(props) {
     return undefined
   }
 
-  const createCalendarMilestoneEntry = async (milestoneItem) => {
+  /* Add it to calendar and change isOnCalendar. The id will change too. */
+  const addCalendarEventToCalendarAsync = async (calendarEvent, milestoneKey) => {
+    const newCalendarEvent = Object.assign({}, calendarEvent);
+    delete newCalendarEvent.id;
+    const eventId = await Calendar.createEventAsync(calendarId, newCalendarEvent);
+    newCalendarEvent.id = eventId;
 
-    /* On Android, allday events need to be set to midnight and timezone utc.
-     Otherwise the start and/or end date might be wrong.
-     It can even look right on the calendar, then if you edit the entry and look at the dates it has a different date and is wrong.
-     
-     I don't know if ios behaves this way though.  It needs tested.
-     */
-
-
-    const milestoneKey = milestoneItem.key;
-    // Set to UTC midnight for allday events. Android needs it that way.
-    const start = milestoneItem.event.isFullDay ? new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0) : new Date(milestoneItem.time);
-
-    const numMinutesPastStart = 5;
-    const end = milestoneItem.event.isFullDay ? new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0) : new Date(milestoneItem.time + (numMinutesPastStart * 60000));
-
-    // 9am on the day of event if full day, else 2 hours before
-    const offsetMinutes = milestoneItem.event.isFullDay ? 9 * 60 : -120;
-
-
-    const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
-
-    const eventId = await Calendar.createEventAsync(calendarId, {
-      alarms: [{ relativeOffset: offsetMinutes, method: Calendar.AlarmMethod.ALERT }],
-      notes: verboseDesc + "\n\nThis event was created by the Fun Times app." + getCalendarNotesLineWithMilestoneKey(milestoneItem),
-      title: verboseDesc,
-      startDate: start,
-      endDate: end,
-      allDay: milestoneItem.event.isFullDay,
-      timeZone: "UTC", //milestoneItem.event.isFullDay ? "UTC" : Localization.timezone, // string, required on Android
-      endTimeZone: null, // milestoneItem.event.isFullDay ? null : Localization.timezone, // This is how my calendar app on my device creates them for full day
-    });
-    // jmr - is it too slow to query ??
-    // const mapEntry = {};
-    // mapEntry[milestoneKey] = eventId;
-    // const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
-    // setCalendarMilestoneEventsMap(newMap);
-
-    // get new event map and list after adding one
-    await getCalendarEventsAsync(calendarId);
-  }
-
-  const removeCalendarMilestoneEntry = async (milestoneItem) => {
-    const milestoneKey = milestoneItem.key;
-    const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
-    if (calendarEventId) {
-      // jmr - is it too slow to query
-      // const newMap = Object.assign({}, calendarMilestoneEventsMap);
-      // delete newMap[milestoneKey];
-      // setCalendarMilestoneEventsMap(newMap);
-      await Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
-
-      // get new event list after removing one
+    /* This is a little faster than calling 
       await getCalendarEventsAsync(calendarId);
+      to repopulate and sort the list and recreate the map. */
+    const mapEntry = {};
+    mapEntry[milestoneKey] = eventId;
+    const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
+    setCalendarMilestoneEventsMap(newMap);
+
+    const newWrappedCalendarEvent = wrapCalendarEventObject(newCalendarEvent, true, milestoneKey);
+    logger.warn("New wrapped calendar event is ", newWrappedCalendarEvent);
+
+
+    /* find where to insert/replace the newWrappedCalendarEvent to efficiently
+      have a new sorted list */
+    let newWrappedCalendarEventsList = [];
+    let hasBeenAdded = false;
+    for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+      if (hasBeenAdded) {
+        // We've dealt with the new one, just add the rest
+        newWrappedCalendarEventsList.push(wrappedCalendarEventsList[idx]);
+      } else {
+
+        if (newWrappedCalendarEvent.milestoneKey === wrappedCalendarEventsList[idx].milestoneKey) {
+          /* We need to replace this one with the new one
+            Don't just look at startTime being equal, because there can be more than one
+            milestone with the same startTime and we want both on the calendar. */
+          newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
+          hasBeenAdded = true;
+        } else {
+          // This is not a replacement
+          if (newWrappedCalendarEvent.startTime <= wrappedCalendarEventsList[idx].startTime) {
+            // Add the new before we put 
+            newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
+            hasBeenAdded = true;
+          }
+          newWrappedCalendarEventsList.push(wrappedCalendarEventsList[idx]);
+        }
+      }
     }
+    if (!hasBeenAdded) {
+      // It goes at the end
+      newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
+    }
+    setWrappedCalendarEventsList(newWrappedCalendarEventsList);
+
   }
 
-  const toggleCalendarMilestoneEvent = (milestoneItem) => {
+  /* Remove from calendarMilestoneEventsMap and mark the wrappedCalendarEvent isOnCalendar as false.
+    This is more performant than taking it off the calendar and calling 
+    await getCalendarEventsAsync(calendarId);
+    to repopulate and sort the list and recreate the map.
+    Additionally, leaving it in wrappedCalendarEventsList allows the user to still see what they just 
+    took off and to add it back.
+  */
+  const removeCalendarEventFromCalendar = (calendarEventId, milestoneKey) => {
+    /* milestoneKey is passed in separately because it might be undefined if the
+      user created their own calendar event without the app on this calendar.
+      We can handle seeing those and toggling them.
+      */
+
+    if (milestoneKey) {
+      const newMap = Object.assign({}, calendarMilestoneEventsMap);
+      delete newMap[milestoneKey];
+      setCalendarMilestoneEventsMap(newMap);
+    }
+
+    if (calendarEventId) {
+      Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
+
+      // Mark its isOnCalendar as false, but keep it in the list
+      let newWrappedCalendarEventsList = [];
+
+      for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+
+        let newWrappedCalendarEvent;
+        if (wrappedCalendarEventsList[idx].id === calendarEventId) {
+          newWrappedCalendarEvent = Object.assign({}, wrappedCalendarEventsList[idx], { isOnCalendar: false });
+        } else {
+          newWrappedCalendarEvent = wrappedCalendarEventsList[idx];
+        }
+        newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
+      }
+      setWrappedCalendarEventsList(newWrappedCalendarEventsList);
+    }
+
+  }
+
+
+
+  const toggleMilestoneScreenCalendarEvent = (milestoneItem) => {
 
     const milestoneKey = milestoneItem.key;
     const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
     if (calendarEventId) {
-      removeCalendarMilestoneEntry(milestoneItem);
+      removeCalendarEventFromCalendar(calendarEventId, milestoneKey);
     } else {
-      createCalendarMilestoneEntry(milestoneItem);
+
+      /* On Android, allDay events need to be set to midnight and timezone utc.
+       Otherwise the start and/or end date might be wrong.
+       It can even look right on the calendar, then if you edit the entry and look at the dates it has a different date and is wrong.
+       
+       I don't know if ios behaves this way though.  It needs tested.
+       */
+
+      const milestoneKey = milestoneItem.key;
+      // Set to UTC midnight for allDay events. Android needs it that way.
+      const allDay = getIsMilestoneFullDay(milestoneItem);
+
+      const start = allDay ? new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0) : (new Date(milestoneItem.time));
+      // for allDay, set end 24 hours later.  Otherwise end is start.
+      const end = allDay ? new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0) : start;
+
+      // 9am on the day of event if all day, else 2 hours before
+      const offsetMinutes = allDay ? 9 * 60 : -120;
+
+      const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
+
+
+
+      const newCalendarEvent = {
+        alarms: [{ relativeOffset: offsetMinutes, method: Calendar.AlarmMethod.ALERT }],
+        notes: verboseDesc + "\n\nThis event was created by the Fun Times app." + getCalendarNotesLineWithMilestoneKey(milestoneItem),
+        title: verboseDesc,
+        startDate: start,
+        endDate: end,
+        allDay: allDay,
+        timeZone: allDay ? "UTC" : Localization.timezone, // string, required on Android
+        endTimeZone: null,
+      };
+      addCalendarEventToCalendarAsync(newCalendarEvent, milestoneKey);
     }
   }
 
+  const toggleCalendarScreenCalendarEvent = (wrappedCalendarEvent) => {
+
+    const milestoneKey = wrappedCalendarEvent.milestoneKey; // this might not exist (if they added stuff to the calendar)
+    const calendarEventId = wrappedCalendarEvent.id;
+    if (wrappedCalendarEvent.isOnCalendar) {
+      removeCalendarEventFromCalendar(calendarEventId, milestoneKey);
+    } else {
+      addCalendarEventToCalendarAsync(wrappedCalendarEvent.calendarEvent, milestoneKey);
+    }
+  }
 
 
   return (
     <CalendarContext.Provider value={{
       isCalendarReady: isCalendarReady,
       wrappedCalendarEventsList: wrappedCalendarEventsList,
-      toggleCalendarMilestoneEvent: toggleCalendarMilestoneEvent,
+      toggleMilestoneScreenCalendarEvent: toggleMilestoneScreenCalendarEvent,
+      toggleCalendarScreenCalendarEvent: toggleCalendarScreenCalendarEvent,
       getMilestoneVerboseDescription: getMilestoneVerboseDescription,
       getIsMilestoneInCalendar: getIsMilestoneInCalendar,
-      removeFunTimesCalendar: removeFunTimesCalendar,
+      removeFunTimesCalendarEventsAsync: removeFunTimesCalendarEventsAsync,
       getMilestoneOnCalendarColorStyle: getMilestoneOnCalendarColorStyle,
       getMilestoneNotOnCalendarColorStyle: getMilestoneNotOnCalendarColorStyle,
       getMilestoneOnCalendarCardStyle: getMilestoneOnCalendarCardStyle,
