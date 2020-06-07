@@ -6,7 +6,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Header } from "react-native-elements"
 
 import AppSettingsContext from '../context/AppSettingsContext'
-import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
+import CalendarContext, {
+  howManyDaysAheadCalendar,
+  howManyDaysAgoCalendar, makeMilestoneClipboardContentForWrappedCalendarEvent
+} from '../context/CalendarContext'
 import ClipboardCopyable from '../components/ClipboardCopyable'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
@@ -118,14 +121,13 @@ function CalendarScreen(props) {
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
     const opacityStyle = (eventTime < nowTime) ? styles.lessOpacity : styles.fullOpacity;
 
-    const clipboadContent = wrappedCalendarEvent.header + "\n" + wrappedCalendarEvent.description; // use verbose description for this no matter which screen they're on
-
-
     return (<EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
       <View style={[styles.eventCardTextWrapper, opacityStyle]}>
-        <ClipboardCopyable content={clipboadContent}>
-          <EventCardHeader style={colorStyle}>{wrappedCalendarEvent.header}</EventCardHeader>
-          <EventCardBodyText style={colorStyle}>{wrappedCalendarEvent.description}</EventCardBodyText>
+        <ClipboardCopyable onPressGetContentFunction={() => {
+          return makeMilestoneClipboardContentForWrappedCalendarEvent(wrappedCalendarEvent);
+        }}>
+          <EventCardHeader style={colorStyle}>{wrappedCalendarEvent.whenDescription}</EventCardHeader>
+          <EventCardBodyText style={colorStyle}>{wrappedCalendarEvent.whatDescription}</EventCardBodyText>
         </ClipboardCopyable>
       </View>
       <View style={opacityStyle}>

@@ -16,11 +16,13 @@ import * as logger from '../utils/logger'
 
 const ClipboardCopyable = (props) => {
 
-    const content = props.content;
-
     const copiedMessage = i18n.t('copiedToClipboard');
 
     onCopy = () => {
+        let content = props.content;
+        if (props.onPressGetContentFunction) {
+            content = props.onPressGetContentFunction();
+        }
         logger.warn("jmr == copied ", content);
         Clipboard.setString(content);
         ToastAndroid.show(copiedMessage, ToastAndroid.SHORT);
@@ -35,8 +37,10 @@ const ClipboardCopyable = (props) => {
     );
 }
 
+/* Should pass either content or a function to get content at onPress time */
 ClipboardCopyable.propTypes = {
-    content: PropTypes.string.isRequired,
+    content: PropTypes.string,
+    onPressGetContentFunction: PropTypes.func,
 };
 
 export default ClipboardCopyable;

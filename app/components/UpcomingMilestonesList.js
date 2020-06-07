@@ -6,7 +6,11 @@ import { useScrollToTop } from '@react-navigation/native'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme from '../style/theme'
-import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar, getIsMilestoneFullDay } from '../context/CalendarContext'
+import CalendarContext, {
+  howManyDaysAheadCalendar, howManyDaysAgoCalendar,
+  getIsMilestoneFullDay, makeMilestoneClipboardContentForMilestone,
+  getMilestoneVerboseDescription
+} from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
@@ -92,9 +96,8 @@ export default function UpcomingMilestonesList(props) {
     const noShowTimeOfDay = getIsMilestoneFullDay(item);
     const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
 
-    const verboseDesc = calendarContext.getMilestoneVerboseDescription(item);
+    const verboseDesc = getMilestoneVerboseDescription(item);
     const desc = props.verboseDescription ? verboseDesc : i18n.t(item.unit, { someValue: item.description });
-    const clipboadContent = specialDisplayDateTime + "\n" + verboseDesc; // use verbose description for this no matter which screen they're on
 
     const isOnCalendar = calendarContext.getIsMilestoneInCalendar(item);
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
@@ -106,7 +109,9 @@ export default function UpcomingMilestonesList(props) {
 
     return (<EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
       <View style={[styles.eventCardTextWrapper, opacityStyle]}>
-        <ClipboardCopyable content={clipboadContent}>
+        <ClipboardCopyable onPressGetContentFunction={() => {
+          return makeMilestoneClipboardContentForMilestone(item);
+        }}>
           <EventCardHeader style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
           <EventCardBodyText style={colorStyle}>{desc}</EventCardBodyText>
         </ClipboardCopyable>
@@ -154,7 +159,7 @@ UpcomingMilestonesList.propTypes = {
   */
   verboseDescription: PropTypes.bool.isRequired,
   listHeaderComponent: PropTypes.element,
-  showHeaderIfListEmpty: PropTypes.bool, // still how header even if list is empty
+  showHeaderIfListEmpty: PropTypes.bool, // still show header even if list is empty
   maxNumMilestonesPerEvent: PropTypes.number, // If > 0 only show up to this many milestones per event
 }
 

@@ -2,10 +2,11 @@ import React, { useState, useEffect, createContext } from 'react'
 import { StyleSheet } from 'react-native'
 import * as Calendar from 'expo-calendar'
 import * as Localization from 'expo-localization'
+import moment from 'moment-timezone'
 
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
+import { getDisplayStringForDate, getDisplayStringForTime, getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import theme, { getContrastFontColor } from '../style/theme'
 
 export const howManyDaysAheadCalendar = 365; // How far ahead should we calendar things
@@ -18,20 +19,7 @@ const CALENDAR_TITLE = 'Fun Times Milestones Calendar';
 
 const initialColor = theme.DEFAULT_CALENDAR_COLOR;
 
-// This created with defaults.  The provider sets the real values using value prop.
-const CalendarContext = createContext({
-  isCalendarReady: false,
-  wrappedCalendarEventsList: [],
-  toggleMilestoneScreenCalendarEvent: () => { },
-  toggleCalendarScreenCalendarEvent: () => { },
-  getMilestoneVerboseDescription: () => { },
-  getIsMilestoneInCalendar: () => { },
-  removeFunTimesCalendarEventsAsync: () => { },
-  getMilestoneOnCalendarColorStyle: () => { },
-  getMilestoneNotOnCalendarColorStyle: () => { },
-  getMilestoneOnCalendarCardStyle: () => { },
-  getMilestoneNotOnCalendarCardStyle: () => { },
-});
+
 
 // Assuming not changing timezones while app is open
 const TIMEZONEOFFSET_MILLISECONDS = (new Date()).getTimezoneOffset() * 60000;
@@ -68,6 +56,22 @@ function createMilestoneNotOnCalendarCardStyle(colorToUse) {
 }
 
 
+const nowDate = new Date();
+const nowTime = nowDate.getTime();
+
+
+export const getMilestoneVerboseDescription = (milestoneItem) => {
+  const event = milestoneItem.event;
+  const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
+
+  const isEventInFuture = (event.epochMillis > nowTime);
+  const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
+  const desc = i18n.t(i18nKey, { milestoneDesciption: i18n.t(milestoneItem.unit, { someValue: milestoneItem.description }), eventTitle: event.title, eventDateTime: eventDisplayDateTime });
+  return desc;
+}
+
+
+
 const wrappedCalendarEventListSorter = (a, b) => { return (a.startTime - b.startTime); }
 
 function wrapCalendarEventObject(calendarEvent, isOnCalendar, milestoneKey) {
@@ -87,8 +91,8 @@ function wrapCalendarEventObject(calendarEvent, isOnCalendar, milestoneKey) {
   // Make an object that wraps calendarEvent
   return {
     calendarEvent: calendarEvent, // hang on to original
-    header: specialDisplayDateTime,
-    description: calendarEvent.title, // The title is the description
+    whenDescription: specialDisplayDateTime,
+    whatDescription: calendarEvent.title, // The title is the description
     isOnCalendar: isOnCalendar,
     milestoneKey: milestoneKey, // possible it doesn't exist if the user created an event not with app. Use id as a key for React iterables.
     key: calendarEvent.id,
@@ -102,6 +106,80 @@ function wrapCalendarEventObject(calendarEvent, isOnCalendar, milestoneKey) {
 export function getIsMilestoneFullDay(milestoneItem) {
   return milestoneItem.event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(milestoneItem.unit) < 0);
 }
+
+/* 
+  Get something to describe the milestone that can be copied to the clipboard.
+  milestoneTime - milliseconds, when is the milestone
+  isAllDay - boolean, true if milestone is considered all day
+  description - what this milestone commemorates
+  */
+const makeMilestoneClipboardContent = (milestoneTime, isAllDay, description) => {
+
+  logger.warn("jmr --- getting something for clipboard");
+
+  const startMoment = moment(milestoneTime);
+  const nowMoment = moment(new Date());
+
+  const isToday = startMoment.isSame(new Date(), "day");
+  const isPast = startMoment.isBefore(nowMoment);
+
+  const dayValue = getDisplayStringForDate(startMoment.toDate());
+  const timeValue = getDisplayStringForTime(startMoment.toDate());
+
+  if (isToday) {
+    if (isAllDay) {
+      return i18n.t('milestoneTodayDescriptionWithDayOnly', { dayValue: dayValue, whatValue: description });
+    } else if (isPast) {
+      return i18n.t('milestoneTodayPastDescriptionWithDayAndTime', { dayValue: dayValue, timeValue: timeValue, whatValue: description });
+    } else {
+      return i18n.t('milestoneTodayFutureDescriptionWithDayAndTime', { dayValue: dayValue, timeValue: timeValue, whatValue: description });
+    }
+  } else if (isPast) {
+    if (isAllDay) {
+      return i18n.t('milestonePastDescriptionWithDayOnly', { dayValue: dayValue, whatValue: description });
+    } else {
+      return i18n.t('milestonePastDescriptionWithDayAndTime', { dayValue: dayValue, timeValue: timeValue, whatValue: description });
+    }
+  } else {
+    // It's in the future
+    if (isAllDay) {
+      return i18n.t('milestoneFutureDescriptionWithDayOnly', { dayValue: dayValue, whatValue: description });
+    }
+    return i18n.t('milestoneFutureDescriptionWithDayAndTime', { dayValue: dayValue, timeValue: timeValue, whatValue: description });
+  }
+}
+
+
+export const makeMilestoneClipboardContentForMilestone = (milestoneItem) => {
+  const allDay = getIsMilestoneFullDay(milestoneItem);
+  const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
+  return makeMilestoneClipboardContent(milestoneItem.time, allDay, verboseDesc);
+
+}
+
+export const makeMilestoneClipboardContentForWrappedCalendarEvent = (wrappedCalendarEvent) => {
+  if (!wrappedCalendarEvent) {
+    return '';
+  }
+  /* All day events are at start of day UTC time so need to add offset to get right day and time in this timezone */
+  const startTime = wrappedCalendarEvent.allDay ? wrappedCalendarEvent.startTime + TIMEZONEOFFSET_MILLISECONDS : wrappedCalendarEvent.startTime;
+  return makeMilestoneClipboardContent(startTime, wrappedCalendarEvent.allDay, wrappedCalendarEvent.whatDescription);
+}
+
+
+// This created with defaults.  The provider sets the real values using value prop.
+const CalendarContext = createContext({
+  isCalendarReady: false,
+  wrappedCalendarEventsList: [],
+  toggleMilestoneScreenCalendarEvent: () => { },
+  toggleCalendarScreenCalendarEvent: () => { },
+  getIsMilestoneInCalendar: () => { },
+  removeFunTimesCalendarEventsAsync: () => { },
+  getMilestoneOnCalendarColorStyle: () => { },
+  getMilestoneNotOnCalendarColorStyle: () => { },
+  getMilestoneOnCalendarCardStyle: () => { },
+  getMilestoneNotOnCalendarCardStyle: () => { },
+});
 
 /**
  * Provides a way to see attributes about the device.
@@ -203,16 +281,6 @@ function MyCalendarProvider(props) {
   }
 
 
-  function getMilestoneVerboseDescription(milestoneItem) {
-    const event = milestoneItem.event;
-    const eventDisplayDateTime = getDisplayStringDateTimeForEvent(event);
-
-    const isEventInFuture = (event.epochMillis > nowTime);
-    const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
-    desc = i18n.t(i18nKey, { milestoneDesciption: i18n.t(milestoneItem.unit, { someValue: milestoneItem.description }), eventTitle: event.title, eventDateTime: eventDisplayDateTime });
-    return desc;
-  }
-
 
   async function getDefaultCalendarSourceAsync() {
     const calendars = await Calendar.getCalendarsAsync();
@@ -246,11 +314,6 @@ function MyCalendarProvider(props) {
     return newCalendarId;
 
   }
-
-
-  const nowDate = new Date();
-  const nowTime = nowDate.getTime();
-
 
 
 
@@ -467,7 +530,6 @@ function MyCalendarProvider(props) {
       wrappedCalendarEventsList: wrappedCalendarEventsList,
       toggleMilestoneScreenCalendarEvent: toggleMilestoneScreenCalendarEvent,
       toggleCalendarScreenCalendarEvent: toggleCalendarScreenCalendarEvent,
-      getMilestoneVerboseDescription: getMilestoneVerboseDescription,
       getIsMilestoneInCalendar: getIsMilestoneInCalendar,
       removeFunTimesCalendarEventsAsync: removeFunTimesCalendarEventsAsync,
       getMilestoneOnCalendarColorStyle: getMilestoneOnCalendarColorStyle,

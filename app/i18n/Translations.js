@@ -16,7 +16,7 @@ export const en = {
   headerTodayTitle: "Today",
   headerUpcomingMilestonesScreenTitle: "Milestones",
   subtitleMilestonesScreen: "These milestones are for starred events, based on settings.",
-  headerCalendar: "Fun Times Calendar",
+  headerCalendar: "Calendar",
   headerMoreTitle: "Settings",
   upcomingFutureEventCountdownTitle: "Milestones",
   upcomingPastEventMilestoneTitle: "Milestones",
@@ -36,7 +36,7 @@ export const en = {
   save: 'Save',
   cancel: 'Cancel',
   delete: 'Delete',
-  copiedToClipboard: 'Copied to clipboard',
+  copiedToClipboard: 'Added to clipboard',
   doNotShowAgainMessage: "Don't show again",
   addToFavorites: 'Add To Favorites',
   removeFromFavorites: 'Remove From Favorites',
@@ -77,9 +77,17 @@ export const en = {
   numberNameMole: "Avagadro (mole)",
   numberNameRGas: "R (ideal gas constant)",
   numberNameFaraday: "F (Faraday)",
-  constantTenMultiple: "Digits of {{numberName}}! {{someValue}}",
-  constantExact: "{{numberName}}! {{someValue}}",
+  constantTenMultiple: "{{someValue}} [digits of {{numberName}}]",
+  constantExact: "{{numberName}} ({{someValue}})",
   constantOtherMultiple: "{{multiplier}} * {{numberName}} = {{someValue}}",
+  milestoneFutureDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it will be {{whatValue}}',
+  milestoneFutureDescriptionWithDayOnly: 'On {{dayValue}} it will be {{whatValue}}',
+  milestoneTodayDescriptionWithDayOnly: 'Today ({{dayValue}}) marks {{whatValue}}',
+  milestoneTodayFutureDescriptionWithDayAndTime: 'Today ({{dayValue}}) at {{timeValue}} it will be {{whatValue}}',
+  milestoneTodayPastDescriptionWithDayAndTime: 'Today ({{dayValue}}) at {{timeValue}} it was {{whatValue}}',
+  milestonePastDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it was {{whatValue}}',
+  milestonePastDescriptionWithDayOnly: 'On {{dayValue}} it was {{whatValue}}',
+
 };
 
 
