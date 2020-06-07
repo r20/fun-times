@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View } from 'react-native'
-import { Slider } from "react-native-elements"
+import { StyleSheet, Text, View, Platform } from 'react-native'
+import { Slider, Header } from "react-native-elements"
 
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import AppSettingsContext from '../context/AppSettingsContext'
@@ -9,6 +9,41 @@ import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  sliderWrapper: {
+    flex: 0,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  subtitle: {
+    fontSize: theme.FONT_SIZE_SMALL,
+    paddingHorizontal: 15,
+  },
+  emptyText: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: theme.FONT_SIZE_LARGE,
+    padding: 15,
+  },
+  maxMilestoneLabel: {
+    fontSize: theme.FONT_SIZE_SMALL,
+  },
+  header: {
+    color: theme.PRIMARY_TEXT_COLOR,
+    fontSize: theme.FONT_SIZE_XLARGE
+  },
+});
+
+
+const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerUpcomingMilestonesScreenTitle')}</Text>
 
 
 function MilestoneCalendar(props) {
@@ -36,6 +71,14 @@ function MilestoneCalendar(props) {
 
   // jmr - move slider to settings??
   return (<View style={styles.container} >
+    <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
+      containerStyle={Platform.select({
+        android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
+      })}
+      backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
+      centerComponent={headerCenterComponent}
+    />
+    <Text style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</Text>
     <View style={styles.sliderWrapper} >
       <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
       <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
@@ -50,25 +93,3 @@ function MilestoneCalendar(props) {
 }
 
 export default MilestoneCalendar;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  sliderWrapper: {
-    flex: 0,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  emptyText: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
-    padding: 15,
-  },
-  maxMilestoneLabel: {
-    fontSize: theme.FONT_SIZE_SMALL,
-  },
-});

@@ -10,8 +10,8 @@ import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-ic
 
 import EventDateTimePickerAndroid from '../components/EventDateTimePickerAndroid'
 import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
-import ColorPickerModal from '../components/ColorPickerModal'
-import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
+
+import theme from '../style/theme'
 import * as Localization from 'expo-localization'
 import moment from 'moment-timezone'
 
@@ -41,8 +41,7 @@ function AddOrEditEvent(props) {
   // If it was undefined, use true
   const initialIsFullDay = (newEvent && newEvent.isFullDay === false) ? newEvent.isFullDay : true;
   const [useFullDay, setUseFullDay] = useState(initialIsFullDay);
-  const [selectedColor, setSelectedColor] = useState(newEvent ? newEvent.color : getRandomColor);
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+
 
   const [useDateAndTimeInMilestones, setUseDateAndTimeInMilestones] = useState(newEvent ? newEvent.useDateAndTimeInMilestones : false);
 
@@ -69,7 +68,7 @@ function AddOrEditEvent(props) {
     if (isCreate) {
       event = new Event({
         title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
-        color: selectedColor, isCustom: true, selected: true, ignoreIfPast: false,
+        isCustom: true, selected: true, ignoreIfPast: false,
         useDateAndTimeInMilestones: useDateAndTimeInMilestones, extraNumbersForMilestones: extraNumbersForMilestones
       });
     } else {
@@ -77,7 +76,6 @@ function AddOrEditEvent(props) {
       event.title = newTitle;
       event.epochMillis = selectedDate.getTime();
       event.isFullDay = useFullDay;
-      event.color = selectedColor;
       event.useDateAndTimeInMilestones = useDateAndTimeInMilestones;
       event.extraNumbersForMilestones = extraNumbersForMilestones;
     }
@@ -125,7 +123,7 @@ function AddOrEditEvent(props) {
         </View>
       ),
     });
-  }, [navigation, title, selectedDate, useFullDay, selectedColor, useDateAndTimeInMilestones, extraNumbersForMilestones]);
+  }, [navigation, title, selectedDate, useFullDay, useDateAndTimeInMilestones, extraNumbersForMilestones]);
 
 
   const getSampleNumbers = (isFullDay, epochTime) => {
@@ -196,27 +194,6 @@ function AddOrEditEvent(props) {
             />
           }
         </View>
-        {false && /*Can get rid of color code */
-          <React.Fragment>
-            <TouchableOpacity style={styles.colorPicker} onPress={() => setColorPickerVisible(true)}>
-              <Text>{i18n.t("selectColor")}</Text>
-              <MaterialCommunityIcons
-                name="palette"
-                style={{ fontSize: 50, color: selectedColor }}
-              />
-            </TouchableOpacity>
-            <ColorPickerModal
-              visible={colorPickerVisible}
-              colors={colors}
-              selectedColor={selectedColor}
-              text=""
-              onSelect={newColor => {
-                setSelectedColor(newColor);
-                setColorPickerVisible(false);
-              }}
-            />
-          </React.Fragment>
-        }
 
         <View style={styles.switch}>
           <Text>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</Text>
@@ -264,14 +241,6 @@ const styles = StyleSheet.create({
   },
   eventDateTimePickerWrapper: {
     marginTop: Platform.OS === 'ios' ? 40 : spaceAmount,
-  },
-  colorPicker: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spaceAmount,
-    marginBottom: spaceAmount,
   },
   headerButton: {
     // padding is so touching close to it works too

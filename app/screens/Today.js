@@ -1,13 +1,39 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View, Platform } from 'react-native'
 import { useFocusEffect, useScrollToTop, useNavigation } from '@react-navigation/native'
+import { Header, ButtonGroup } from 'react-native-elements'
 
 import i18n from '../i18n/i18n'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import EventComparedToNow from '../components/EventComparedToNow'
 import theme from '../style/theme'
 import EventCard, { EventCardHeader } from '../components/EventCard'
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  contentContainerStyle: {
+    padding: 15,
+  },
+  emptyText: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: theme.FONT_SIZE_LARGE,
+    padding: 15,
+  },
+  header: {
+    color: theme.PRIMARY_TEXT_COLOR,
+    fontSize: theme.FONT_SIZE_XLARGE
+  },
+});
+
+
+
+const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerTodayTitle')}</Text>
+
 
 function Today(props) {
 
@@ -49,6 +75,13 @@ function Today(props) {
   const keyExtractor = item => item.title + nowMillis;
 
   return (<View style={styles.container} >
+    <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
+      containerStyle={Platform.select({
+        android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
+      })}
+      backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
+      centerComponent={headerCenterComponent}
+    />
     {!empty &&
       <FlatList
         ref={ref}
@@ -66,18 +99,3 @@ function Today(props) {
 
 export default Today;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  contentContainerStyle: {
-    padding: 15,
-  },
-  emptyText: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
-    padding: 15,
-  },
-});

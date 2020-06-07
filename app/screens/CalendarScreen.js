@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Header } from "react-native-elements"
 
 import AppSettingsContext from '../context/AppSettingsContext'
 import CalendarContext, { howManyDaysAheadCalendar, howManyDaysAgoCalendar } from '../context/CalendarContext'
@@ -12,6 +12,52 @@ import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import * as logger from '../utils/logger'
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  emptyText: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: theme.FONT_SIZE_LARGE,
+    padding: 15,
+  },
+  contentContainerStyle: {
+    padding: 15,
+  },
+  eventCardTextWrapper: {
+    flex: 1,
+  },
+  lessOpacity: {
+    opacity: 0.5,
+  },
+  fullOpacity: {
+    opacity: 1,
+  },
+  calendarButton: {
+    // padding is so touching close to it works too
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    borderRadius: 5, // Not seen, but that's ok
+  },
+  card: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  header: {
+    color: theme.PRIMARY_TEXT_COLOR,
+    fontSize: theme.FONT_SIZE_XLARGE
+  },
+});
+
+
+const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerCalendar')}</Text>
 
 
 // This is only used to differentiate between old and new events, so no need to update
@@ -92,6 +138,13 @@ function CalendarScreen(props) {
 
   return (
     <React.Fragment>
+      <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
+        containerStyle={Platform.select({
+          android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
+        })}
+        backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
+        centerComponent={headerCenterComponent}
+      />
       {calendarContext.isCalendarReady && !isEmpty &&
         <FlatList
           ref={ref}
@@ -114,40 +167,3 @@ function CalendarScreen(props) {
 }
 
 export default CalendarScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  emptyText: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
-    padding: 15,
-  },
-  contentContainerStyle: {
-    padding: 15,
-  },
-  eventCardTextWrapper: {
-    flex: 1,
-  },
-  lessOpacity: {
-    opacity: 0.5,
-  },
-  fullOpacity: {
-    opacity: 1,
-  },
-  calendarButton: {
-    // padding is so touching close to it works too
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderRadius: 5, // Not seen, but that's ok
-  },
-  card: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-});

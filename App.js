@@ -7,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { EventsAndMilestonesContextProvider } from './app/context/EventsAndMilestonesContext'
 import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 import { CalendarProvider } from './app/context/CalendarContext'
+import AppBottomTabNavigator from './app/navigation/AppBottomTabNavigator'
+
 
 // Before rendering any navigation stack, to optimize memory usage and performance
 import { enableScreens } from 'react-native-screens';
@@ -26,8 +28,6 @@ if (process.env.NODE_ENV !== 'development') {
   console.log = () => { };
 }
 
-
-import AppStackNavigator from './app/navigation/AppStackNavigator'
 
 /* jmr - need to add crash reporting and aggregation via sentry.
 See https://docs.expo.io/versions/latest/guides/using-sentry/ */
@@ -54,6 +54,6 @@ export default class App extends React.Component {
     if (!this.state.isReady) {
       return <AppLoading />;
     }
-    return <CalendarProvider><AppSettingsContextProvider><EventsAndMilestonesContextProvider ><MenuProvider><AppStackNavigator /></MenuProvider></EventsAndMilestonesContextProvider></AppSettingsContextProvider></CalendarProvider>
+    return <CalendarProvider><AppSettingsContextProvider><EventsAndMilestonesContextProvider ><MenuProvider><AppBottomTabNavigator /></MenuProvider></EventsAndMilestonesContextProvider></AppSettingsContextProvider></CalendarProvider>
   }
 }

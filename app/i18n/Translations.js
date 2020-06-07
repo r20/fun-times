@@ -15,7 +15,7 @@ export const en = {
   headerEditEventTitle: "Edit Event",
   headerTodayTitle: "Today",
   headerUpcomingMilestonesScreenTitle: "Milestones",
-  subtitleMilestonesScreen: "Milestones shown are for starred events, and based on settings.",
+  subtitleMilestonesScreen: "These milestones are for starred events, based on settings.",
   headerCalendar: "Fun Times Calendar",
   headerMoreTitle: "Settings",
   upcomingFutureEventCountdownTitle: "Milestones",
