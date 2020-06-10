@@ -9,18 +9,16 @@ import { useScrollToTop } from '@react-navigation/native'
 
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
-import theme, { getContrastFontColor, colors, getRandomColor } from '../style/theme'
-
-import AppSettingsContext from '../context/AppSettingsContext'
-import CalendarContext from '../context/CalendarContext'
-import * as Utils from '../utils/Utils'
-import * as logger from '../utils/logger'
-import Divider from '../components/Divider'
-import i18n from '../i18n/i18n'
-import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../utils/interestingNumbersFinder'
+import theme from '../../style/theme'
+import settingsStyles from './settingsStyles'
+import AppSettingsContext from '../../context/AppSettingsContext'
+import * as Utils from '../../utils/Utils'
+import * as logger from '../../utils/logger'
+import i18n from '../../i18n/i18n'
+import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../../utils/interestingNumbersFinder'
 
 
-function Settings(props) {
+function MilestoneTypesSettings(props) {
 
   // This allows clicking tab navigator icon causing scroll to top.
   const ref = React.useRef(null);
@@ -39,7 +37,6 @@ function Settings(props) {
   */
 
   const appSettingsContext = useContext(AppSettingsContext);
-  const calendarContext = useContext(CalendarContext);
 
 
   /* Things seem a little more responsive if I use local state and then update appSettingsContext
@@ -67,42 +64,15 @@ function Settings(props) {
     }
   }
 
-  const onRequestRemoveCalendar = () => {
-
-    Alert.alert(
-      i18n.t('calendarRemoveTitle'),
-      i18n.t('calendarRemoveConfirmation'),
-      [
-        {
-          text: i18n.t('cancel'),
-          onPress: () => {
-            logger.log('Cancel Pressed');
-          },
-          style: 'cancel',
-        },
-        {
-          text: i18n.t('ok'), onPress: () => {
-            logger.log('OK Pressed');
-            calendarContext.removeFunTimesCalendarEventsAsync();
-          }
-        },
-      ],
-      // On Android, cancelable: true allows them to tap outside the box to get rid of alert without doing anything
-      { cancelable: true }
-    );
-
-  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <React.Fragment>
 
         <ScrollView ref={ref} contentContainerStyle={styles.container}>
-          <Divider style={styles.divider} />
-          <Text style={styles.header}>{i18n.t("settingsHeaderShowAdditionalMilestonesForNumberTypes")}</Text>
 
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("useRound")}</Text>
+            <Text style={settingsStyles.settingsText}>{i18n.t("useRound")}</Text>
             <Switch
               value={appSettingsContext.numberTypeUseMap.round}
               onValueChange={isYes => {
@@ -111,7 +81,7 @@ function Settings(props) {
             />
           </View>
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("useCount")}</Text>
+            <Text style={settingsStyles.settingsText}>{i18n.t("useCount")}</Text>
             <Switch
               value={appSettingsContext.numberTypeUseMap.count}
               onValueChange={isYes => {
@@ -120,7 +90,7 @@ function Settings(props) {
             />
           </View>
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("useRepDigits")}</Text>
+            <Text style={settingsStyles.settingsText}>{i18n.t("useRepDigits")}</Text>
             <Switch
               value={appSettingsContext.numberTypeUseMap.repDigits}
               onValueChange={isYes => {
@@ -129,7 +99,7 @@ function Settings(props) {
             />
           </View>
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("usePowers")}</Text>
+            <Text style={settingsStyles.settingsText}>{i18n.t("usePowers")}</Text>
             <Switch
               value={appSettingsContext.numberTypeUseMap.superPower}
               onValueChange={isYes => {
@@ -138,7 +108,7 @@ function Settings(props) {
             />
           </View>
           <View style={[styles.switchSelection]}>
-            <Text>{i18n.t("useBinary")}</Text>
+            <Text style={settingsStyles.settingsText}>{i18n.t("useBinary")}</Text>
             <Switch
               value={appSettingsContext.numberTypeUseMap.binary}
               onValueChange={isYes => {
@@ -147,10 +117,10 @@ function Settings(props) {
             />
           </View>
 
-          <Divider style={styles.divider} />
-          <Text style={styles.header}>{i18n.t("settingsHeaderHowMuchConstants")}</Text>
 
-          <Text style={styles.sliderTitle}>{translationKeyMap.pi}</Text>
+          <Text style={[settingsStyles.settingsText, styles.howMuchTitle]}>{i18n.t("settingsHeaderHowMuchConstants")}</Text>
+
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.pi}</Text>
           <Slider value={howMuchPi} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPi}
             onSlidingComplete={(newVal) => {
@@ -158,7 +128,7 @@ function Settings(props) {
               appSettingsContext.setUsePi(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.speedOfLight}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.speedOfLight}</Text>
           <Slider value={howMuchSpeedOfLight} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchSpeedOfLight}
             onSlidingComplete={(newVal) => {
@@ -166,7 +136,7 @@ function Settings(props) {
               appSettingsContext.setUseSpeedOfLight(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.gravity}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.gravity}</Text>
           <Slider value={howMuchGravity} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchGravity}
             onSlidingComplete={(newVal) => {
@@ -174,7 +144,7 @@ function Settings(props) {
               appSettingsContext.setUseGravity(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.euler}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.euler}</Text>
           <Slider value={howMuchEuler} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchEuler}
             onSlidingComplete={(newVal) => {
@@ -182,7 +152,7 @@ function Settings(props) {
               appSettingsContext.setUseEuler(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.phi}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.phi}</Text>
           <Slider value={howMuchPhi} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPhi}
             onSlidingComplete={(newVal) => {
@@ -190,7 +160,7 @@ function Settings(props) {
               appSettingsContext.setUsePhi(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.pythagoras}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.pythagoras}</Text>
           <Slider value={howMuchPythagoras} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPythagoras}
             onSlidingComplete={(newVal) => {
@@ -198,7 +168,7 @@ function Settings(props) {
               appSettingsContext.setUsePythagoras(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.mole}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.mole}</Text>
           <Slider value={howMuchMole} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchMole}
             onSlidingComplete={(newVal) => {
@@ -206,7 +176,7 @@ function Settings(props) {
               appSettingsContext.setUseMole(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.rGas}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.rGas}</Text>
           <Slider value={howMuchRGas} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchRGas}
             onSlidingComplete={(newVal) => {
@@ -214,7 +184,7 @@ function Settings(props) {
               appSettingsContext.setUseRGas(newVal);
             }}
           />
-          <Text style={styles.sliderTitle}>{translationKeyMap.faraday}</Text>
+          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.faraday}</Text>
           <Slider value={howMuchFaraday} step={1} minimumValue={0} maximumValue={3}
             thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchFaraday}
             onSlidingComplete={(newVal) => {
@@ -223,36 +193,27 @@ function Settings(props) {
             }}
           />
 
-          <Divider style={styles.divider} />
-
-
-          <Button onPress={onRequestRemoveCalendar} title="Remove All Calendar Entries" ></Button>
         </ScrollView>
       </React.Fragment>
     </TouchableWithoutFeedback>
   );
 }
 
-/* jmr - should get confirmation first before deleting calendar */
 
-export default Settings;
+export default MilestoneTypesSettings;
 
-Settings.propTypes = {
 
-}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 0,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-  },
   header: {
     paddingVertical: 10,
   },
   sliderTitle: {
-    paddingTop: 15,
+    paddingTop: 10,
+  },
+  howMuchTitle: {
+    paddingTop: 20,
+    paddingBottom: 5,
   },
   divider: {
     marginVertical: 10,

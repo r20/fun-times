@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, Platform } from 'react-native'
 import { Header } from "react-native-elements"
 
-import Settings from '../components/Settings'
+import Settings from '../components/settings/Settings'
 import i18n from '../i18n/i18n'
 import theme from '../style/theme'
 
