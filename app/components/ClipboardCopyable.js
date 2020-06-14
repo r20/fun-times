@@ -23,7 +23,6 @@ const ClipboardCopyable = (props) => {
         if (props.onPressGetContentFunction) {
             content = props.onPressGetContentFunction();
         }
-        logger.warn("jmr == copied ", content);
         Clipboard.setString(content);
         ToastAndroid.show(copiedMessage, ToastAndroid.SHORT);
     }

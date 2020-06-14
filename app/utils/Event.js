@@ -12,14 +12,14 @@ export default class Event {
         title
         key
         epochMillis
-        color
+        color (not used anymore)
         keywords
         isFullDay
         isCustom
         ignoreIfPast // Only show this event if it is in the future
         selected // Whether the event is selected/visible in non-events screens
         isSelectedByDefault // For standard events
-        specialNumbers // TBD - need to figure out how to implement this.  Thisis other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
+        specialNumbers // jmr TBD - need to figure out how to implement this.  This is other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
         tags
     */
     constructor(options = {}) {
@@ -36,7 +36,7 @@ export default class Event {
         this.key = options.key || options.title;
 
         /* These are required */
-        if (!options.title || !options.epochMillis || !options.color) {
+        if (!options.title || !options.epochMillis) {
             logger.error("Required options to Event constructor not specified! ", options);
         }
     }

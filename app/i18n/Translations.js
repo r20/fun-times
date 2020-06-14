@@ -84,6 +84,7 @@ export const en = {
   constantTenMultiple: "{{someValue}} [digits of {{numberName}}]",
   constantExact: "{{numberName}} ({{someValue}})",
   constantOtherMultiple: "{{multiplier}} * {{numberName}} = {{someValue}}",
+  superPowerDescription: "{{powerValue}}^{{powerValue}} (super power!) = {{formattedNumber}}",
   milestoneFutureDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it will be {{whatValue}}',
   milestoneFutureDescriptionWithDayOnly: 'On {{dayValue}} it will be {{whatValue}}',
   milestoneTodayDescriptionWithDayOnly: 'Today ({{dayValue}}) marks {{whatValue}}',

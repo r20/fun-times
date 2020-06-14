@@ -294,6 +294,7 @@ function findExponentsForBaseSoPowerInRange(base, start, end) {
  * @param {Number} end - end of range to look for interesting powers within
  */
 function findSuperPowersInRange(start, end) {
+
   const found = [];
   let baseAndExpo = 4;
   let num = Math.pow(baseAndExpo, baseAndExpo);
@@ -384,7 +385,7 @@ export function getSortedInterestingNumbersMap() {
     return sortedInterestingNumbersMap;
   }
 
-  const start = new Decimal(100);
+  const start = new Decimal(100); // For our set types of numbers that apply to all events, must be at least this big to be interesting
 
   /* If an event was older than maxNumberOfYearsAway it'd mess us up.
   This could happen if a standard evnet was created that was older, or if maxNumberOfYearsAway
@@ -461,7 +462,6 @@ export function getSortedInterestingNumbersMap() {
 
   }
 
-
   /* Need to also find super powers using oher numbers, like pi,
     and tag them with both super power and other tag */
   somenums = findSuperPowersInRange(start, end);
@@ -469,15 +469,15 @@ export function getSortedInterestingNumbersMap() {
   for (let sIdx = 0; sIdx < somenums.length; sIdx++) {
     const power = somenums[sIdx];
     const num = Math.pow(power, power);
-    // TODO: should i18n this and other descriptors
     var interestingInfo = {
       tags: [INTERESTING_TYPES.superPower],
-      descriptor: "Super power!! " + power + "^" + power + " (" + numberToFormattedString(Math.pow(power, power)) + ")",
+      descriptor: i18n.t('superPowerDescription', { powerValue: power, formattedNumber: numberToFormattedString(num) }),
       number: num,
     };
     interestingList.push(interestingInfo);
   }
   interestingList.sort(sortFunction);
+
   sortedInterestingNumbersMap[INTERESTING_TYPES.superPower] = interestingList;
 
 

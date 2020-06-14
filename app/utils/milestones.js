@@ -24,12 +24,14 @@ export function getMilestoneKey(milestoneItem) {
     Create milestone object (and set key using getMilestoneKey).
     event - event this milestone is created for
     unit - time unit (e.g. years)
-    description - helps describe the milestone, but only partially. jmr - is that right? Explain how ??
+    description - description of the number, used in other code as part of the full description of the milestone
+            e.g. "4^4 (super power!) = 256"
     numberType - usually one of INTERESTING_TYPES, but could be custom too
     numberCode - used for constants to tell what the interesting number is in relation to the constant (e.g. exact, same digits, other multiple)
     time - in milliseconds
 */
 function createMilestone(event, unit, description, numberType, numberCode, time) {
+
     const milestone = {
         event: event,
         unit: unit,
@@ -61,6 +63,7 @@ export function shouldShowMilestoneForNumberType(milestone, numberTypeUseMap) {
 
 const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
 const numberTypes = Object.keys(sortedInterestingNumbersMap);
+
 
 /**
  * This function calls others to get the interesting milestones.
@@ -97,66 +100,71 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         }
     }
 
+
+    /* Create a helper function that is used in multiple places */
+    const createMilestoneIfNeeded = (unit, start, end, num, descriptor, numberType, numberCode) => {
+
+        if (num >= start && num <= end) {
+            let interestingTime;
+
+            if (Number.isInteger(num)) {
+                if (isEventInFuture) {
+                    interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
+                } else {
+                    interestingTime = eventMoment.clone().add(num, unit).valueOf();
+                }
+            } else {
+                /* Before I was handling decimals, I saw a case where 40,000,000,000 * G (2.669720 months)
+                    and 50,000,000,000 * G (3.337150 months) were both at the same time (it added 3 months).
+                    moment rounds decimals because adding dates is complex.
+                    So instead, add/subtract the integer part normally with moment and the time units 
+                    (to account for months of different lengths, daylight savings, leap year, etc.)
+                    then convert the decimal part to ms and add/subtract that. */
+
+                let integerPart = Math.trunc(num);
+                let decimalPart = num % 1; // Since this is javascript, it may lose some precision but that's ok.
+
+                const ms = moment.duration(decimalPart, unit).asMilliseconds();
+
+                if (isEventInFuture) {
+                    const tmpMoment = eventMoment.clone().subtract(integerPart, unit);
+                    interestingTime = tmpMoment.clone().subtract(ms, "ms").valueOf();
+                } else {
+                    const tmpMoment = eventMoment.clone().add(integerPart, unit);
+                    interestingTime = tmpMoment.clone().add(ms, "ms").valueOf();
+
+                }
+            }
+
+            if (interestingTime >= pastMoment.valueOf()) {
+                /* InterestingTime needs to be after our pastMoment.
+                E.g. An interesting time of 10 years ahead of a past event
+                might be eariler this year but in past.  Don't show it.  */
+                if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
+                    /* The interestingTime can't be too close to the event.
+                    Must be less than the event - tooCloseMillis,
+                    or greater than event+tooCloseMillis
+                    */
+                    return createMilestone(event, unit, descriptor, numberType, numberCode, interestingTime);
+                }
+            }
+        }
+        return null;
+    };
+
+
     const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     for (let unitsIidx = 0; unitsIidx < units.length; unitsIidx++) {
         const unit = units[unitsIidx];
         let start, end;
 
-        /* Create a helper function that is used in multiple places */
-        const createMilestoneIfNeeded = (num, descriptor, numberType, numberCode) => {
-
-            if (num >= start && num <= end) {
-                let interestingTime;
-
-                if (Number.isInteger(num)) {
-                    if (isEventInFuture) {
-                        interestingTime = eventMoment.clone().subtract(num, unit).valueOf();
-                    } else {
-                        interestingTime = eventMoment.clone().add(num, unit).valueOf();
-                    }
-                } else {
-                    /* Before I was handling decimals, I saw a case where 40,000,000,000 * G (2.669720 months)
-                        and 50,000,000,000 * G (3.337150 months) were both at the same time (it added 3 months).
-                        moment rounds decimals because adding dates is complex.
-                        So instead, add/subtract the integer part normally with moment and the time units 
-                        (to account for months of different lengths, daylight savings, leap year, etc.)
-                        then convert the decimal part to ms and add/subtract that. */
-
-                    let integerPart = Math.trunc(num);
-                    let decimalPart = num % 1; // Since this is javascript, it may lose some precision but that's ok.
-
-                    const ms = moment.duration(decimalPart, unit).asMilliseconds();
-
-                    if (isEventInFuture) {
-                        const tmpMoment = eventMoment.clone().subtract(integerPart, unit);
-                        interestingTime = tmpMoment.clone().subtract(ms, "ms").valueOf();
-                    } else {
-                        const tmpMoment = eventMoment.clone().add(integerPart, unit);
-                        interestingTime = tmpMoment.clone().add(ms, "ms").valueOf();
-
-                    }
-                }
-
-                if (interestingTime >= pastMoment.valueOf()) {
-                    /* InterestingTime needs to be after our pastMoment.
-                    E.g. An interesting time of 10 years ahead of a past event
-                    might be eariler this year but in past.  Don't show it.  */
-                    if (interestingTime < event.epochMillis - tooCloseMillis || interestingTime > event.epochMillis + tooCloseMillis) {
-                        /* The interestingTime can't be too close to the event.
-                        Must be less than the event - tooCloseMillis,
-                        or greater than event+tooCloseMillis
-                        */
-                        return createMilestone(event, unit, descriptor, numberType, numberCode, interestingTime);
-                    }
-                }
-            }
-            return null;
-        };
-
         const spanBetweenPastAndEvent = Math.abs(pastMoment.diff(eventMoment, unit));
         const spanBetweenFutureAndEvent = Math.abs(futureMoment.diff(eventMoment, unit));
-        logger.log(" spanBetweenPastAndEvent ", spanBetweenPastAndEvent);
-        logger.log(" spanBetweenFutureAndEvent ", spanBetweenFutureAndEvent);
+
+        logger.log(" spanBetweenPastAndEvent ", event.title, unit, spanBetweenPastAndEvent);
+        logger.log(" spanBetweenFutureAndEvent ", event.title, unit, spanBetweenFutureAndEvent);
+
+
         if (isEventInFuture) {
             start = futureMoment.isBefore(eventMoment) ? spanBetweenFutureAndEvent : 0;
             end = spanBetweenPastAndEvent;
@@ -170,19 +178,18 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         if (unit === 'years') {
             // Add in aniversaries
             for (var yr = start; yr <= end; yr++) {
-                const newMilestone = createMilestoneIfNeeded(yr, yr, INTERESTING_TYPES.round, undefined);
+                const newMilestone = createMilestoneIfNeeded(unit, start, end, yr, yr, INTERESTING_TYPES.round, undefined);
                 if (newMilestone) {
                     milestoneList.push(newMilestone);
                 }
             }
         }
 
+
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
 
             const numberType = numberTypes[numberTypesIdx];
-
             const sortedInterestingNumbers = sortedInterestingNumbersMap[numberType];
-            //  logger.warn(" Number of interesting numbers for type ", numberType, sortedInterestingNumbers.length);
 
             for (var sortedListIndex = 0; sortedListIndex < sortedInterestingNumbers.length; sortedListIndex++) {
                 const info = sortedInterestingNumbers[sortedListIndex];
@@ -226,7 +233,7 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
                     }
                 }
 
-                const newMilestone = createMilestoneIfNeeded(info.number, info.descriptor, numberType, numberCode);
+                const newMilestone = createMilestoneIfNeeded(unit, start, end, info.number, info.descriptor, numberType, numberCode);
                 if (newMilestone) {
                     milestoneList.push(newMilestone);
                 }
