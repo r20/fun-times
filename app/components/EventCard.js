@@ -1,8 +1,10 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { View, Text, StyleSheet } from 'react-native'
-import theme, { getContrastFontColor } from '../style/theme'
+import MyThemeContext from '../context/MyThemeContext'
 
+import MyText, { MyCalendarText, MyCalendarTextLarge } from './MyText'
+import * as logger from '../utils/logger'
 
 /**
  * Components in this file provide a way for consistent styling of information
@@ -12,7 +14,18 @@ import theme, { getContrastFontColor } from '../style/theme'
 
 const EventCard = (props) => {
 
-    let stylesArray = [styles.card, styles.eventInfoCard];
+    const myThemeContext = useContext(MyThemeContext);
+
+    const eventInfoCardStyle = {
+        borderWidth: 0,
+        borderStyle: 'solid',
+        color: myThemeContext.colors.calendarContrast,
+        backgroundColor: myThemeContext.colors.calendar,
+        borderColor: myThemeContext.colors.calendarContrast,
+
+    };
+
+    let stylesArray = [styles.card, eventInfoCardStyle];
     if (props.style) {
         if (Array.isArray(props.style)) {
             stylesArray = stylesArray.concat(props.style);
@@ -36,7 +49,7 @@ export default EventCard;
 export const EventCardHeader = (props) => {
 
     return (
-        <Text style={[styles.header, props.style]}>{props.children}</Text>
+        <MyCalendarTextLarge style={[styles.header, props.style]}>{props.children}</MyCalendarTextLarge>
     );
 }
 
@@ -47,7 +60,7 @@ EventCardHeader.propTypes = {
 export const EventCardBodyText = (props) => {
 
     return (
-        <Text style={[styles.bodyText, props.style]}>{props.children}</Text>
+        <MyCalendarText style={[props.style]}>{props.children}</MyCalendarText>
     );
 }
 
@@ -57,20 +70,11 @@ EventCardBodyText.propTypes = {
 
 export const EVENT_CARD_MARGIN = 5;
 
-const myColor = theme.DEFAULT_EVENTINFO_COLOR;
 
 const styles = StyleSheet.create({
     header: {
-        fontSize: theme.FONT_SIZE_MEDIUM + 2,
         fontWeight: 'bold',
         paddingBottom: 3,
-        color: getContrastFontColor(myColor),
-        backgroundColor: myColor,
-    },
-    bodyText: {
-        fontSize: theme.FONT_SIZE_MEDIUM,
-        color: getContrastFontColor(myColor),
-        backgroundColor: myColor,
     },
     card: {
         flex: 0,
@@ -78,13 +82,5 @@ const styles = StyleSheet.create({
         margin: EVENT_CARD_MARGIN,
         borderRadius: 3,
         overflow: 'hidden',
-    },
-    eventInfoCard: {
-        borderWidth: 0,
-        borderStyle: 'solid',
-        color: getContrastFontColor(myColor),
-        backgroundColor: myColor,
-        borderColor: getContrastFontColor(myColor),
-
     },
 });

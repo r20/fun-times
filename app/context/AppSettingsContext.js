@@ -1,5 +1,6 @@
 import React, { createContext } from 'react'
 import { AsyncStorage, Platform, Alert } from 'react-native'
+import { Appearance } from 'react-native-appearance'
 
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
@@ -8,6 +9,7 @@ import { INTERESTING_TYPES, INTERESTING_CONSTANTS } from '../utils/interestingNu
 const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
+const STORAGE_KEY_isThemeDefault = '@isThemeDefault';
 
 
 const DATEPICKER_YEAR_TIP_STATES = {
@@ -36,6 +38,7 @@ const AppSettingsContext = createContext({
   setUseMole: () => { },
   setUseRGas: () => { },
   setUseFaraday: () => { },
+  setIsThemeDefault: () => { },
 });
 
 
@@ -51,12 +54,13 @@ export class AppSettingsContextProvider extends React.Component {
     // For debug, this is how to remove keys
     //AsyncStorage.multiRemove([STORAGE_KEY_numberTypeUseMap, STORAGE_KEY_calendarMaxNumberMilestonesPerEvent, STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE]);
 
-
     this.state = {
-      // Default value
+      // Default values
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
       calendarMaxNumberMilestonesPerEvent: 3,
       numberTypeUseMap: {}, // has usePowers, useBinary, useGravity, etc. attributes. 
+      isThemeDefault: true,
+      isInitialSettingsLoaded: false,
     };
   }
 
@@ -113,6 +117,19 @@ export class AppSettingsContextProvider extends React.Component {
     } catch (e) {
       logger.warn("Error from failing to load use* number types: ", e);
     }
+
+    try {
+  
+      let isThemeDefault = await AsyncStorage.getItem(STORAGE_KEY_isThemeDefault) || "true";
+      isThemeDefault = JSON.parse(isThemeDefault);
+
+      this.setState({ isThemeDefault: isThemeDefault });
+    } catch (e) {
+      logger.warn("Error from failing to load isThemeDefault: ", e);
+    }
+
+    // After all settings are initially loaded set this
+    this.setState({ isInitialSettingsLoaded: true });
 
   }
 
@@ -180,7 +197,19 @@ export class AppSettingsContextProvider extends React.Component {
   }
 
 
+  /**
+   * Set and save isThemeDefault
+   */
+  setIsThemeDefault = (isYes) => {
+    try {
+       this.setState({ isThemeDefault: isYes });
 
+      // Don't wait
+      AsyncStorage.setItem(STORAGE_KEY_isThemeDefault, JSON.stringify(isYes));
+    } catch (e) {
+      logger.warn("Error from trying to setIsThemeDefault: ", isYes, e);
+    }
+  }
 
 
   /**
@@ -264,6 +293,7 @@ export class AppSettingsContextProvider extends React.Component {
         setUseMole: this.setUseMole,
         setUseRGas: this.setUseRGas,
         setUseFaraday: this.setUseFaraday,
+        setIsThemeDefault: this.setIsThemeDefault,
       }}>
         {this.props.children}
       </AppSettingsContext.Provider>

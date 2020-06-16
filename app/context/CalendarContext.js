@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from 'react'
+import React, { useState, useEffect, createContext, useContext } from 'react'
 import { StyleSheet } from 'react-native'
 import * as Calendar from 'expo-calendar'
 import * as Localization from 'expo-localization'
@@ -7,7 +7,7 @@ import moment from 'moment-timezone'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import { getDisplayStringForDate, getDisplayStringForTime, getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
-import theme, { getContrastFontColor } from '../style/theme'
+import MyThemeContext, { getContrastFontColor } from './MyThemeContext'
 
 export const howManyDaysAheadCalendar = 365; // How far ahead should we calendar things
 
@@ -16,9 +16,6 @@ export const howManyDaysAgoCalendar = 3; // So user can see a little before toda
 export const numMillisecondsPerDay = 24 * 60 * 60000;
 
 const CALENDAR_TITLE = 'Fun Times Milestones Calendar';
-
-const initialColor = theme.DEFAULT_CALENDAR_COLOR;
-
 
 
 // Assuming not changing timezones while app is open
@@ -186,15 +183,20 @@ const CalendarContext = createContext({
  */
 function MyCalendarProvider(props) {
 
-  [calendarId, setCalendarId] = useState(null);
-  [calendarMilestoneEventsMap, setCalendarMilestoneEventsMap] = useState(null);
-  [wrappedCalendarEventsList, setWrappedCalendarEventsList] = useState([]);
-  [isCalendarReady, setIsCalendarReady] = useState(false);
+  const myThemeContext = useContext(MyThemeContext);
 
-  [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
-  [milestoneNotOnCalendarColorStyle, setMilestoneNotOnCalendarColorStyle] = useState(createMilestoneNotOnCalendarColorStyle(initialColor));
-  [milestoneOnCalendarCardStyle, setMilestoneOnCalendarCardStyle] = useState(createMilestoneOnCalendarCardStyle(initialColor));
-  [milestoneNotOnCalendarCardStyle, setMilestoneNotOnCalendarCardStyle] = useState(createMilestoneNotOnCalendarCardStyle(initialColor));
+  const initialColor = myThemeContext.colors.calendar;
+
+
+  const [calendarId, setCalendarId] = useState(null);
+  const [calendarMilestoneEventsMap, setCalendarMilestoneEventsMap] = useState(null);
+  const [wrappedCalendarEventsList, setWrappedCalendarEventsList] = useState([]);
+  const [isCalendarReady, setIsCalendarReady] = useState(false);
+
+  const [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
+  const [milestoneNotOnCalendarColorStyle, setMilestoneNotOnCalendarColorStyle] = useState(createMilestoneNotOnCalendarColorStyle(initialColor));
+  const [milestoneOnCalendarCardStyle, setMilestoneOnCalendarCardStyle] = useState(createMilestoneOnCalendarCardStyle(initialColor));
+  const [milestoneNotOnCalendarCardStyle, setMilestoneNotOnCalendarCardStyle] = useState(createMilestoneNotOnCalendarCardStyle(initialColor));
 
   /* This is done here so we can create the objects once and then re-use them no matter how much cards
   are re-rendered (As long as color stays the same, the same object is used.). */
@@ -230,7 +232,7 @@ function MyCalendarProvider(props) {
         if (cal.title === CALENDAR_TITLE) {
           calFound = true;
           theCalendarId = cal.id;
-          setStyleStates(cal.color);
+          setStyleStates(cal.color); // Change styles for calendar screen, but not cards for other screens
           logger.log('We found the calendar.', cal);
           break;
         }
@@ -294,7 +296,7 @@ function MyCalendarProvider(props) {
         ? await getDefaultCalendarSourceAsync()
         : { isLocalAccount: true, name: 'Fun Times Calendar' };
 
-    const colorToUse = theme.DEFAULT_CALENDAR_COLOR;
+    const colorToUse = initialColor;
     setStyleStates(colorToUse);
 
     const newCalendarId = await Calendar.createCalendarAsync({

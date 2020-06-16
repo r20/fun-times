@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
+import {Text} from 'react-native'
 import { AppLoading } from 'expo'
 import * as Font from 'expo-font'
 import { MenuProvider } from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
+import { AppearanceProvider, useColorScheme } from 'react-native-appearance'
 
 import { EventsAndMilestonesContextProvider } from './app/context/EventsAndMilestonesContext'
 import { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 import { CalendarProvider } from './app/context/CalendarContext'
+import {MyThemeProvider} from './app/context/MyThemeContext'
 import AppBottomTabNavigator from './app/navigation/AppBottomTabNavigator'
-
+import MyText from './app/components/MyText'
 
 // Before rendering any navigation stack, to optimize memory usage and performance
 import { enableScreens } from 'react-native-screens';
@@ -32,28 +35,23 @@ if (process.env.NODE_ENV !== 'development') {
 /* jmr - need to add crash reporting and aggregation via sentry.
 See https://docs.expo.io/versions/latest/guides/using-sentry/ */
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isReady: false,
-    };
-  }
+export default  (props) => {
 
-  async componentDidMount() {
-    // Some fonts used in native-base components need to be pre-loaded
-    await Font.loadAsync({
-      Roboto: require('native-base/Fonts/Roboto.ttf'),
-      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
-      ...Ionicons.font,
-    });
-    this.setState({ isReady: true });
-  }
+  // jmr- I don't think this was doing anything.  It was await and the function was async and that had problems. (it was class component before that)
+  // const [isReady, setIsReady] = useState(false);
 
-  render() {
-    if (!this.state.isReady) {
-      return <AppLoading />;
-    }
-    return <CalendarProvider><AppSettingsContextProvider><EventsAndMilestonesContextProvider ><MenuProvider><AppBottomTabNavigator /></MenuProvider></EventsAndMilestonesContextProvider></AppSettingsContextProvider></CalendarProvider>
-  }
+  // if (!isReady) {
+  //    Font.loadAsync({
+  //     Roboto: require('native-base/Fonts/Roboto.ttf'),
+  //     Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
+  //     ...Ionicons.font,
+  //   });
+  //   setIsReady(true);
+  // }
+
+  // if (!isReady) {
+  //   return (<AppLoading />);
+  // }
+  return (<AppearanceProvider><AppSettingsContextProvider><MyThemeProvider><CalendarProvider><EventsAndMilestonesContextProvider ><MenuProvider><AppBottomTabNavigator /></MenuProvider></EventsAndMilestonesContextProvider></CalendarProvider></MyThemeProvider></AppSettingsContextProvider></AppearanceProvider>);
+
 }

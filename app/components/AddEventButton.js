@@ -1,18 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Icon, Fab } from 'native-base'
-import theme, { getContrastFontColor } from '../style/theme'
+import MyThemeContext from '../context/MyThemeContext'
 
 const AddEventButton = ({ onPress }) => {
+
+  const myThemeContext = useContext(MyThemeContext);
 
   return (
     <Fab
       direction="up"
-      style={{ backgroundColor: theme.ADD_EVENT_BUTTON_BACKGROUND_COLOR, color: getContrastFontColor(theme.ADD_EVENT_BUTTON_BACKGROUND_COLOR) }}
+      style={{ backgroundColor: myThemeContext.colors.primary }}
       position="bottomRight"
       onPress={onPress}
     >
-      <Icon name="add" />
+      <Icon name="add" style={{ color: myThemeContext.colors.primaryContrast }}
+        position="bottomRight" />
     </Fab>
   );
 }

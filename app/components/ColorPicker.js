@@ -4,7 +4,7 @@ import { TouchableOpacity, StyleSheet } from 'react-native'
 import { FlatGrid } from 'react-native-super-grid'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import {getContrastFontColor} from '../style/theme'
+import {getContrastFontColor} from '../context/MyThemeContext'
 
 
 /**

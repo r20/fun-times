@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, Text, View, Platform } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
 import { NavigationContainer } from '@react-navigation/native'
-import { MyReactNavigationBasedTheme } from '../style/theme'
 // Search for available icons at https://expo.github.io/vector-icons/
 
+import MyThemeContext from '../context/MyThemeContext'
 import AppStackNavigator from '../navigation/AppStackNavigator'
 import EventsScreen from '../screens/EventsScreen'
 import Today from '../screens/Today'
@@ -14,8 +14,8 @@ import MilestoneCalendar from '../screens/MilestoneCalendar'
 import CalendarScreen from '../screens/CalendarScreen'
 import More from '../screens/More'
 import i18n from '../i18n/i18n'
-import theme from '../style/theme'
 import * as logger from '../utils/logger'
+import AppSettingsContext from '../context/AppSettingsContext'
 
 
 const Tab = createBottomTabNavigator();
@@ -25,6 +25,8 @@ function MyTabs(props) {
   // const route = useRoute();
 
   const dots = Platform.OS === "ios" ? "more-horiz" : 'more-vert';
+
+  const myThemeContext = useContext(MyThemeContext);
 
   // React.useLayoutEffect(() => {
   //   // EventsScreen is initialRouteName
@@ -56,13 +58,13 @@ function MyTabs(props) {
 
   const tabBarOptions = {
     showLabel: false,
-    activeTintColor: theme.PRIMARY_ACTIVE_TEXT_COLOR,
-    inactiveTintColor: theme.PRIMARY_INACTIVE_TEXT_COLOR,
-    activeBackgroundColor: theme.PRIMARY_ACTIVE_BACKGROUND_COLOR,
-    inactiveBackgroundColor: theme.PRIMARY_INACTIVE_BACKGROUND_COLOR,
+    activeTintColor: myThemeContext.colors.primary,
+    inactiveTintColor: myThemeContext.colors.unselected,
+    activeBackgroundColor: myThemeContext.colors.background,
+    inactiveBackgroundColor: myThemeContext.colors.background,
     style: {
       borderTopWidth: 1,
-      borderTopColor: theme.TAB_BAR_BORDER_COLOR,
+      borderTopColor: myThemeContext.colors.tabBorder,
     },
 
   };
@@ -91,7 +93,14 @@ function MyTabs(props) {
 
 export default function AppBottomTabsNavigator() {
 
-  return <NavigationContainer theme={MyReactNavigationBasedTheme}><MyTabs /></NavigationContainer>
+  const appSettingsContext = useContext(AppSettingsContext);
+  const myThemeContext = useContext(MyThemeContext);
+
+  if (!appSettingsContext.isInitialSettingsLoaded) {
+    return null; // jmr- should change to a loading symbol or keep splash screen
+  }
+
+  return <NavigationContainer theme={myThemeContext.myReactNavigationBasedTheme}><MyTabs /></NavigationContainer>
 }
 
 const styles = StyleSheet.create({

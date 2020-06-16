@@ -1,16 +1,15 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, Platform } from 'react-native'
-import { Slider, Header } from "react-native-elements"
+import { StyleSheet, View, Slider } from 'react-native'
 
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import AppSettingsContext from '../context/AppSettingsContext'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
-import theme from '../style/theme'
+import MyThemeContext from '../context/MyThemeContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-
-
+import MyText, { MyTextSmall, MyTextLarge, MyTextXLarge } from '../components/MyText'
+import MyScreenHeader from '../components/MyScreenHeader'
 
 const styles = StyleSheet.create({
   container: {
@@ -24,32 +23,24 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   subtitle: {
-    fontSize: theme.FONT_SIZE_SMALL,
     paddingHorizontal: 15,
   },
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
-  },
-  maxMilestoneLabel: {
-    fontSize: theme.FONT_SIZE_SMALL,
-  },
-  header: {
-    color: theme.PRIMARY_TEXT_COLOR,
-    fontSize: theme.FONT_SIZE_XLARGE
   },
 });
 
-
-const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerUpcomingMilestonesScreenTitle')}</Text>
 
 
 function MilestoneCalendar(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const appSettingsContext = useContext(AppSettingsContext);
+
+  const myThemeContext = useContext(MyThemeContext);
+
 
   let filtered = eventsAndMilestonesContext.allEvents.filter(function (value, index, arr) {
     return eventsAndMilestonesContext.isEventSelected(value);
@@ -71,23 +62,17 @@ function MilestoneCalendar(props) {
 
   // jmr - move slider to settings??
   return (<View style={styles.container} >
-    <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
-      containerStyle={Platform.select({
-        android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
-      })}
-      backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
-      centerComponent={headerCenterComponent}
-    />
-    <Text style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</Text>
+    <MyScreenHeader title={i18n.t('headerUpcomingMilestonesScreenTitle')} />
+    <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>
     <View style={styles.sliderWrapper} >
-      <Text style={styles.maxMilestoneLabel}>{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</Text>
+      <MyTextSmall >{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</MyTextSmall>
       <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
-        thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
+        onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
     {!empty &&
       <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
-    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneCalendarMessage')}</Text></View>}
+    {empty && <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestoneCalendarMessage')}</MyTextLarge></View>}
   </View>
   );
 }

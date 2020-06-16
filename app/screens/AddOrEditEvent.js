@@ -1,25 +1,24 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, Text, View, ScrollView, TextInput, Switch,
+  StyleSheet, View, ScrollView, TextInput, Switch,
   TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert, Platform
 } from 'react-native'
-import { Button } from 'react-native-elements'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import moment from 'moment-timezone'
+
 
 import EventDateTimePickerAndroid from '../components/EventDateTimePickerAndroid'
 import EventDateTimePickerIos from '../components/EventDateTimePickerIos'
-
-import theme from '../style/theme'
-import * as Localization from 'expo-localization'
-import moment from 'moment-timezone'
-
+import MyThemeContext from '../context/MyThemeContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as Utils from '../utils/Utils'
 import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
+import MyText, { MyTextXLarge } from '../components/MyText'
+import MyPrimaryButton from '../components/MyPrimaryButton'
 
 /* jmr - After move function, move this ?? */
 import Decimal from 'decimal.js-light'
@@ -27,14 +26,14 @@ import Decimal from 'decimal.js-light'
 function AddOrEditEvent(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
+  const myThemeContext = useContext(MyThemeContext);
+
   const route = useRoute();
   const navigation = useNavigation();
 
   const oldEvent = route.params?.oldEvent ?? null;
   const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
   const isCreate = !oldEvent;
-
-  const [titleInputHeight, setTitleInputHeight] = useState(50);
 
   const [title, setTitle] = useState(newEvent ? newEvent.title : '');
   const [selectedDate, setSelectedDate] = useState(newEvent ? (new Date(newEvent.epochMillis)) : null);
@@ -53,6 +52,15 @@ function AddOrEditEvent(props) {
     title: i18n.t("eventNameInputPlaceholder"),
   }
 
+  const titleInputStyle = {
+    fontSize: myThemeContext.FONT_SIZE_XLARGE,
+    color: myThemeContext.colors.text,
+    borderColor: 'gray',
+    borderWidth: 0,
+    borderRadius: 3,
+    padding: 5,
+    marginTop: 20,
+  };
 
   /**
    * Save event if there's not one by the same title.
@@ -112,13 +120,13 @@ function AddOrEditEvent(props) {
     navigation.setOptions({
       headerLeft: () => (
         <View style={styles.headerButton}>
-          <Button onPress={() => { navigation.goBack(); }}
+          <MyPrimaryButton onPress={() => { navigation.goBack(); }}
             title={i18n.t("cancel")} type="clear" accessibilityLabel="cancel" />
         </View>
       ),
       headerRight: () => (
         <View style={styles.headerButton}>
-          <Button disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
+          <MyPrimaryButton disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
             title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
         </View>
       ),
@@ -169,13 +177,11 @@ function AddOrEditEvent(props) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
       <ScrollView contentContainerStyle={styles.container}>
+
         <TextInput
-          style={[styles.titleInput, titleInputHeight]}
+          style={[titleInputStyle]}
           multiline={false}
           onChangeText={text => setTitle(text)}
-          onContentSizeChange={(event) => {
-            setTitleInputHeight(event.nativeEvent.contentSize.height);
-          }}
           placeholder={eventPlaceholders.title}
           maxLength={50}
           value={title ? title : ''}
@@ -196,7 +202,7 @@ function AddOrEditEvent(props) {
         </View>
 
         <View style={styles.switch}>
-          <Text>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</Text>
+          <MyText>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</MyText>
           <Switch
             value={useDateAndTimeInMilestones}
             onValueChange={isYes => {
@@ -230,14 +236,6 @@ const styles = StyleSheet.create({
     paddingLeft: 45, // Needs to leave enough room for ios picker
     flexDirection: 'column',
     justifyContent: 'flex-start',
-  },
-  titleInput: {
-    fontSize: theme.FONT_SIZE_XLARGE,
-    borderColor: 'gray',
-    borderWidth: 0,
-    borderRadius: 3,
-    padding: 5,
-    marginTop: 20,
   },
   eventDateTimePickerWrapper: {
     marginTop: Platform.OS === 'ios' ? 40 : spaceAmount,

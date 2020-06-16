@@ -6,11 +6,11 @@ import { useScrollToTop } from '@react-navigation/native'
 
 import i18n from '../i18n/i18n'
 import AddEventButton from '../components/AddEventButton'
-import theme from '../style/theme'
+
 import SwipeableEventListItem from '../components/SwipeableEventListItem'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
-
+import MyText, { MyTextLarge } from '../components/MyText'
 
 
 function CustomEvents(props) {
@@ -47,7 +47,7 @@ function CustomEvents(props) {
           initialNumToRender={10}
         />
       }
-      {empty && <Text style={styles.emptyText}>{i18n.t('emptyCustomEventsMessage')}</Text>}
+      {empty && <MyTextLarge style={styles.emptyText}>{i18n.t('emptyCustomEventsMessage')}</MyTextLarge>}
       <AddEventButton onPress={onPressAddEvent} />
     </View>
   );
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
   },
 });

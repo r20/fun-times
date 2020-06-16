@@ -6,7 +6,6 @@ import { withNavigation } from '@react-navigation/compat'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import EventSelectedStar from '../components/EventSelectedStar'
-import theme from '../style/theme'
 import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
 import * as logger from '../utils/logger'
 
@@ -49,7 +48,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
   },
   card: {
     flex: 1, // So it will stretch out and take up rest of space

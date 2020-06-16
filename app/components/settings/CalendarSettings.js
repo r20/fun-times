@@ -1,14 +1,12 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import {
-  StyleSheet, Text, View, ScrollView, Switch, Alert, Platform, Button
-} from 'react-native'
+import { StyleSheet, View, ScrollView, Switch, Alert } from 'react-native'
 
 import CalendarContext from '../../context/CalendarContext'
 import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
-
+import MyPrimaryButton from '../../components/MyPrimaryButton'
 
 function CalendarSettings(props) {
 
@@ -54,7 +52,7 @@ function CalendarSettings(props) {
     <React.Fragment>
 
 
-      <Button onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} ></Button>
+      <MyPrimaryButton onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
 
     </React.Fragment>
   );

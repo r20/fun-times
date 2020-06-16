@@ -66,6 +66,7 @@ export const en = {
   settingsCalendar: "Calendar",
   settingsAbout: "About",
   settingsVersion: "Version {{someValue}}",
+  settingsDefaultTheme: "Default Theme",
   useRound: "Round numbers (e.g. 1,000 or 4,000)",
   useCount: "Counting up or down (e.g. 12,345)",
   useRepDigits: "Repeating digits (e.g. 11,111)",

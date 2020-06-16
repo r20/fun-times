@@ -1,12 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, View, Modal, Dimensions } from 'react-native'
 
 import ColorPicker from './ColorPicker'
 import * as Utils from '../utils/Utils'
-import theme from '../style/theme'
+import MyThemeContext from '../context/MyThemeContext'
 
 export default function ColorPickerModal(props) {
+
+    const myThemeContext = useContext(MyThemeContext);
+
+    const screenWidth = Dimensions.get('window').width;
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: '#0004',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        card: {
+            width: screenWidth - 40,
+            backgroundColor: myThemeContext.colors.background, // jmr - is this even needed?
+        },
+    });
 
     return (
         <Modal
@@ -33,17 +50,4 @@ ColorPickerModal.propTypes = {
     onSelect: PropTypes.func.isRequired,
 };
 
-const screenWidth = Dimensions.get('window').width;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#0004',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    card: {
-        width: screenWidth - 40,
-        backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
-    },
-});

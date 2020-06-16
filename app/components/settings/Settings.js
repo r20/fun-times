@@ -10,22 +10,23 @@ import { useScrollToTop } from '@react-navigation/native'
 import Accordion from 'react-native-collapsible/Accordion'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
-import styles from './settingsStyles'
-import theme, { getContrastFontColor, colors, getRandomColor } from '../../style/theme'
-
+import GeneralSettings from './GeneralSettings'
 import MilestonTypesSettings from './MilestoneTypesSettings'
 import CalendarSettings from './CalendarSettings'
 
 import * as logger from '../../utils/logger'
 import Divider from '../../components/Divider'
 import i18n from '../../i18n/i18n'
-
+import MyText, { MyTextLarge } from '../MyText'
+import MyThemeContext from '../../context/MyThemeContext';
 
 function Settings(props) {
 
   // This allows clicking tab navigator icon causing scroll to top.
   const ref = React.useRef(null);
   useScrollToTop(ref);
+
+  const myThemeContext = useContext(MyThemeContext);
 
   /*
   jmr:  Here's a list of things that could be done to improve app
@@ -39,15 +40,33 @@ function Settings(props) {
   Event groups, with color? (birthdays, holidays)
   */
 
-  [activeSections, setActiveSections] = useState([]);
+  const [activeSections, setActiveSections] = useState([]);
+
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 0,
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      paddingHorizontal: 20,
+    },
+    settingsSectionHeaderText: {
+      color: myThemeContext.colors.primary,
+      paddingVertical: 10,
+    },
+    divider: {
+      marginVertical: 10,
+      height: 1,
+    },
+  });
 
   const SECTIONS = [
     {
-      title: (<Text style={styles.settingsSectionHeaderText}>{i18n.t("settingsMilestoneNumberTypes")}</Text>),
+      title: (<MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsMilestoneNumberTypes")}</MyTextLarge>),
       content: <MilestonTypesSettings />,
     },
     {
-      title: <Text style={styles.settingsSectionHeaderText}>{i18n.t("settingsCalendar")}</Text>,
+      title: <MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsCalendar")}</MyTextLarge>,
       content: <CalendarSettings />,
     },
   ];
@@ -72,9 +91,10 @@ function Settings(props) {
       <React.Fragment>
 
         <ScrollView ref={ref} contentContainerStyle={styles.container}>
+          <GeneralSettings />
           <Accordion
             expandMultiple={true}
-            underlayColor={theme.PRIMARY_BACKGROUND_COLOR}
+            underlayColor={myThemeContext.colors.background}
             sections={SECTIONS}
             activeSections={activeSections}
             renderSectionTitle={_renderSectionTile}
@@ -84,8 +104,8 @@ function Settings(props) {
           />
 
           <Divider style={styles.divider} />
-          <Text style={styles.settingsSectionHeaderText}>{i18n.t("settingsAbout")}</Text>
-          <Text style={styles.settingsText}>{i18n.t("settingsVersion", { someValue: Constants.manifest.version })}</Text>
+          <MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsAbout")}</MyTextLarge>
+          <MyText >{i18n.t("settingsVersion", { someValue: Constants.manifest.version })}</MyText>
         </ScrollView>
       </React.Fragment>
     </TouchableWithoutFeedback>
@@ -93,4 +113,3 @@ function Settings(props) {
 }
 
 export default Settings;
-

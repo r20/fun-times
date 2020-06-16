@@ -9,15 +9,16 @@ import EventComparedToNow from '../components/EventComparedToNow'
 import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
-import theme from '../style/theme'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader } from '../components/EventCard'
 import * as logger from '../utils/logger'
-
+import MyText, { MyTextLarge, MyTextXLarge } from '../components/MyText'
+import MyThemeContext from '../context/MyThemeContext'
 
 function EventInfo(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
+  const myThemeContext = useContext(MyThemeContext);
 
   const route = useRoute();
   const navigation = useNavigation();
@@ -75,17 +76,17 @@ function EventInfo(props) {
         ) : (
             <View style={styles.headerRightComponent}>
               <TouchableOpacity onPress={onRequestRemove} style={styles.headerButton}>
-                <FontAwesome name="trash-o" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+                <FontAwesome name="trash-o" size={30} style={{ color: myThemeContext.colors.primary }} />
               </TouchableOpacity>
               <EventSelectedStar event={event} containerStyle={styles.headerButton} />
               <TouchableOpacity onPress={onPressEditItem} style={styles.headerButton}>
-                <MaterialIcons name="edit" size={30} style={{ color: theme.PRIMARY_HEADER_BUTTONS_COLOR }} />
+                <MaterialIcons name="edit" size={30} style={{ color: myThemeContext.colors.primary }} />
               </TouchableOpacity>
             </View>
           );
       },
     });
-  }, [navigation, event]);
+  }, [navigation, event, myThemeContext]);
 
 
   const now = new Date();
@@ -104,7 +105,7 @@ function EventInfo(props) {
         <EventComparedToNow event={event} nowMillis={nowMillis} />
       </EventCard>
 
-      <Text style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</Text>
+      <MyTextLarge style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</MyTextLarge>
     </React.Fragment>
   );
 
@@ -116,7 +117,7 @@ function EventInfo(props) {
     jmr - if title is really long, looks bad in EventInfo screen */
   return (
     <View style={styles.container}>
-      <View style={styles.titleWrapper}><Text style={styles.title}>{event.title}</Text></View>
+      <View style={styles.titleWrapper}><MyTextXLarge style={styles.title}>{event.title}</MyTextXLarge></View>
       <UpcomingMilestonesList listHeaderComponent={upcomingMilestoneListHeader}
         showHeaderIfListEmpty={true} events={[event]} verboseDescription={false} />
     </View>
@@ -130,6 +131,7 @@ EventInfo.propTypes = {
   navigation: PropTypes.object.isRequired,
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -141,8 +143,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    color: theme.PRIMARY_TEXT_COLOR,
-    fontSize: theme.FONT_SIZE_XLARGE,
     fontWeight: 'bold',
     paddingTop: 15, // If we make body and header same with no border, we'd change this
     paddingHorizontal: 10,
@@ -157,13 +157,9 @@ const styles = StyleSheet.create({
     // padding is so touching close to it works too
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: theme.PRIMARY_BACKGROUND_COLOR,
-    borderRadius: 5, // In case we show background in future
   },
   upcomingHeader: {
-    fontSize: theme.FONT_SIZE_MEDIUM + 2,
     padding: 10,
     marginTop: 20,
   },
 });
-

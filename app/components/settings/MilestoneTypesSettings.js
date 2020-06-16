@@ -1,24 +1,24 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, Text, View, ScrollView, Switch,
-  TouchableWithoutFeedback, Keyboard, Alert, Platform, Button
+  StyleSheet, View, ScrollView, Switch, Slider,
+  TouchableWithoutFeedback, Keyboard
 } from 'react-native'
-import { Slider } from 'react-native-elements'
+
 import { useScrollToTop } from '@react-navigation/native'
 
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
-import theme from '../../style/theme'
-import settingsStyles from './settingsStyles'
 import AppSettingsContext from '../../context/AppSettingsContext'
 import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../../utils/interestingNumbersFinder'
-
+import MyText from '../MyText'
+import MyThemeContext from '../../context/MyThemeContext'
 
 function MilestoneTypesSettings(props) {
+
 
   // This allows clicking tab navigator icon causing scroll to top.
   const ref = React.useRef(null);
@@ -71,8 +71,8 @@ function MilestoneTypesSettings(props) {
 
         <ScrollView ref={ref} contentContainerStyle={styles.container}>
 
-          <View style={[styles.switchSelection]}>
-            <Text style={settingsStyles.settingsText}>{i18n.t("useRound")}</Text>
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("useRound")}</MyText>
             <Switch
               value={appSettingsContext.numberTypeUseMap.round}
               onValueChange={isYes => {
@@ -80,8 +80,8 @@ function MilestoneTypesSettings(props) {
               }}
             />
           </View>
-          <View style={[styles.switchSelection]}>
-            <Text style={settingsStyles.settingsText}>{i18n.t("useCount")}</Text>
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("useCount")}</MyText>
             <Switch
               value={appSettingsContext.numberTypeUseMap.count}
               onValueChange={isYes => {
@@ -89,8 +89,8 @@ function MilestoneTypesSettings(props) {
               }}
             />
           </View>
-          <View style={[styles.switchSelection]}>
-            <Text style={settingsStyles.settingsText}>{i18n.t("useRepDigits")}</Text>
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("useRepDigits")}</MyText>
             <Switch
               value={appSettingsContext.numberTypeUseMap.repDigits}
               onValueChange={isYes => {
@@ -98,8 +98,8 @@ function MilestoneTypesSettings(props) {
               }}
             />
           </View>
-          <View style={[styles.switchSelection]}>
-            <Text style={settingsStyles.settingsText}>{i18n.t("usePowers")}</Text>
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("usePowers")}</MyText>
             <Switch
               value={appSettingsContext.numberTypeUseMap.superPower}
               onValueChange={isYes => {
@@ -107,8 +107,8 @@ function MilestoneTypesSettings(props) {
               }}
             />
           </View>
-          <View style={[styles.switchSelection]}>
-            <Text style={settingsStyles.settingsText}>{i18n.t("useBinary")}</Text>
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("useBinary")}</MyText>
             <Switch
               value={appSettingsContext.numberTypeUseMap.binary}
               onValueChange={isYes => {
@@ -118,75 +118,75 @@ function MilestoneTypesSettings(props) {
           </View>
 
 
-          <Text style={[settingsStyles.settingsText, styles.howMuchTitle]}>{i18n.t("settingsHeaderHowMuchConstants")}</Text>
+          <MyText style={styles.howMuchTitle}>{i18n.t("settingsHeaderHowMuchConstants")}</MyText>
 
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.pi}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.pi}</MyText>
           <Slider value={howMuchPi} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPi}
+            onValueChange={setHowMuchPi}
             onSlidingComplete={(newVal) => {
               setHowMuchPi(newVal);
               appSettingsContext.setUsePi(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.speedOfLight}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.speedOfLight}</MyText>
           <Slider value={howMuchSpeedOfLight} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchSpeedOfLight}
+            onValueChange={setHowMuchSpeedOfLight}
             onSlidingComplete={(newVal) => {
               setHowMuchSpeedOfLight(newVal);
               appSettingsContext.setUseSpeedOfLight(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.gravity}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.gravity}</MyText>
           <Slider value={howMuchGravity} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchGravity}
+            onValueChange={setHowMuchGravity}
             onSlidingComplete={(newVal) => {
               setHowMuchGravity(newVal);
               appSettingsContext.setUseGravity(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.euler}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.euler}</MyText>
           <Slider value={howMuchEuler} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchEuler}
+            onValueChange={setHowMuchEuler}
             onSlidingComplete={(newVal) => {
               setHowMuchEuler(newVal);
               appSettingsContext.setUseEuler(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.phi}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.phi}</MyText>
           <Slider value={howMuchPhi} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPhi}
+            onValueChange={setHowMuchPhi}
             onSlidingComplete={(newVal) => {
               setHowMuchPhi(newVal);
               appSettingsContext.setUsePhi(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.pythagoras}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.pythagoras}</MyText>
           <Slider value={howMuchPythagoras} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchPythagoras}
+            onValueChange={setHowMuchPythagoras}
             onSlidingComplete={(newVal) => {
               setHowMuchPythagoras(newVal);
               appSettingsContext.setUsePythagoras(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.mole}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.mole}</MyText>
           <Slider value={howMuchMole} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchMole}
+            onValueChange={setHowMuchMole}
             onSlidingComplete={(newVal) => {
               setHowMuchMole(newVal);
               appSettingsContext.setUseMole(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.rGas}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.rGas}</MyText>
           <Slider value={howMuchRGas} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchRGas}
+            onValueChange={setHowMuchRGas}
             onSlidingComplete={(newVal) => {
               setHowMuchRGas(newVal);
               appSettingsContext.setUseRGas(newVal);
             }}
           />
-          <Text style={[settingsStyles.settingsText, styles.sliderTitle]}>{translationKeyMap.faraday}</Text>
+          <MyText style={styles.sliderTitle}>{translationKeyMap.faraday}</MyText>
           <Slider value={howMuchFaraday} step={1} minimumValue={0} maximumValue={3}
-            thumbTintColor={theme.PRIMARY_ACTIVE_TEXT_COLOR} onValueChange={setHowMuchFaraday}
+            onValueChange={setHowMuchFaraday}
             onSlidingComplete={(newVal) => {
               setHowMuchFaraday(newVal);
               appSettingsContext.setUseFaraday(newVal);
@@ -205,19 +205,12 @@ export default MilestoneTypesSettings;
 
 
 const styles = StyleSheet.create({
-  header: {
-    paddingVertical: 10,
-  },
   sliderTitle: {
     paddingTop: 10,
   },
   howMuchTitle: {
     paddingTop: 20,
     paddingBottom: 5,
-  },
-  divider: {
-    marginVertical: 10,
-    height: 2,
   },
   switchSelection: {
     flex: 0,

@@ -6,7 +6,6 @@ import { RectButton } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'
 
 import i18n from '../i18n/i18n'
-import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
@@ -98,7 +97,6 @@ const styles = StyleSheet.create({
   },
   swipeRightActionText: {
     color: '#ffffff',
-    fontSize: theme.FONT_SIZE_LARGE,
     marginRight: 20,
   },
   trashStyle: {

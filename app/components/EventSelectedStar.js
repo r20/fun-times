@@ -5,8 +5,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
+import MyThemeContext from '../context/MyThemeContext'
 
 function EventSelectedStar(props) {
+
+    const myThemeContext = useContext(MyThemeContext);
 
     const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
     const event = props.event;
@@ -19,11 +22,16 @@ function EventSelectedStar(props) {
         }
     }
 
+    const starStyle = {
+        fontSize: 30,
+        color: isSelected ? 'gold' : myThemeContext.colors.unselected,
+    };
+
     return (
         <TouchableOpacity style={[props.containerStyle, styles.selected]} onPress={toggleSelected}>
             <MaterialCommunityIcons
                 name="star"
-                style={isSelected ? styles.starSelected : styles.starUnselected}
+                style={starStyle}
             />
         </TouchableOpacity>
     );
@@ -41,13 +49,5 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    starSelected: {
-        fontSize: 30,
-        color: 'gold',
-    },
-    starUnselected: {
-        fontSize: 30,
-        color: 'lightgray',
     },
 });

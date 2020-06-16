@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useScrollToTop } from '@react-navigation/native'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
-import theme from '../style/theme'
+
 import CalendarContext, {
   howManyDaysAheadCalendar, howManyDaysAgoCalendar,
   getIsMilestoneFullDay, makeMilestoneClipboardContentForMilestone,
@@ -19,7 +19,7 @@ import ClipboardCopyable from '../components/ClipboardCopyable'
 
 import AppSettingsContext from '../context/AppSettingsContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
-
+import MyText, { MyTextLarge } from './MyText'
 
 // This is only used to differentiate between old and new events, so no need to update
 const nowTime = (new Date()).getTime();
@@ -143,7 +143,7 @@ export default function UpcomingMilestonesList(props) {
       {isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
-          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyMilestoneMessage', { someValue: howManyDaysAheadCalendar })}</Text></View>
+          <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestoneMessage', { someValue: howManyDaysAheadCalendar })}</MyTextLarge></View>
         </React.Fragment>
       }
     </React.Fragment>
@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
   },
   calendarButton: {

@@ -1,10 +1,9 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Text, StyleSheet, FlatList, View } from 'react-native'
+import { StyleSheet, FlatList, View } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 
 import i18n from '../i18n/i18n'
-import theme from '../style/theme'
 import EventListItem from '../components/EventListItem'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'

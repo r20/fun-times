@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { FlatList, StyleSheet, Text, View, Platform } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useFocusEffect, useScrollToTop, useNavigation } from '@react-navigation/native'
-import { Header, ButtonGroup } from 'react-native-elements'
 
 import i18n from '../i18n/i18n'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import EventComparedToNow from '../components/EventComparedToNow'
-import theme from '../style/theme'
 import EventCard, { EventCardHeader } from '../components/EventCard'
+import MyText, { MyTextLarge } from '../components/MyText'
+import MyScreenHeader from '../components/MyScreenHeader'
 
 const styles = StyleSheet.create({
   container: {
@@ -21,18 +21,9 @@ const styles = StyleSheet.create({
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
   },
-  header: {
-    color: theme.PRIMARY_TEXT_COLOR,
-    fontSize: theme.FONT_SIZE_XLARGE
-  },
 });
-
-
-
-const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerTodayTitle')}</Text>
 
 
 function Today(props) {
@@ -75,13 +66,7 @@ function Today(props) {
   const keyExtractor = item => item.title + nowMillis;
 
   return (<View style={styles.container} >
-    <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
-      containerStyle={Platform.select({
-        android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
-      })}
-      backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
-      centerComponent={headerCenterComponent}
-    />
+    <MyScreenHeader title={i18n.t('headerTodayTitle')} />
     {!empty &&
       <FlatList
         ref={ref}
@@ -92,7 +77,7 @@ function Today(props) {
         initialNumToRender={4}
       />
     }
-    {empty && <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyTodayMessage')}</Text></View>}
+    {empty && <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyTodayMessage')}</MyTextLarge></View>}
   </View>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import theme from '../style/theme'
 import { Divider } from 'react-native-elements'
 
 

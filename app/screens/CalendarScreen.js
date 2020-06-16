@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Header } from "react-native-elements"
+
 
 import AppSettingsContext from '../context/AppSettingsContext'
 import CalendarContext, {
@@ -11,12 +11,13 @@ import CalendarContext, {
   howManyDaysAgoCalendar, makeMilestoneClipboardContentForWrappedCalendarEvent
 } from '../context/CalendarContext'
 import ClipboardCopyable from '../components/ClipboardCopyable'
-import theme from '../style/theme'
+
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import * as logger from '../utils/logger'
-
-
+import MyText, { MyTextLarge, MyTextXLarge } from '../components/MyText'
+import MyThemeContext from '../context/MyThemeContext'
+import MyScreenHeader from '../components/MyScreenHeader'
 
 const styles = StyleSheet.create({
   container: {
@@ -26,7 +27,6 @@ const styles = StyleSheet.create({
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: theme.FONT_SIZE_LARGE,
     padding: 15,
   },
   contentContainerStyle: {
@@ -53,14 +53,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  header: {
-    color: theme.PRIMARY_TEXT_COLOR,
-    fontSize: theme.FONT_SIZE_XLARGE
-  },
 });
 
-
-const headerCenterComponent = <Text style={styles.header}>{i18n.t('headerCalendar')}</Text>
 
 
 // This is only used to differentiate between old and new events, so no need to update
@@ -81,11 +75,11 @@ function CalendarScreen(props) {
 
   const calendarContext = useContext(CalendarContext);
   const appSettingsContext = useContext(AppSettingsContext);
+  const myThemeContext = useContext(MyThemeContext);
 
   const wrappedCalendarEventsList = calendarContext.wrappedCalendarEventsList || [];
 
   const isEmpty = wrappedCalendarEventsList.length === 0;
-
 
 
   /* To optimize and improve FlatList performance, use fixed height
@@ -138,15 +132,10 @@ function CalendarScreen(props) {
     </EventCard>);
   }
 
+  // jmr - the 'dark-context' should only be if we are on light theme?? (not seing time and battery and such of status bar)
   return (
     <React.Fragment>
-      <Header statusBarProps={{ barStyle: 'dark-content', translucent: true, backgroundColor: 'transparent' }}
-        containerStyle={Platform.select({
-          android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
-        })}
-        backgroundColor={theme.PRIMARY_BACKGROUND_COLOR}
-        centerComponent={headerCenterComponent}
-      />
+      <MyScreenHeader title={i18n.t('headerCalendar')} />
       {calendarContext.isCalendarReady && !isEmpty &&
         <FlatList
           ref={ref}
@@ -161,7 +150,7 @@ function CalendarScreen(props) {
       {calendarContext.isCalendarReady && isEmpty &&
         <React.Fragment>
           {props.showHeaderIfListEmpty && props.listHeaderComponent}
-          <View style={styles.container} ><Text style={styles.emptyText}>{i18n.t('emptyCalendarMessage', { someValue: howManyDaysAheadCalendar })}</Text></View>
+          <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyCalendarMessage', { someValue: howManyDaysAheadCalendar })}</MyTextLarge></View>
         </React.Fragment>
       }
     </React.Fragment>

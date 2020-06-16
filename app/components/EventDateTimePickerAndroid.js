@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Button, Platform, Switch, Text } from 'react-native'
+import { StyleSheet, View,  Switch } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 
 import * as Utils from '../utils/Utils'
@@ -8,6 +8,8 @@ import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 import AppSettingsContext from '../context/AppSettingsContext'
 import { maxNumberOfYearsAway } from '../utils/interestingNumbersFinder'
+import MyText from './MyText'
+import MyPrimaryButton from './MyPrimaryButton'
 
 /* 
   Start on a date that makes it convenient for using the spinner.
@@ -95,10 +97,10 @@ function EventDateTimePickerAndroid(props) {
   return (
     <React.Fragment>
       <View style={{ marginBottom: props.spaceBetweenDateAndTime }}>
-        <Button onPress={showDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
+        <MyPrimaryButton onPress={showDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
       </View>
       <View style={styles.fullDaySelection}>
-        <Text>{i18n.t("fullDay")}</Text>
+        <MyText>{i18n.t("fullDay")}</MyText>
         <Switch
           value={props.useFullDay}
           onValueChange={isYes => {
@@ -107,7 +109,7 @@ function EventDateTimePickerAndroid(props) {
         />
       </View>
       <View style={{ marginTop: 20 }}>
-        <Button disabled={props.useFullDay} onPress={showTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
+        <MyPrimaryButton disabled={props.useFullDay} onPress={showTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
       </View>
       {show && (
         <DateTimePicker
