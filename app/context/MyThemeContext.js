@@ -52,7 +52,7 @@ const darkThemeColors = {
   border: '#000000', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
   primaryContrast: getContrastFontColor('#2196F3'),
-  unselected: '#666666', // gray
+  unselected: '#888888', // gray
   tabBorder: '#222222', // same as footerBackground so no border for dark
   calendar: '#A5F2F3', // A light blueish
   calendarContrast: getContrastFontColor('#A5F2F3'),
