@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { Text, StyleSheet, FlatList, View } from 'react-native'
+import { StyleSheet, FlatList, View } from 'react-native'
 import { withNavigation } from '@react-navigation/compat'
 import { useScrollToTop } from '@react-navigation/native'
 

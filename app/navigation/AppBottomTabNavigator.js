@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { StyleSheet, Text, View, Platform } from 'react-native'
+import { StyleSheet, View, Platform } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
@@ -60,10 +60,11 @@ function MyTabs(props) {
     showLabel: false,
     activeTintColor: myThemeContext.colors.primary,
     inactiveTintColor: myThemeContext.colors.unselected,
-    activeBackgroundColor: myThemeContext.colors.background,
-    inactiveBackgroundColor: myThemeContext.colors.background,
+    activeBackgroundColor: myThemeContext.colors.footerBackground,
+    inactiveBackgroundColor: myThemeContext.colors.footerBackground,
     style: {
       borderTopWidth: 1,
+      // No border if dark theme
       borderTopColor: myThemeContext.colors.tabBorder,
     },
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Platform, Colors } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
@@ -9,15 +9,19 @@ import AddOrEditEvent from '../screens/AddOrEditEvent'
 import EventInfo from '../screens/EventInfo'
 
 import i18n from '../i18n/i18n'
+import MyThemeContext from '../context/MyThemeContext'
 
 const Stack = createStackNavigator();
 function MyStack() {
+
+    const myThemeContext = useContext(MyThemeContext);
 
     const opts = {
         gestureEnabled: false, headerTitle: '',
         headerStyle: {
             elevation: 0,
             shadowOpacity: 0,
+            backgroundColor: myThemeContext.colors.headerBackground,
         },
     };
 

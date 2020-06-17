@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Clipboard } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Clipboard } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useScrollToTop } from '@react-navigation/native'
 

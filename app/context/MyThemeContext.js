@@ -24,7 +24,7 @@ export const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
-const lightThemeText = '#444444'; // darker gray
+const lightThemeText = '#333333';
 const lightThemeColors = {
   ...DefaultTheme.colors,
   primary: '#2196F3', // blue 
@@ -34,13 +34,15 @@ const lightThemeColors = {
   border: '#ffffff', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
   primaryContrast: getContrastFontColor('#2196F3'),
-  unselected: '#c3c3c3', // light gray
+  unselected: '#aaaaaa', // light gray
   tabBorder: '#c3c3c3', // light gray
   calendar: '#A5F2F3', // A light blueish
   calendarContrast: getContrastFontColor('#A5F2F3'),
+  headerBackground: '#ffffff',
+  footerBackground: '#ffffff',
 }
 
-const darkThemeText = '#dfdfdf'; // lighter gray
+const darkThemeText = '#ffffff';
 const darkThemeColors = {
   ...DefaultTheme.colors,
   primary: '#2196F3', // blue 
@@ -50,10 +52,12 @@ const darkThemeColors = {
   border: '#000000', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
   primaryContrast: getContrastFontColor('#2196F3'),
-  unselected: '#444444', // darker gray
-  tabBorder: '#444444', // darker gray
+  unselected: '#666666', // gray
+  tabBorder: '#222222', // same as footerBackground so no border for dark
   calendar: '#A5F2F3', // A light blueish
   calendarContrast: getContrastFontColor('#A5F2F3'),
+  headerBackground: '#000000',
+  footerBackground: '#222222',
 }
 
 /** 
@@ -65,7 +69,8 @@ export function getContrastFontColor(hexcolor) {
   var g = parseInt(hexcolor.substring(3, 5), 16);
   var b = parseInt(hexcolor.substring(5, 7), 16);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 180 ? lightThemeText : '#ffffff'; // This, because white looks better than darkThemeText if hexcolor is not black (and not wanting to bother checking if black)
+  // I think white looks best on colored cards/buttons and black looks best if color is light and theme is dark
+  return yiq >= 180 ? '#000000' : '#ffffff'; 
 };
 
 

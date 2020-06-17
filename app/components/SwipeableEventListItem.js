@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { Text, StyleSheet, View, Alert, Animated } from 'react-native'
+import { StyleSheet, View, Alert, Animated } from 'react-native'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 import { RectButton } from 'react-native-gesture-handler'
 import { FontAwesome } from '@expo/vector-icons'

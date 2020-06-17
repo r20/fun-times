@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity } from 'react-native'
 import { MaterialIcons, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 

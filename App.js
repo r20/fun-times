@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import {Text} from 'react-native'
 import { AppLoading } from 'expo'
 import * as Font from 'expo-font'
 import { MenuProvider } from 'react-native-popup-menu'

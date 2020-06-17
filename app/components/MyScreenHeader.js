@@ -25,7 +25,7 @@ const MyScreenHeader = (props) => {
         containerStyle={Platform.select({
             android: Platform.Version <= 20 ? { paddingTop: 0, height: 56 } : {},
         })}
-        backgroundColor={myThemeContext.colors.background}
+        backgroundColor={myThemeContext.colors.headerBackground}
         centerComponent={headerCenterComponent}
     />);
 }

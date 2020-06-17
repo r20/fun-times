@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import MyThemeContext from '../context/MyThemeContext'
 
 import MyText, { MyCalendarText, MyCalendarTextLarge } from './MyText'

@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import Constants from 'expo-constants';
 import {
-  StyleSheet, Text, View, ScrollView, Switch,
-  TouchableWithoutFeedback, Keyboard, Alert, Platform, Button
+  StyleSheet, View, ScrollView, Switch,
+  TouchableWithoutFeedback, Keyboard, Alert, Platform,
 } from 'react-native'
 import { Slider } from 'react-native-elements'
 import { useScrollToTop } from '@react-navigation/native'
