@@ -10,11 +10,11 @@ const AddEventButton = ({ onPress }) => {
   return (
     <Fab
       direction="up"
-      style={{ backgroundColor: myThemeContext.colors.primary }}
+      style={{ backgroundColor: myThemeContext.colors.secondary }}
       position="bottomRight"
       onPress={onPress}
     >
-      <Icon name="add" style={{ color: myThemeContext.colors.primaryContrast }}
+      <Icon name="add" style={{ color: myThemeContext.colors.secondaryContrast }}
         position="bottomRight" />
     </Fab>
   );
