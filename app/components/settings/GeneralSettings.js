@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, View, ScrollView, Switch, Slider,
-  TouchableWithoutFeedback, Keyboard, Platform, Button
+  StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard, Platform, Button
 } from 'react-native'
 
 import { useScrollToTop } from '@react-navigation/native'
@@ -14,6 +13,7 @@ import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import MyText from '../MyText'
+import MySwitch from '../MySwitch'
 
 function GeneralSettings(props) {
 
@@ -31,7 +31,7 @@ function GeneralSettings(props) {
 
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("settingsDefaultTheme")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.isThemeDefault}
               onValueChange={isYes => {
                 appSettingsContext.setIsThemeDefault(isYes);

@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, View, ScrollView, Switch, Slider,
-  TouchableWithoutFeedback, Keyboard
+  StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard
 } from 'react-native'
 
 import { useScrollToTop } from '@react-navigation/native'
@@ -15,6 +14,8 @@ import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../../utils/interestingNumbersFinder'
 import MyText from '../MyText'
+import MySwitch from '../MySwitch'
+import MySlider from '../MySlider'
 import MyThemeContext from '../../context/MyThemeContext'
 
 function MilestoneTypesSettings(props) {
@@ -73,7 +74,7 @@ function MilestoneTypesSettings(props) {
 
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("useRound")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.numberTypeUseMap.round}
               onValueChange={isYes => {
                 appSettingsContext.setUseRound(isYes);
@@ -82,7 +83,7 @@ function MilestoneTypesSettings(props) {
           </View>
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("useCount")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.numberTypeUseMap.count}
               onValueChange={isYes => {
                 appSettingsContext.setUseCount(isYes);
@@ -91,7 +92,7 @@ function MilestoneTypesSettings(props) {
           </View>
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("useRepDigits")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.numberTypeUseMap.repDigits}
               onValueChange={isYes => {
                 appSettingsContext.setUseRepDigits(isYes);
@@ -100,7 +101,7 @@ function MilestoneTypesSettings(props) {
           </View>
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("usePowers")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.numberTypeUseMap.superPower}
               onValueChange={isYes => {
                 appSettingsContext.setUsePowers(isYes);
@@ -109,7 +110,7 @@ function MilestoneTypesSettings(props) {
           </View>
           <View style={styles.switchSelection}>
             <MyText >{i18n.t("useBinary")}</MyText>
-            <Switch
+            <MySwitch
               value={appSettingsContext.numberTypeUseMap.binary}
               onValueChange={isYes => {
                 appSettingsContext.setUseBinary(isYes);
@@ -121,7 +122,7 @@ function MilestoneTypesSettings(props) {
           <MyText style={styles.howMuchTitle}>{i18n.t("settingsHeaderHowMuchConstants")}</MyText>
 
           <MyText style={styles.sliderTitle}>{translationKeyMap.pi}</MyText>
-          <Slider value={howMuchPi} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchPi} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchPi}
             onSlidingComplete={(newVal) => {
               setHowMuchPi(newVal);
@@ -129,7 +130,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.speedOfLight}</MyText>
-          <Slider value={howMuchSpeedOfLight} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchSpeedOfLight} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchSpeedOfLight}
             onSlidingComplete={(newVal) => {
               setHowMuchSpeedOfLight(newVal);
@@ -137,7 +138,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.gravity}</MyText>
-          <Slider value={howMuchGravity} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchGravity} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchGravity}
             onSlidingComplete={(newVal) => {
               setHowMuchGravity(newVal);
@@ -145,7 +146,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.euler}</MyText>
-          <Slider value={howMuchEuler} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchEuler} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchEuler}
             onSlidingComplete={(newVal) => {
               setHowMuchEuler(newVal);
@@ -153,7 +154,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.phi}</MyText>
-          <Slider value={howMuchPhi} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchPhi} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchPhi}
             onSlidingComplete={(newVal) => {
               setHowMuchPhi(newVal);
@@ -161,7 +162,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.pythagoras}</MyText>
-          <Slider value={howMuchPythagoras} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchPythagoras} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchPythagoras}
             onSlidingComplete={(newVal) => {
               setHowMuchPythagoras(newVal);
@@ -169,7 +170,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.mole}</MyText>
-          <Slider value={howMuchMole} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchMole} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchMole}
             onSlidingComplete={(newVal) => {
               setHowMuchMole(newVal);
@@ -177,7 +178,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.rGas}</MyText>
-          <Slider value={howMuchRGas} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchRGas} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchRGas}
             onSlidingComplete={(newVal) => {
               setHowMuchRGas(newVal);
@@ -185,7 +186,7 @@ function MilestoneTypesSettings(props) {
             }}
           />
           <MyText style={styles.sliderTitle}>{translationKeyMap.faraday}</MyText>
-          <Slider value={howMuchFaraday} step={1} minimumValue={0} maximumValue={3}
+          <MySlider value={howMuchFaraday} step={1} minimumValue={0} maximumValue={3}
             onValueChange={setHowMuchFaraday}
             onSlidingComplete={(newVal) => {
               setHowMuchFaraday(newVal);

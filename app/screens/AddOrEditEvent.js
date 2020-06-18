@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  StyleSheet, View, ScrollView, TextInput, Switch,
-  TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert, Platform
+  StyleSheet, View, ScrollView, TextInput, TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert, Platform
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
@@ -18,6 +17,7 @@ import Event, { cloneEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 import MyText, { MyTextXLarge } from '../components/MyText'
+import MySwitch from '../components/MySwitch'
 import MyPrimaryButton from '../components/MyPrimaryButton'
 
 /* jmr - After move function, move this ?? */
@@ -203,7 +203,7 @@ function AddOrEditEvent(props) {
 
         <View style={styles.switch}>
           <MyText>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</MyText>
-          <Switch
+          <MySwitch
             value={useDateAndTimeInMilestones}
             onValueChange={isYes => {
               setUseDateAndTimeInMilestones(isYes);

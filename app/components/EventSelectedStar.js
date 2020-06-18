@@ -24,7 +24,7 @@ function EventSelectedStar(props) {
 
     const starStyle = {
         fontSize: 30,
-        color: isSelected ? 'gold' : myThemeContext.colors.unselected,
+        color: isSelected ? myThemeContext.colors.starred : myThemeContext.colors.unselected,
     };
 
     return (

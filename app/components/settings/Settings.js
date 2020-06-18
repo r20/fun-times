@@ -2,10 +2,9 @@ import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import Constants from 'expo-constants';
 import {
-  StyleSheet, View, ScrollView, Switch,
-  TouchableWithoutFeedback, Keyboard, Alert, Platform,
+  StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard, Alert, Platform,
 } from 'react-native'
-import { Slider } from 'react-native-elements'
+
 import { useScrollToTop } from '@react-navigation/native'
 import Accordion from 'react-native-collapsible/Accordion'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'

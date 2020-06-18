@@ -27,6 +27,7 @@ const MyScreenHeader = (props) => {
         })}
         backgroundColor={myThemeContext.colors.headerBackground}
         centerComponent={headerCenterComponent}
+        containerStyle={{ borderBottomWidth: 0, borderColor: myThemeContext.colors.headerBackground }}
     />);
 }
 export default MyScreenHeader;

@@ -9,6 +9,7 @@ import i18n from '../i18n/i18n'
 import EventListItem from '../components/EventListItem'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import * as logger from '../utils/logger'
+import MyThemeContext from '../context/MyThemeContext'
 
 
 
@@ -18,6 +19,30 @@ function SwipeableEventListItem(props) {
   const event = props.event;
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
 
+const myThemeContext = useContext(MyThemeContext);
+
+
+  const styles = StyleSheet.create({
+    swipeRightActionButton: {
+      backgroundColor: myThemeContext.colors.danger,
+      margin: 5,
+      width: '100%',
+      flex: 1,
+      justifyContent: 'flex-end',
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: 3,
+    },
+    swipeRightActionText: {
+      color: myThemeContext.colors.dangerContrast,
+      marginRight: 20,
+    },
+    trashStyle: {
+      color: myThemeContext.colors.dangerContrast,
+    }
+  });
+
+  
   const onRequestRemove = () => {
 
     Alert.alert(
@@ -84,22 +109,3 @@ SwipeableEventListItem.propTypes = {
   event: PropTypes.object.isRequired,
 }
 
-const styles = StyleSheet.create({
-  swipeRightActionButton: {
-    backgroundColor: 'red',
-    margin: 5,
-    width: '100%',
-    flex: 1,
-    justifyContent: 'flex-end',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 3,
-  },
-  swipeRightActionText: {
-    color: '#ffffff',
-    marginRight: 20,
-  },
-  trashStyle: {
-    color: '#ffffff',
-  }
-});

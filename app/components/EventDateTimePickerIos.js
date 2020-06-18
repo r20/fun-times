@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Platform, Switch } from 'react-native'
+import { StyleSheet, View, Platform } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 
 import * as Utils from '../utils/Utils'
@@ -9,6 +9,7 @@ import i18n from '../i18n/i18n'
 import AppSettingsContext from '../context/AppSettingsContext'
 import Divider from '../components/Divider'
 import MyText from './MyText'
+import MySlider from './MySlider'
 import MyPrimaryButton from './MyPrimaryButton'
 import { maxNumberOfYearsAway } from '../utils/interestingNumbersFinder'
 
@@ -120,7 +121,7 @@ function EventDateTimePickerIos(props) {
 
       <View style={[styles.fullDaySelection, { marginTop: props.spaceBetweenDateAndTime }]}>
         <MyText>{i18n.t("fullDay")}</MyText>
-        <Switch
+        <MySwitch
           value={props.useFullDay}
           onValueChange={isYes => {
             props.onSetUseFullDay(isYes);

@@ -34,7 +34,7 @@ function EventsScreen(props) {
         selectedIndex={selectedIndex}
         buttons={buttons}
         innerBorderStyle={{ width: 0 }}
-        containerStyle={{ borderWidth: 0 }}
+        containerStyle={{ borderWidth: 1, borderColor: myThemeContext.colors.primary }}
         selectedTextStyle={{
           color: myThemeContext.colors.primaryContrast,
           backgroundColor: myThemeContext.colors.primary,

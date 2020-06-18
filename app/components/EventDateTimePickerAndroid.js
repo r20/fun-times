@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View,  Switch } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 
 import * as Utils from '../utils/Utils'
@@ -10,6 +10,7 @@ import AppSettingsContext from '../context/AppSettingsContext'
 import { maxNumberOfYearsAway } from '../utils/interestingNumbersFinder'
 import MyText from './MyText'
 import MyPrimaryButton from './MyPrimaryButton'
+import MySwitch from './MySwitch'
 
 /* 
   Start on a date that makes it convenient for using the spinner.
@@ -101,7 +102,7 @@ function EventDateTimePickerAndroid(props) {
       </View>
       <View style={styles.fullDaySelection}>
         <MyText>{i18n.t("fullDay")}</MyText>
-        <Switch
+        <MySwitch
           value={props.useFullDay}
           onValueChange={isYes => {
             props.onSetUseFullDay(isYes);

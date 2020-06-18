@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, Slider } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import AppSettingsContext from '../context/AppSettingsContext'
@@ -9,6 +9,7 @@ import MyThemeContext from '../context/MyThemeContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import MyText, { MyTextSmall, MyTextLarge, MyTextXLarge } from '../components/MyText'
+import MySlider from '../components/MySlider'
 import MyScreenHeader from '../components/MyScreenHeader'
 
 const styles = StyleSheet.create({
@@ -66,7 +67,7 @@ function MilestoneCalendar(props) {
     <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>
     <View style={styles.sliderWrapper} >
       <MyTextSmall >{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</MyTextSmall>
-      <Slider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
+      <MySlider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
         onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
     {!empty &&
