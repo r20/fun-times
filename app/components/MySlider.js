@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Slider } from 'react-native'
 
-import MyThemeContext, { getContrastFontColor } from '../context/MyThemeContext'
+import MyThemeContext from '../context/MyThemeContext'
 
 
 /* This was created in case need to style all dividers

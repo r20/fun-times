@@ -97,10 +97,6 @@ export default function AppBottomTabsNavigator() {
   const appSettingsContext = useContext(AppSettingsContext);
   const myThemeContext = useContext(MyThemeContext);
 
-  if (!appSettingsContext.isInitialSettingsLoaded) {
-    return null; // jmr- should change to a loading symbol or keep splash screen
-  }
-
   return <NavigationContainer theme={myThemeContext.myReactNavigationBasedTheme}><MyTabs /></NavigationContainer>
 }
 

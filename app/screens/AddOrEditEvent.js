@@ -19,6 +19,8 @@ import i18n from '../i18n/i18n'
 import MyText, { MyTextXLarge } from '../components/MyText'
 import MySwitch from '../components/MySwitch'
 import MyPrimaryButton from '../components/MyPrimaryButton'
+import { getInterestingNumbersForTime } from '../utils/milestones'
+
 
 /* jmr - After move function, move this ?? */
 import Decimal from 'decimal.js-light'
@@ -134,40 +136,79 @@ function AddOrEditEvent(props) {
   }, [navigation, title, selectedDate, useFullDay, useDateAndTimeInMilestones, extraNumbersForMilestones]);
 
 
-  const getSampleNumbers = (isFullDay, epochTime) => {
-    let theMoment = moment(epochTime);
-    const month = theMoment.month() + 1; // moment is zero based so add one
-    const day = theMoment.date()
-    const yyyy = theMoment.year();
-    const yy = theMoment.format('YY');
-    const hh = theMoment.format('hh');
-    const HH = theMoment.format('HH');
-    const mm = theMoment.format('mm');
-    const ss = theMoment.format('ss');
-
-    let extraDecimals = {};
-    /* Some of these might be unneeded for some months and days
-      (e.g. MDYYYY and MMDYYYY and MDDYYYY could all be 10192020),
-      but to get all possibilities we try everything and store it in a 
-      map so duplicates are not present.
-    */
-    extraDecimals[theMoment.format('MDYYYY')] = new Decimal(parseInt(theMoment.format('MDYYYY')));
-    extraDecimals[theMoment.format('MDYY')] = new Decimal(parseInt(theMoment.format('MDYY')));
-    extraDecimals[theMoment.format('YYYY/M/D')] = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D')));
-    extraDecimals[theMoment.format('M.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add(parseInt(theMoment.format('M')));
-    extraDecimals[theMoment.format('MM.D')] = (new Decimal(parseInt(theMoment.format('D')))).div(100).add(parseInt(theMoment.format('MM')));
+  // const getSampleNumbers = (isFullDay, epochTime) => {
+  //   let theMoment = moment(epochTime);
 
 
-    extraDecimals[theMoment.format('MDYYYYhhmm')] = new Decimal(parseInt(theMoment.format('MDYYYYhhmm')));
-    extraDecimals[theMoment.format('MDYYYYHmm')] = new Decimal(parseInt(theMoment.format('MDYYYYHmm')));
+  //   /* Some of these might be unneeded for some months and days
+  //   (e.g. MDYYYY and MMDYYYY and MDDYYYY could all be 10192020),
+  //   but to get all possibilities we try everything and store it in a 
+  //   map so duplicates are not present.
+  //   */
+  //   let extraDecimals = {};
 
-    return "jmr " + Object.keys(extraDecimals);
-  }
+  //   let tmpDecimal;
+  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D')));
+  //   extraDecimals[theMoment.format('YYYY/M/D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
+
+  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('M')))).div(parseInt(theMoment.format('D')));
+  //   extraDecimals[theMoment.format('M/D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
+
+  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('D')))).div(parseInt(theMoment.format('M')));
+  //   extraDecimals[theMoment.format('D/M') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
+
+  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).minus(parseInt(theMoment.format('M'))).minus(parseInt(theMoment.format('D')));
+  //   extraDecimals[theMoment.format('YYYY-M-D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
+
+  //   tmpDecimal = (new Decimal(parseFloat(theMoment.format('M.D'))));
+  //   extraDecimals[theMoment.format('M.D')] = tmpDecimal;
+
+  //   tmpDecimal = (new Decimal(parseFloat(theMoment.format('D.M'))));
+  //   extraDecimals[theMoment.format('D.M')] = tmpDecimal;
+
+  //   const dateFormats = [
+  //     'YYYYMD', 'YYYYMMDD', 'YYYYMDD', 'YYYYMMD',
+  //     'MDYYYY', 'MMDDYYYY', 'MDDYYYY', 'MMDYYYY',
+  //     'MDYY', 'MMDDYY', 'MDDYY', 'MMDYY',
+  //     'DMYYYY', 'DDMMYYYY', 'DDMYYYY', 'DMMYYYY',
+  //   ];
+  //   for (let idx = 0; idx < dateFormats.length; idx++) {
+  //     // Doing parseInt and then myInt.toString() will get rid of leading zero
+  //     let myInt = parseInt(theMoment.format(dateFormats[idx]), 10);
+  //     extraDecimals[myInt.toString()] = new Decimal(myInt);
+
+  //     if (!isFullDay) {
+  //       /* Use year, month, and day combinations with time combinations */
+  //       myInt = parseInt(theMoment.format(dateFormats[idx] + 'hhmm'), 10);
+  //       extraDecimals[myInt.toString()] = new Decimal(myInt);
+  //       myInt = parseInt(theMoment.format(dateFormats[idx] + 'Hmm'), 10);
+  //       extraDecimals[myInt.toString()] = new Decimal(myInt);
+  //     }
+  //   }
 
 
-  const sampleNumbers = selectedDate ? getSampleNumbers(useFullDay, selectedDate.getTime()) : "JMR: Enter date to find out";
+
+  //   return "jmr " + Object.keys(extraDecimals);
+  // }
 
 
+
+  let sampleNumbers = selectedDate ? getInterestingNumbersForTime(selectedDate.getTime(), useFullDay, undefined) : null;
+
+  
+  // if (sampleNumbers) {
+  //   const keys = Object.keys(sampleNumbers);
+    
+  //   sampleNumbers = sampleNumbers.filter((value, index, arr) => {
+  //     // jmr - only show the description
+  //   });
+  //   let filtered = prevState.allMilestones.filter(function (value, index, arr) {
+  //     return (value.event && value.event.title !== event.title);
+  //   });
+
+  // } else {
+  //   sampleNumbers = "JMR: Enter date to find out";
+  // }
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input

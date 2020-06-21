@@ -4,7 +4,7 @@ import nanomemoize from 'nano-memoize'
 import * as logger from './logger'
 import moment from 'moment-timezone'
 import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
-import * as Utils from './Utils'
+import { numberToFormattedString } from './Utils'
 
 
 /*
@@ -63,6 +63,90 @@ export function shouldShowMilestoneForNumberType(milestone, numberTypeUseMap) {
 
 const sortedInterestingNumbersMap = getSortedInterestingNumbersMap();
 const numberTypes = Object.keys(sortedInterestingNumbersMap);
+
+
+/**
+ * Returns a map with numbers as they key and maps to an object that looks like:
+ *  tags
+ *  num
+ *  descriptor
+ *  event
+ * (This is similar to the object in interestingNumbersFinder except it has an optional event tag with it.)
+ * 
+ * @param {*} epochTime (number): Epoch millisecond time to generate numbers from
+ * @param {*} isFullDay (boolean): Determines whether numbers generated include hour and minute
+ * @param {*} event     (Object): optional
+ */
+export const getInterestingNumbersForTime = (epochTime, isFullDay, event) => {
+
+    let theMoment = moment(epochTime);
+
+    function makeInterestingInfo(num, descriptor, event) {
+        return {
+            tags: [], // what should I tag this with?  Should it be in INTERESTING_TYPES??
+            num: num,
+            descriptor: descriptor,
+            event: event
+        };
+    }
+
+
+    /* Some of these might be unneeded for some months and days
+    (e.g. MDYYYY and MMDYYYY and MDDYYYY could all be 10192020),
+    but to get all possibilities we try everything and store it in a 
+    map so duplicates are not present.
+    */
+    let numToInterestingInfo = {};
+
+    let tmpDecimal;
+    tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D')));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), theMoment.format('YYYY/M/D') + '=' + numberToFormattedString(tmpDecimal.valueOf(), true), event);
+
+    tmpDecimal = (new Decimal(parseInt(theMoment.format('M')))).div(parseInt(theMoment.format('D')));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), theMoment.format('M/D') + '=' + numberToFormattedString(tmpDecimal.valueOf(), true), event);
+
+    tmpDecimal = (new Decimal(parseInt(theMoment.format('D')))).div(parseInt(theMoment.format('M')));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), theMoment.format('D/M') + '=' + numberToFormattedString(tmpDecimal.valueOf(), true), event);
+
+    tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).minus(parseInt(theMoment.format('M'))).minus(parseInt(theMoment.format('D')));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), theMoment.format('YYYY-M-D') + '=' + numberToFormattedString(tmpDecimal.valueOf(), false), event);
+
+    tmpDecimal = (new Decimal(parseFloat(theMoment.format('M.D'))));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), tmpDecimal.valueOf(), event);
+
+    tmpDecimal = (new Decimal(parseFloat(theMoment.format('D.M'))));
+    numToInterestingInfo[tmpDecimal.valueOf()] = makeInterestingInfo(tmpDecimal.valueOf(), tmpDecimal.valueOf(), event);
+
+    /* Order matters here.  The YYYYMD (with single M and single D) is put before MM and DD combinations
+    so if the month or day is only one digit this format will be used and shown in the descriptor.
+    Showing 6262001 (MDYYYY) is better than showing it as 6262001 (MMDDYYYY) for example.
+    */
+    const dateFormats = [
+        'YYYYMMDD', 'YYYYMMD', 'YYYYMDD', 'YYYYMD',
+        'MMDDYYYY', 'MDDYYYY', 'MMDYYYY', 'MDYYYY',
+        'MMDDYY', 'MMDYY', 'MDDYY', 'MDYY',
+        'DDMMYYYY', 'DMMYYYY', 'DDMYYYY', 'DMYYYY',
+    ];
+    for (let idx = 0; idx < dateFormats.length; idx++) {
+        // Doing parseInt and then myInt.toString() will get rid of leading zero
+        const dateFormat = dateFormats[idx];
+        let myInt = parseInt(theMoment.format(dateFormat), 10);
+        numToInterestingInfo[myInt] = makeInterestingInfo(myInt, myInt + " (" + dateFormat + ")", event);
+
+        if (!isFullDay) {
+            /* Use year, month, and day combinations with time combinations */
+            myInt = parseInt(theMoment.format(dateFormat + 'hhmm'), 10);
+            numToInterestingInfo[myInt] = makeInterestingInfo(myInt, myInt + " (" + dateFormat + "hhmm)", event);
+            myInt = parseInt(theMoment.format(dateFormat + 'Hmm'), 10);
+            numToInterestingInfo[myInt] = makeInterestingInfo(myInt, myInt + " (" + dateFormat + "Hmm)", event);
+        }
+    }
+
+    return numToInterestingInfo;
+}
+
+
+
 
 
 /**

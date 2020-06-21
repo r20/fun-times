@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types'
 import { TouchableOpacity, StyleSheet } from 'react-native'
 import { FlatGrid } from 'react-native-super-grid'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import {getContrastFontColor} from '../context/MyThemeContext'
+import MyThemeContext from '../context/MyThemeContext'
 
 
 /**
@@ -15,9 +15,10 @@ import {getContrastFontColor} from '../context/MyThemeContext'
 function ColorPicker(props) {
 
     const [selectedColor, setSelectedColor] = useState(props.selectedColor);
+    const myThemeContext = useContext(MyThemeContext);
 
     const renderItem = ({ item }) => {
-        const fontColor = getContrastFontColor(item);
+        const fontColor = myThemeContext.getContrastFontColor(item);
         return (
             <TouchableOpacity
                 style={[styles.circle, { backgroundColor: item }]}

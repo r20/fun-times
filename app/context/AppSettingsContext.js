@@ -119,7 +119,7 @@ export class AppSettingsContextProvider extends React.Component {
     }
 
     try {
-  
+
       let isThemeDefault = await AsyncStorage.getItem(STORAGE_KEY_isThemeDefault) || "true";
       isThemeDefault = JSON.parse(isThemeDefault);
 
@@ -129,7 +129,10 @@ export class AppSettingsContextProvider extends React.Component {
     }
 
     // After all settings are initially loaded set this
-    this.setState({ isInitialSettingsLoaded: true });
+    setTimeout(() => {
+      this.setState({ isInitialSettingsLoaded: true });
+    }, 10);
+
 
   }
 
@@ -202,7 +205,7 @@ export class AppSettingsContextProvider extends React.Component {
    */
   setIsThemeDefault = (isYes) => {
     try {
-       this.setState({ isThemeDefault: isYes });
+      this.setState({ isThemeDefault: isYes });
 
       // Don't wait
       AsyncStorage.setItem(STORAGE_KEY_isThemeDefault, JSON.stringify(isYes));

@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import { Button } from 'react-native-elements'
 
 
-import MyThemeContext, { getContrastFontColor } from '../context/MyThemeContext'
+import MyThemeContext from '../context/MyThemeContext'
 
 
 
@@ -24,7 +24,7 @@ const MyPrimaryButton = (props) => {
             buttonStyle: { backgroundColor: myThemeContext.colors.primary },
             titleStyle: { color: myThemeContext.colors.primaryContrast },
             disabledStyle: { backgroundColor: myThemeContext.colors.unselected },
-            disabledTitleStyle: { color: getContrastFontColor(myThemeContext.colors.unselected) },
+            disabledTitleStyle: { color: myThemeContext.getContrastFontColor(myThemeContext.colors.unselected) },
         };
     }
 

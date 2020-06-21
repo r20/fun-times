@@ -7,7 +7,7 @@ import moment from 'moment-timezone'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import { getDisplayStringForDate, getDisplayStringForTime, getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
-import MyThemeContext, { getContrastFontColor } from './MyThemeContext'
+import MyThemeContext from './MyThemeContext'
 
 export const howManyDaysAheadCalendar = 365; // How far ahead should we calendar things
 
@@ -20,37 +20,6 @@ const CALENDAR_TITLE = 'Fun Times Milestones Calendar';
 
 // Assuming not changing timezones while app is open
 const TIMEZONEOFFSET_MILLISECONDS = (new Date()).getTimezoneOffset() * 60000;
-
-function createMilestoneOnCalendarColorStyle(colorToUse) {
-  return {
-    color: getContrastFontColor(colorToUse),
-    backgroundColor: colorToUse,
-  }
-}
-function createMilestoneNotOnCalendarColorStyle(colorToUse) {
-  return {
-    color: getContrastFontColor(colorToUse),
-    backgroundColor: colorToUse,
-  }
-}
-function createMilestoneOnCalendarCardStyle(colorToUse) {
-  return {
-    color: getContrastFontColor(colorToUse),
-    backgroundColor: colorToUse,
-    borderColor: colorToUse,
-    borderWidth: 0,
-    borderStyle: 'solid',
-  }
-}
-function createMilestoneNotOnCalendarCardStyle(colorToUse) {
-  return {
-    color: getContrastFontColor(colorToUse),
-    backgroundColor: colorToUse,
-    borderColor: colorToUse,
-    borderWidth: 0,
-    borderStyle: 'solid',
-  }
-}
 
 
 const nowDate = new Date();
@@ -111,8 +80,6 @@ export function getIsMilestoneFullDay(milestoneItem) {
   description - what this milestone commemorates
   */
 const makeMilestoneClipboardContent = (milestoneTime, isAllDay, description) => {
-
-  logger.warn("jmr --- getting something for clipboard");
 
   const startMoment = moment(milestoneTime);
   const nowMoment = moment(new Date());
@@ -184,6 +151,7 @@ const CalendarContext = createContext({
 function MyCalendarProvider(props) {
 
   const myThemeContext = useContext(MyThemeContext);
+  logger.warn("jmr === what is the theme? is it dark: ", myThemeContext.isThemeDark);
 
   const initialColor = myThemeContext.colors.calendar;
 
@@ -193,12 +161,44 @@ function MyCalendarProvider(props) {
   const [wrappedCalendarEventsList, setWrappedCalendarEventsList] = useState([]);
   const [isCalendarReady, setIsCalendarReady] = useState(false);
 
+
+  function createMilestoneOnCalendarColorStyle(colorToUse) {
+    return {
+      color: myThemeContext.getContrastFontColor(colorToUse),
+      backgroundColor: colorToUse,
+    }
+  }
+  function createMilestoneNotOnCalendarColorStyle(colorToUse) {
+    return {
+      color: myThemeContext.getContrastFontColor(colorToUse),
+      backgroundColor: colorToUse,
+    }
+  }
+  function createMilestoneOnCalendarCardStyle(colorToUse) {
+    return {
+      color: myThemeContext.getContrastFontColor(colorToUse),
+      backgroundColor: colorToUse,
+      borderColor: colorToUse,
+      borderWidth: 0,
+      borderStyle: 'solid',
+    }
+  }
+  function createMilestoneNotOnCalendarCardStyle(colorToUse) {
+    return {
+      color: myThemeContext.getContrastFontColor(colorToUse),
+      backgroundColor: colorToUse,
+      borderColor: colorToUse,
+      borderWidth: 0,
+      borderStyle: 'solid',
+    }
+  }
+
   const [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
   const [milestoneNotOnCalendarColorStyle, setMilestoneNotOnCalendarColorStyle] = useState(createMilestoneNotOnCalendarColorStyle(initialColor));
   const [milestoneOnCalendarCardStyle, setMilestoneOnCalendarCardStyle] = useState(createMilestoneOnCalendarCardStyle(initialColor));
   const [milestoneNotOnCalendarCardStyle, setMilestoneNotOnCalendarCardStyle] = useState(createMilestoneNotOnCalendarCardStyle(initialColor));
 
-  /* This is done here so we can create the objects once and then re-use them no matter how much cards
+  /* The style objects are created here in CalendarContext so we can create the objects once and then re-use them no matter how much cards
   are re-rendered (As long as color stays the same, the same object is used.). */
   const setStyleStates = (colorToUse) => {
     setMilestoneOnCalendarColorStyle(createMilestoneOnCalendarColorStyle(colorToUse));

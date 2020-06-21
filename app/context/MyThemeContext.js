@@ -28,72 +28,22 @@ export const colors = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#
 export const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 }
-// DFF2D8 (beige)
-// C6DEA6 (tea green)
-// F5EE9E faint yellow
-// F06543 orange
-// 56EEF4 electric blue
-/*
-BCEDF6 light blue
-B24C63 maroon
 
-I like this green DDFBD2 with the blue BCEDF6
-raspberry ( DB2955) goes with it
-This dark gray (54494B) goes with it, and this B98389 (old rose which looks like brownish with pink)
-
----
-This could be a good color for the star (FCFF6C), or this FFFD82, or for darker goldsh this F7B801
-They go with tangerine (F68E5F) and dark blue (324376)
-This could be red for remove (E94F37) or this E3170A
-
-=================
-almost black: 1F271B
-blue 2196F3
-calendar: BCEDF6
-star?:F4D35E or FFDD4A
-plus button:  EE964B
-red: E4572E
-
-or same black, blue, calendar with
-F3CA40 for star, or FFFC31 or FAFF81
-purple for plus: 624CAB
-red: FF1053
-
-or the same black and blues
-and A5B452 or C8D96F for greens
-FF312E for red
-and FFED65 for yellow
-(this is  a good dark gray that goes with all these minus the black)
-Here's another black option
-Here's a red C1292E that goes with the blues, FFED65 yellow, and C8D96F green
-
-Here's a good combo: https://coolors.co/967d69-2196f3-fff07c-bcedf6-f02d3a
-https://coolors.co/ce2d4f-2196f3-688b58-bcedf6-dbff76
-https://coolors.co/3b413c-2196f3-ffed66-bcedf6-a38560
-https://coolors.co/3b413c-2196f3-ffed66-bcedf6-79b791
-https://coolors.co/232c33-2196f3-fffd82-bcedf6-6a994e
-
-*/
 
 let palette;
 /* 
   calendar used to be used to be #A5F2F3
 
+  https://coolors.co/296eb4-92d5e6-f4d35e-222222-96031a
+
+
   Palette colors are: 
-        most butons, calendar, starred,  + button, dark_tabbar, red */
-
-palette = ["#2196f3", "#bcedf6", "#F0CF65", "#2196f3", "#222222", "#E3170A"];
-palette = ["#2196f3", "#bcedf6", "#F0CF65", "#9EB25D", "#222222", "#E3170A"];
-palette = ["#2196f3", "#bcedf6", "#FFF07C", "#FE5D26", "#2B303A", "#F02D3A"];
-palette = ["#2196f3", "#bcedf6", "#F3DE2C", "#688B58", "#2B303A", "#CE2D4F"];
-
-palette = ["#2196f3", "#bcedf6", "#FFED66", "#79B791", "#30362F", "#9E2A2B"];
-palette = ["#2196f3", "#bcedf6", "#fff07c", "#967d69", "#12263A", "#f02d3a"];
+        most buttons, calendar,   starred,  +button, dark_tabbar, red */
+palette = ["#296EB4", "#92D5E6", "#F4D35E", "#296EB4", "#222222", "#96031A"];
+palette = ["#296EB4", "#75B9BE", "#F4D35E", "#296EB4", "#222222", "#96031A"];
 
 
-palette = ["#2196f3", "#bcedf6", "#FFBE0B", "#6A994E", "#232C33", "#EC0B43"]; // 686963 is a good color for unselected in dark theme for this
-
-
+let isDarkTheme = false;
 const lightThemeText = '#333333';
 const lightThemeColors = {
   ...DefaultTheme.colors,
@@ -103,21 +53,22 @@ const lightThemeColors = {
   card: '#ffffff', // The background color of card-like elements, such as headers, tab bars etc. (We don't use this for calendar cards)
   border: '#ffffff', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
-  primaryContrast: getContrastFontColor(palette[0]),
+  primaryContrast: _getContrastFontColorForTheme(palette[0], isDarkTheme),
   unselected: '#aaaaaa', // light gray
   tabBorder: '#c3c3c3', // light gray
   secondary: palette[3],
   secondaryLighterOrDarker: adjustLighterOrDarker(palette[3], 80),
-  secondaryContrast: getContrastFontColor(palette[3]),
+  secondaryContrast: _getContrastFontColorForTheme(palette[3], isDarkTheme),
   calendar: palette[1],
-  calendarContrast: getContrastFontColor(palette[1]),
+  calendarContrast: _getContrastFontColorForTheme(palette[1], isDarkTheme),
   headerBackground: '#ffffff',
   footerBackground: '#ffffff',
   starred: palette[2],
   danger: palette[5],
-  dangerContrast: getContrastFontColor(palette[5]),
+  dangerContrast: _getContrastFontColorForTheme(palette[5], isDarkTheme),
 }
 
+isDarkTheme = true;
 const darkThemeText = '#ffffff';
 const darkThemeColors = {
   ...DefaultTheme.colors,
@@ -127,32 +78,36 @@ const darkThemeColors = {
   card: '#000000', // The background color of card-like elements, such as headers, tab bars etc. (We don't use this for calendar cards)
   border: '#000000', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
-  primaryContrast: getContrastFontColor(palette[0]),
+  primaryContrast: _getContrastFontColorForTheme(palette[0], isDarkTheme),
   unselected: '#888888', // gray
   tabBorder: palette[4], // same as footerBackground so no border for dark
   secondary: palette[3],
   secondaryLighterOrDarker: adjustLighterOrDarker(palette[3], -80),
-  secondaryContrast: getContrastFontColor(palette[3]),
+  secondaryContrast: _getContrastFontColorForTheme(palette[3], isDarkTheme),
   calendar: palette[1],
-  calendarContrast: getContrastFontColor(palette[1]),
+  calendarContrast: _getContrastFontColorForTheme(palette[1], isDarkTheme),
   headerBackground: '#000000',
   footerBackground: palette[4],
   starred: palette[2],
   danger: palette[5],
-  dangerContrast: getContrastFontColor(palette[5]),
+  dangerContrast: _getContrastFontColorForTheme(palette[5], isDarkTheme),
 }
 
 /** 
  * Return the color that works best (light or dark)
  * to use for contrasting with the input hexcolor.
+ * 
+ * There's another function within the theme that will apply isThemeDark.
  */
-export function getContrastFontColor(hexcolor) {
+function _getContrastFontColorForTheme(hexcolor, isDarkTheme) {
   var r = parseInt(hexcolor.substring(1, 3), 16);
   var g = parseInt(hexcolor.substring(3, 5), 16);
   var b = parseInt(hexcolor.substring(5, 7), 16);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  // Have slightly different cutoff threshoold depending on if theme is dark
+  const cutoffVal = isDarkTheme ? 150 : 180;
   // I think white looks best on colored cards/buttons and black looks best if color is light and theme is dark
-  return yiq >= 180 ? '#000000' : '#ffffff';
+  return yiq >= cutoffVal ? '#000000' : '#ffffff';
 };
 
 
@@ -164,6 +119,10 @@ const MyThemeContext = createContext({
   FONT_SIZE_MEDIUM: FONT_SIZE_MEDIUM,
   FONT_SIZE_LARGE: FONT_SIZE_LARGE,
   FONT_SIZE_XLARGE: FONT_SIZE_XLARGE,
+  getContrastFontColor: (hexcolor) => {
+    return _getContrastFontColorForTheme(hexcolor, true);
+  },
+  isThemeDark: true,
 });
 
 
@@ -176,6 +135,10 @@ export const MyThemeProvider = (props) => {
   const appSettingsContext = useContext(AppSettingsContext);
   // Use isThemeDefault setting and the device color scheme setting to see if we want dark
   const isThemeDark = appSettingsContext.isThemeDefault ? isColorSchemeDark : !isColorSchemeDark;
+
+  const getContrastFontColor = (hexcolor) => {
+    return _getContrastFontColorForTheme(hexcolor, isThemeDark);
+  }
 
   const myReactNavigationBasedTheme = {
     ...DefaultTheme,
@@ -192,6 +155,7 @@ export const MyThemeProvider = (props) => {
       FONT_SIZE_MEDIUM: FONT_SIZE_MEDIUM,
       FONT_SIZE_LARGE: FONT_SIZE_LARGE,
       FONT_SIZE_XLARGE: FONT_SIZE_XLARGE,
+      getContrastFontColor: getContrastFontColor,
       isThemeDark: isThemeDark,
     }}>
       {props.children}
