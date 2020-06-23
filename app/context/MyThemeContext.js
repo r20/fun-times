@@ -54,7 +54,8 @@ const lightThemeColors = {
   border: '#ffffff', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
   primaryContrast: _getContrastFontColorForTheme(palette[0], isDarkTheme),
-  unselected: '#aaaaaa', // light gray
+  unselected: '#c3c3c3', // light gray
+  unselectedContrast: '#888888',
   tabBorder: '#c3c3c3', // light gray
   secondary: palette[3],
   secondaryLighterOrDarker: adjustLighterOrDarker(palette[3], 80),
@@ -79,7 +80,8 @@ const darkThemeColors = {
   border: '#000000', // The color of borders, e.g. header border, tab bar border etc.},
   // Those above are for react navigation and can be retrieved with useTheme().  These are extras for this app. (And useTheme doesn't return them in its object.)
   primaryContrast: _getContrastFontColorForTheme(palette[0], isDarkTheme),
-  unselected: '#888888', // gray
+  unselected: '#555555', // gray
+  unselectedContrast: '#333333',
   tabBorder: palette[4], // same as footerBackground so no border for dark
   secondary: palette[3],
   secondaryLighterOrDarker: adjustLighterOrDarker(palette[3], -80),
@@ -105,7 +107,7 @@ function _getContrastFontColorForTheme(hexcolor, isDarkTheme) {
   var b = parseInt(hexcolor.substring(5, 7), 16);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
   // Have slightly different cutoff threshoold depending on if theme is dark
-  const cutoffVal = isDarkTheme ? 150 : 180;
+  const cutoffVal = isDarkTheme ? 150 : 165;
   // I think white looks best on colored cards/buttons and black looks best if color is light and theme is dark
   return yiq >= cutoffVal ? '#000000' : '#ffffff';
 };

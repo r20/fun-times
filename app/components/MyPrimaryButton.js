@@ -24,7 +24,7 @@ const MyPrimaryButton = (props) => {
             buttonStyle: { backgroundColor: myThemeContext.colors.primary },
             titleStyle: { color: myThemeContext.colors.primaryContrast },
             disabledStyle: { backgroundColor: myThemeContext.colors.unselected },
-            disabledTitleStyle: { color: myThemeContext.getContrastFontColor(myThemeContext.colors.unselected) },
+            disabledTitleStyle: { color: myThemeContext.colors.unselectedContrast },
         };
     }
 
