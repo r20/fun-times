@@ -140,7 +140,7 @@ export default function UpcomingMilestonesList(props) {
       }
       {isEmpty &&
         <React.Fragment>
-          {props.showHeaderIfListEmpty && props.listHeaderComponent}
+          {props.showHeaderIfListEmpty && <View style={styles.contentContainerStyle}>{props.listHeaderComponent}</View>}
           <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestoneMessage', { someValue: howManyDaysAheadCalendar })}</MyTextLarge></View>
         </React.Fragment>
       }
@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    padding: 15,
   },
   contentContainerStyle: {
     padding: 15,
