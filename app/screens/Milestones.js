@@ -61,7 +61,7 @@ function Milestones(props) {
     appSettingsContext.setCalendarMaxNumberMilestonesPerEvent(newVal);
   }
 
-  // jmr - move slider to settings??
+  // TBD - move slider to settings??
   return (<View style={styles.container} >
     <MyScreenHeader title={i18n.t('headerUpcomingMilestonesScreenTitle')} />
     <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>

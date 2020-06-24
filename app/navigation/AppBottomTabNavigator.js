@@ -21,40 +21,9 @@ import AppSettingsContext from '../context/AppSettingsContext'
 const Tab = createBottomTabNavigator();
 function MyTabs(props) {
 
-  // const navigation = useNavigation();
-  // const route = useRoute();
-
-  const dots = Platform.OS === "ios" ? "more-horiz" : 'more-vert';
+  const dots ="more-horiz"; // Platform.OS === "ios" ? "more-horiz" : 'more-vert';
 
   const myThemeContext = useContext(MyThemeContext);
-
-  // React.useLayoutEffect(() => {
-  //   // EventsScreen is initialRouteName
-  //   let title = i18n.t("headerEventsTitle");
-  //   if (route && route.state && route.state.routeNames && route.state.index !== undefined) {
-  //     const stateName = route.state.routeNames[route.state.index];
-  //     if (stateName === "Today") {
-  //       title = i18n.t("headerTodayTitle");
-  //     } else if (stateName === "Milestones") {
-  //       title = i18n.t("headerUpcomingMilestonesScreenTitle");
-  //     } else if (stateName === "CalendarScreen") {
-  //       title = i18n.t("headerCalendar");
-  //     } else if (stateName === "More") {
-  //       title = i18n.t("headerMoreTitle");
-  //     }
-  //   }
-
-  //   navigation.setOptions({
-  //     headerTitle: title,
-  //     // this defaults to left android and center on ios
-  //     // headerTitleAlign: 'center' , // on android center makes it too high. So keep it left.
-  //     headerStyle: {
-  //       elevation: 0,
-  //       shadowOpacity: 0,
-  //     },
-
-  //   });
-  // }, [navigation, route]);
 
   const tabBarOptions = {
     showLabel: false,

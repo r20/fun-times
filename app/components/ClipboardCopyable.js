@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { TouchableOpacity, Clipboard } from 'react-native'
 import i18n from '../i18n/i18n'
-import { ToastAndroid } from 'react-native'; // jmr - need to find something for ios
+import { ToastAndroid } from 'react-native'; // TBD - need to find something for ios
 
 import * as logger from '../utils/logger'
 
@@ -17,7 +17,7 @@ const ClipboardCopyable = (props) => {
 
     const copiedMessage = i18n.t('copiedToClipboard');
 
-    onCopy = () => {
+    const onCopy = () => {
         let content = props.content;
         if (props.onPressGetContentFunction) {
             content = props.onPressGetContentFunction();

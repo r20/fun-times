@@ -238,7 +238,8 @@ function MyCalendarProvider(props) {
       }
       logger.log('Here are all your calendars:', calendars);
       if (!calFound) {
-        /* jmr- we should ask user and get permission before creating.  And, we should let them pick color.
+        /* TBD - we should ask user and get permission before creating.  And, we should let them pick color,
+          or change color later (by destroying and recreating for Android).
         */
 
         logger.log("Didn't find calendar, so we'll create one.");
@@ -300,7 +301,7 @@ function MyCalendarProvider(props) {
 
     const newCalendarId = await Calendar.createCalendarAsync({
       title: CALENDAR_TITLE,
-      color: colorToUse, // jmr - should use app color, or let user pick
+      color: colorToUse,
       entityType: Calendar.EntityTypes.EVENT,
       sourceId: defaultCalendarSource.id,
       source: defaultCalendarSource,

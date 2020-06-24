@@ -132,7 +132,6 @@ function CalendarScreen(props) {
     </EventCard>);
   }
 
-  // jmr - the 'dark-context' should only be if we are on light theme?? (not seing time and battery and such of status bar)
   return (
     <React.Fragment>
       <MyScreenHeader title={i18n.t('headerCalendar')} />

@@ -16,9 +16,9 @@ const STORAGE_KEY_CUSTOM_EVENTS_ARRAY = '@save_custom_events_array';
   depending on whether selected */
 const STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP = '@save_standard_events_key_to_selected_map';
 
-const maxNumPastMilestonesPerEvent = 2; // jmr - where to keep this?
+const maxNumPastMilestonesPerEvent = 2;
 
-// jmr - where should we put this for milestone creation??
+/* To keep us from re-rendering because now changed just use the same now */
 const nowTime = (new Date()).getTime();
 
 
@@ -50,9 +50,9 @@ const EventsAndMilestonesContext = createContext({
   customEvents: [],
   standardEvents: [],
   getEventWithTitle: () => { },
-  addCustomEvent: () => { }, //jmr - change title of several of thee methods to have "AndMiletones", e.g. addCustomEventAndMilestones
-  modifyEvent: () => { },
-  removeCustomEvent: () => { },
+  addCustomEventAndMilestones: () => { },
+  modifyEventAndMilestones: () => { },
+  removeCustomEventAndMilestones: () => { },
   toggleEventSelected: () => { },
   removeAllCustomEvents: () => { },
   isEventSelected: isEventSelected,
@@ -80,10 +80,9 @@ export class EventsAndMilestonesContextProvider extends React.Component {
   }
 
   /* 
-  jmr - i could remove this whole function until needed
-  If make a code change that would break old stored events, put stuff in this function
+  TBD If make a code change that would break old stored events, put stuff in this function
     to upgrade them. 
-    TODO - I could change code to store the event object version (or code version) and
+    I could change code to store the event object version (or code version) and
     look at its version compared to current version and do update only if needed. */
   updateCustomEventsForAppUpdate = (customEvents) => {
     try {
@@ -222,7 +221,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
    * Events should have unique titles. If there's already an event
    * with the same title, this will replace it.
    */
-  addCustomEvent = (newEvent) => {
+  addCustomEventAndMilestones = (newEvent) => {
     try {
       // Make sure there's not an event by that title already
       var filtered = this.state.customEvents.filter(function (value, index, arr) {
@@ -273,9 +272,9 @@ export class EventsAndMilestonesContextProvider extends React.Component {
 
   /**
    * Removes the specified event from storage and from the customEvents array,
-   * based on its title.
+   * based on its title, and removes associated milestones.
    */
-  removeCustomEvent = (eventToRemove) => {
+  removeCustomEventAndMilestones = (eventToRemove) => {
     
     try {
       if (eventToRemove && eventToRemove.title) {
@@ -317,7 +316,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
   /**
    * Remove all custom events.
    * 
-   * jmr -if keep this, it needs to modify the milestones too
+   * TBD - This is unused.  If keep this, it needs to modify the milestones too
    * We could iterate through standard events and make new miletones for those only
    */
   removeAllCustomEvents = () => {
@@ -343,7 +342,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
    * with the newEvent.
    * Updates state including milestones and updates async storage as needed.
    */
-  modifyEvent = (oldEvent, newEvent) => {
+  modifyEventAndMilestones = (oldEvent, newEvent) => {
     try {
 
       if (newEvent && newEvent.title && oldEvent && oldEvent.title) {
@@ -403,7 +402,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
   toggleEventSelected = (event) => {
     let newEvent = cloneEvent(event);
     newEvent.selected = !newEvent.selected;
-    this.modifyEvent(event, newEvent);
+    this.modifyEventAndMilestones(event, newEvent);
   }
 
   _updateAsyncStorageStandardEventsMapIfSelectionChange = async (oldEvent, newEvent) => {
@@ -467,10 +466,10 @@ export class EventsAndMilestonesContextProvider extends React.Component {
       <EventsAndMilestonesContext.Provider value={{
         ...this.state,
         removeAllCustomEvents: this.removeAllCustomEvents,
-        addCustomEvent: this.addCustomEvent,
-        modifyEvent: this.modifyEvent,
+        addCustomEventAndMilestones: this.addCustomEventAndMilestones,
+        modifyEventAndMilestones: this.modifyEventAndMilestones,
         getEventWithTitle: this.getEventWithTitle,
-        removeCustomEvent: this.removeCustomEvent,
+        removeCustomEventAndMilestones: this.removeCustomEventAndMilestones,
         toggleEventSelected: this.toggleEventSelected,
         isEventSelected: isEventSelected,
         getCustomEventWithTitle: this.getCustomEventWithTitle,

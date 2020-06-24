@@ -16,8 +16,6 @@ const EXTRA_NUMBER_TYPE_MANUAL_ENTRY = "numberTypeManualEntry";
     So, add numberType also.
 */
 export function getMilestoneKey(milestoneItem) {
-    // jmr - if numberType is custom, remember there could be more than one custom numberType that results in a milestone at same time.
-    // remember this when adding custom numberTypes
     const theKey = "" + milestoneItem.time + "_" + milestoneItem.numberType + "_" + milestoneItem.unit + "_" + milestoneItem.event.title;
     return theKey;
 }
@@ -180,7 +178,7 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
     const nowMoment = moment(nowTime);
     const futureMoment = nowMoment.clone().add(futureDays, 'days');
     const pastMoment = nowMoment.clone().subtract(pastDays, "days");
-    const tooCloseDays = 4; // jmr - redo this ??
+    const tooCloseDays = 4; // TBD - Do I still want this value?
     const tooCloseMillis = tooCloseDays * 24 * 3600 * 1000;
     const isEventInFuture = (event.epochMillis > nowTime);
 
@@ -280,11 +278,10 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
 
 
         /* Add in numbers that are based on the event date and time */
-        // jmr- should I put these in *only* for custom (where there's a chance they could be in?  Or custom plus the standard that have this set?)
-        // Should this be global setting or event specific???  If event specific we could check here. If global then always put them in here and the show* function wil filter them
+        /* TBD: Should this be global setting or event specific???  If event specific we could check here. 
+         If global then always put them in here and the show* function will filter them */
         for (let jdx = 0; jdx < eventDatetimeNumbers.length; jdx++) {
             const info = eventDatetimeNumbers[jdx];
-            // jmr - numbers with many digits after decimal might need better formatting (that's used elsewhere)
             const newMilestone = createMilestoneIfNeeded(unit, start, end, info.number, info.descriptor, EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME, undefined);
             if (newMilestone) {
                 milestoneList.push(newMilestone);
@@ -292,12 +289,11 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         }
 
         /* Add in numbers entered manually for event */
-        if (event.useDateAndTimeInMilestones && event.manualEntryNumbers) {
+        if (event.useManualEntryInMilestones && event.manualEntryNumbers) {
             for (let manIdx = 0; manIdx < event.manualEntryNumbers.length; manIdx++) {
                 const manNumber = event.manualEntryNumbers[manIdx];
-                // jmr - Dec 14th should be 55 days before super bowl.  Check why it isn't showing.
-                // jmr - I should format the number (add commas), but don't round or change decimal places
-                const newMilestone = createMilestoneIfNeeded(unit, start, end, manNumber, manNumber, EXTRA_NUMBER_TYPE_MANUAL_ENTRY, undefined);
+                const formattedManNumber = numberToFormattedString(manNumber, true);
+                const newMilestone = createMilestoneIfNeeded(unit, start, end, manNumber, formattedManNumber, EXTRA_NUMBER_TYPE_MANUAL_ENTRY, undefined);
                 if (newMilestone) {
                     milestoneList.push(newMilestone);
                 }
@@ -374,18 +370,13 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         }
     }
 
-
     // Take out some from beginning if needed
     const numToRemove = afterPastIdx - maxNumMilestonesPast;
     if (numToRemove > 0) {
         milestoneList.splice(0, numToRemove); // splice removes from original array
     }
-    if (event.selected) {
-        console.warn("jmr === numToRemove", numToRemove, milestoneList.length);
-    }
 
     return milestoneList;
-
 
 }
 export const createMilestones = nanomemoize(unmemoizedCreateMilestones);

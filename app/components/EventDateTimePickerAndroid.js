@@ -70,7 +70,7 @@ function EventDateTimePickerAndroid(props) {
 
   /*
   For prototype, this supports only within a certain range.
-  jmr - The DateTimePicker library crashes if value is 2039 or beyond.
+  TBD - The DateTimePicker library crashes if value is 2039 or beyond.
   Until I figure that out, restrict selecting date to end of 2038.
   It also crashes if less than Jan 1, 1900.
   (However, right now nothing is stopping code from using this component and 

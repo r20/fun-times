@@ -1,6 +1,6 @@
 
 
-let isLogOn = false; // jmr
+let isLogOn = false;
 
 export function turnLogOff() {
     isLogOn = false;

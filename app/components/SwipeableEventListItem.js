@@ -64,7 +64,7 @@ const myThemeContext = useContext(MyThemeContext);
         {
           text: i18n.t('ok'), onPress: () => {
             logger.log('OK Pressed');
-            eventsAndMilestonesContext.removeCustomEvent(event);
+            eventsAndMilestonesContext.removeCustomEventAndMilestones(event);
           }
         },
       ],

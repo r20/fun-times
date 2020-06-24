@@ -26,15 +26,11 @@ function MilestoneTypesSettings(props) {
   useScrollToTop(ref);
 
   /*
-  jmr:  Here's a list of things that could be done to improve app
-
-  sharing dates (to send text, add to calendar, etc.)
+  TBD:  Here's a list of things that could be done to improve app
 
   Headers for milestones list (by date, like Month YYYY)
-  star (explain) what it's for.
-  Sort by favorites? If Today things aren't clickable make them different
-
-  Event groups, with color? (birthdays, holidays)
+  Have line between past and future milestones (possibly by changing EventCard of one of them to put it floating above/below)
+  More help and explanation when first open app.
   */
 
   const appSettingsContext = useContext(AppSettingsContext);

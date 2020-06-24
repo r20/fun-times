@@ -27,18 +27,6 @@ function Settings(props) {
 
   const myThemeContext = useContext(MyThemeContext);
 
-  /*
-  jmr:  Here's a list of things that could be done to improve app
-
-  sharing dates (to send text, add to calendar, etc.)
-
-  Headers for milestones list (by date, like Month YYYY)
-  star (explain) what it's for.
-  Sort by favorites? If Today things aren't clickable make them different
-
-  Event groups, with color? (birthdays, holidays)
-  */
-
   const [activeSections, setActiveSections] = useState([]);
 
 

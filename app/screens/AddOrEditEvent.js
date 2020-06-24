@@ -21,10 +21,6 @@ import MySwitch from '../components/MySwitch'
 import MyPrimaryButton from '../components/MyPrimaryButton'
 import { getInterestingNumbersForEventTime } from '../utils/milestones'
 
-
-/* jmr - After move function, move this ?? */
-import Decimal from 'decimal.js-light'
-
 function AddOrEditEvent(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
@@ -85,6 +81,10 @@ function AddOrEditEvent(props) {
 
     const newTitle = title.trim();
 
+    /* Right now we only allow adding one manual number.
+      If that's ever changed to allow more, be sure they don't duplicate the number and/or 
+      check the code for generating the milestone key to be sure keys are unique.
+    */
     const manualEntryNumbers = [];
     if (manualEntryInput) {
       try {
@@ -133,36 +133,31 @@ function AddOrEditEvent(props) {
       logger.log("Saving event ", title, "--", selectedDate);
 
       if (isCreate) {
-        eventsAndMilestonesContext.addCustomEvent(event);
+        eventsAndMilestonesContext.addCustomEventAndMilestones(event);
         // Go to EventInfo with the new event
         navigation.replace("EventInfo", { event: event });
       } else {
-        eventsAndMilestonesContext.modifyEvent(oldEvent, event);
+        eventsAndMilestonesContext.modifyEventAndMilestones(oldEvent, event);
         // Go back to EventInfo with the new event
         navigation.navigate("EventInfo", { event: event });
       }
     }
   }
 
-
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <View style={styles.headerButton}>
-          <MyPrimaryButton onPress={() => { navigation.goBack(); }}
-            title={i18n.t("cancel")} type="clear" accessibilityLabel="cancel" />
-        </View>
-      ),
-      headerRight: () => (
-        <View style={styles.headerButton}>
-          <MyPrimaryButton disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
-            title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
-        </View>
-      ),
-    });
-  }, [navigation, title, selectedDate, useFullDay, useDateAndTimeInMilestones, manualEntryInput]); // jmr - putting manualEntryInput temporarily. It doesn't make sense.
-
-
+  navigation.setOptions({
+    headerLeft: () => (
+      <View style={styles.headerButton}>
+        <MyPrimaryButton onPress={() => { navigation.goBack(); }}
+          title={i18n.t("cancel")} type="clear" accessibilityLabel="cancel" />
+      </View>
+    ),
+    headerRight: () => (
+      <View style={styles.headerButton}>
+        <MyPrimaryButton disabled={!selectedDate || !title || (title && !title.trim())} onPress={onPressSave}
+          title={i18n.t("save")} type="clear" accessibilityLabel="Save event" />
+      </View>
+    ),
+  });
 
   let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useFullDay, undefined) : null;
 
