@@ -151,7 +151,6 @@ const CalendarContext = createContext({
 function MyCalendarProvider(props) {
 
   const myThemeContext = useContext(MyThemeContext);
-  logger.warn("jmr === what is the theme? is it dark: ", myThemeContext.isThemeDark);
 
   const initialColor = myThemeContext.colors.calendar;
 

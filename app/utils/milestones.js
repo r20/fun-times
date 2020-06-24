@@ -6,6 +6,8 @@ import moment from 'moment-timezone'
 import { INTERESTING_TYPES, INTERESTING_CONSTANTS, getSortedInterestingNumbersMap } from './interestingNumbersFinder'
 import { numberToFormattedString } from './Utils'
 
+const EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME = "numberTypeEventDatetime";
+const EXTRA_NUMBER_TYPE_MANUAL_ENTRY = "numberTypeManualEntry";
 
 /*
     Get a key for the milestone.
@@ -35,7 +37,7 @@ function createMilestone(event, unit, description, numberType, numberCode, time)
     const milestone = {
         event: event,
         unit: unit,
-        description: description,
+        description: String(description),
         numberType: numberType,
         numberCode: numberCode,
         time: time,
@@ -48,16 +50,22 @@ function createMilestone(event, unit, description, numberType, numberCode, time)
 
 export function shouldShowMilestoneForNumberType(milestone, numberTypeUseMap) {
 
-    const numberType = milestone.numberType;
+    if (milestone.numberType === EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME) {
+        return milestone.event && milestone.event.useDateAndTimeInMilestones;
+    } else if (milestone.numberType === EXTRA_NUMBER_TYPE_MANUAL_ENTRY) {
+        return milestone.event && milestone.event.useManualEntryInMilestones;
+    } else {
+        const numberType = milestone.numberType;
 
-    const numberTypeUse = numberTypeUseMap[numberType];
+        const numberTypeUse = numberTypeUseMap[numberType];
 
-    if (numberTypeUse && milestone.numberCode) {
-        /* This isn't just a boolean, there's a code to check.
-            If the numberTypeUse setting is >= the code for this milestone, then show it */
-        return numberTypeUse >= milestone.numberCode;
+        if (numberTypeUse && milestone.numberCode) {
+            /* This isn't just a boolean, there's a code to check.
+                If the numberTypeUse setting is >= the code for this milestone, then show it */
+            return numberTypeUse >= milestone.numberCode;
+        }
+        return numberTypeUse;
     }
-    return numberTypeUse;
 }
 
 
@@ -68,23 +76,23 @@ const numberTypes = Object.keys(sortedInterestingNumbersMap);
 /**
  * Returns a map with numbers as they key and maps to an object that looks like:
  *  tags
- *  num
+ *  number
  *  descriptor
  *  event
  * (This is similar to the object in interestingNumbersFinder except it has an optional event tag with it.)
  * 
  * @param {*} epochTime (number): Epoch millisecond time to generate numbers from
  * @param {*} isFullDay (boolean): Determines whether numbers generated include hour and minute
- * @param {*} event     (Object): optional
+ * @param {*} event     (Object): optional. If passed as input parm, it's an attribute on the object returned.
  */
-export const getInterestingNumbersForTime = (epochTime, isFullDay, event) => {
+export const getInterestingNumbersForEventTime = (epochTime, isFullDay, event) => {
 
     let theMoment = moment(epochTime);
 
     function makeInterestingInfo(num, descriptor, event) {
         return {
-            tags: [], // what should I tag this with?  Should it be in INTERESTING_TYPES??
-            num: num,
+            tags: [EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME],
+            number: num,
             descriptor: descriptor,
             event: event
         };
@@ -142,7 +150,8 @@ export const getInterestingNumbersForTime = (epochTime, isFullDay, event) => {
         }
     }
 
-    return numToInterestingInfo;
+    const interestingNums = Object.values(numToInterestingInfo);
+    return interestingNums;
 }
 
 
@@ -183,7 +192,6 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
             milestoneList.push(createMilestone(event, "seconds", "0", "event", undefined, event.epochMillis));
         }
     }
-
 
     /* Create a helper function that is used in multiple places */
     const createMilestoneIfNeeded = (unit, start, end, num, descriptor, numberType, numberCode) => {
@@ -236,6 +244,7 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         return null;
     };
 
+    const eventDatetimeNumbers = getInterestingNumbersForEventTime(event.epochMillis, event.isFullDay, event);
 
     const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     for (let unitsIidx = 0; unitsIidx < units.length; unitsIidx++) {
@@ -259,8 +268,8 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
 
         logger.log(" Unit ", unit, start, end);
 
+        /* Add in anniversaries */
         if (unit === 'years') {
-            // Add in aniversaries
             for (var yr = start; yr <= end; yr++) {
                 const newMilestone = createMilestoneIfNeeded(unit, start, end, yr, yr, INTERESTING_TYPES.round, undefined);
                 if (newMilestone) {
@@ -270,6 +279,35 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         }
 
 
+        /* Add in numbers that are based on the event date and time */
+        // jmr- should I put these in *only* for custom (where there's a chance they could be in?  Or custom plus the standard that have this set?)
+        // Should this be global setting or event specific???  If event specific we could check here. If global then always put them in here and the show* function wil filter them
+        for (let jdx = 0; jdx < eventDatetimeNumbers.length; jdx++) {
+            const info = eventDatetimeNumbers[jdx];
+            // jmr - numbers with many digits after decimal might need better formatting (that's used elsewhere)
+            const newMilestone = createMilestoneIfNeeded(unit, start, end, info.number, info.descriptor, EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME, undefined);
+            if (newMilestone) {
+                milestoneList.push(newMilestone);
+            }
+        }
+
+        /* Add in numbers entered manually for event */
+        if (event.useDateAndTimeInMilestones && event.manualEntryNumbers) {
+            for (let manIdx = 0; manIdx < event.manualEntryNumbers.length; manIdx++) {
+                const manNumber = event.manualEntryNumbers[manIdx];
+                // jmr - Dec 14th should be 55 days before super bowl.  Check why it isn't showing.
+                // jmr - I should format the number (add commas), but don't round or change decimal places
+                const newMilestone = createMilestoneIfNeeded(unit, start, end, manNumber, manNumber, EXTRA_NUMBER_TYPE_MANUAL_ENTRY, undefined);
+                if (newMilestone) {
+                    milestoneList.push(newMilestone);
+                }
+            }
+        }
+
+        /* Add in numbers for other number types.  Do *NOT* look at the settings now and see if they are enabled.
+        Add them all in and whether we show it or not is based on filtering with a show*function later.
+        Adding and re-calculating and re-sorting when the settings change is too slow, so compute and have them
+        on hand even if not turned on now. */
         for (let numberTypesIdx = 0; numberTypesIdx < numberTypes.length; numberTypesIdx++) {
 
             const numberType = numberTypes[numberTypesIdx];
@@ -280,11 +318,8 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
 
                 if (unit === "years" && Number.isInteger(info.number)) {
                     // We add in years already.  We only need to do years if it's not a non-integer like our constants
-                    // jmr - what about event based numbers like 6/26 or 6.26 ??
                     continue;
                 }
-
-                /* jmr - need to add in dates using numbers particular to the event (e.g. 12/25) */
 
                 if (unit === "minutes" && numberType === INTERESTING_TYPES.round) {
                     // Only show round numbers that are bigger

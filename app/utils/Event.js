@@ -21,6 +21,10 @@ export default class Event {
         isSelectedByDefault // For standard events
         specialNumbers // jmr TBD - need to figure out how to implement this.  This is other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
         tags
+        useDateAndTimeInMilestones
+        useManualEntryInMilestones
+        manualEntryNumbers
+
     */
     constructor(options = {}) {
         // Take the this object, add in some defaults, then add in passed in options (which may override defaults)
@@ -31,6 +35,9 @@ export default class Event {
             keywords: [],
             isSelectedByDefault: false,
             ignoreIfPast: true,
+            useDateAndTimeInMilestones: true,
+            useManualEntryInMilestones: false,
+            manualEntryNumbers: [],
         }, options);
         // If key not specified, set it to title
         this.key = options.key || options.title;

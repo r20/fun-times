@@ -114,6 +114,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
       if (!customEvents) {
         customEvents = [];
       }
+
     } catch (e) {
       logger.warn("Failed to load customEvents.");
       logger.log("Error from failing to load customEvents: ", e);
@@ -185,7 +186,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
 
   getMilestonesForEvent = (event) => {
 
-     let milestonesForEvent = createMilestones(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent );
+    let milestonesForEvent = createMilestones(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent);
 
     return milestonesForEvent;
 
@@ -275,6 +276,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
    * based on its title.
    */
   removeCustomEvent = (eventToRemove) => {
+    
     try {
       if (eventToRemove && eventToRemove.title) {
         var filtered = this.state.customEvents.filter(function (value, index, arr) {

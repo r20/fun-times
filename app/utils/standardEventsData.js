@@ -50,11 +50,10 @@ events.push(new Event({
     keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
     isFullDay: true, // If event is whole day, not a specific time
     color: "red",
-    /* An array of numbers that are meaningful to the event that should be used to calculate special
-    milestone times.  The numbers in the date of the event should automatically be included. No need to set those.
-    */
-    specialNumbers: undefined,
     tags: [TAGS.HOLIDAY, TAGS.RELIGION],
+    useDateAndTimeInMilestones: true,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 events.push(new Event({
     title: "New Year's Day",
@@ -65,6 +64,9 @@ events.push(new Event({
     isFullDay: false,
     color: "silver",
     tags: [TAGS.HOLIDAY],
+    useDateAndTimeInMilestones: true,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 events.push(new Event({
     title: "Pi Day",
@@ -72,10 +74,12 @@ events.push(new Event({
     isSelectedByDefault: false,
     epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
     ignoreIfPast: true,
-    isFullDay: false, // Let's calculate times to 1:59:25
+    isFullDay: false, // True if want to calculate times to 1:59:25
     color: "orange",
-    specialNumbers: undefined, // jmr: How should we tell it to use pi??  In other code or here?  And, should we tell it to *only* use specialNumbers?
     tags: [TAGS.QUIRKY, 'pi'],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: true,
+    manualEntryNumbers: [], // Not using 3.14 because it would likely create duplicate entry
 }));
 events.push(new Event({
     title: "US Independence Day",
@@ -85,6 +89,9 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "red",
     tags: [TAGS.HOLIDAY],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 events.push(new Event({
     title: "US Independence Day 1776",
@@ -94,6 +101,9 @@ events.push(new Event({
     ignoreIfPast: false,
     color: "red",
     tags: [TAGS.HOLIDAY],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 events.push(new Event({
     title: "May the Fourth (Star Wars Day)",
@@ -103,6 +113,9 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "black",
     tags: [TAGS.QUIRKY],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 
 // These need updated by hand each year (for now)
@@ -114,8 +127,10 @@ events.push(new Event({
     epochMillis: moment.tz("2021-02-07 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
     color: "brown",
-    specialNumbers: [55],
     tags: [TAGS.SPORTS],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: true,
+    manualEntryNumbers: [55],
 }));
 events.push(new Event({
     title: "Easter",
@@ -125,6 +140,9 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "purple",
     tags: [TAGS.HOLIDAY, TAGS.RELIGION],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 events.push(new Event({
     title: "March Madness Tournament Begins",
@@ -133,8 +151,10 @@ events.push(new Event({
     epochMillis: moment("2021-03-16 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
-    specialNumbers: [64, 68],
     tags: [TAGS.SPORTS],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: true,
+    manualEntryNumbers: [64],
 }));
 events.push(new Event({
     title: "March Madness Final Four",
@@ -143,8 +163,10 @@ events.push(new Event({
     epochMillis: moment("2021-04-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
-    specialNumbers: [4, 64, 68],
     tags: [TAGS.SPORTS],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: true,
+    manualEntryNumbers: [4, 64, 68],
 }));
 events.push(new Event({
     title: "Thanksgiving",
@@ -154,6 +176,9 @@ events.push(new Event({
     ignoreIfPast: true,
     color: "brown",
     tags: [TAGS.HOLIDAY],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: false,
+    manualEntryNumbers: [],
 }));
 
 events.push(new Event({
@@ -163,8 +188,10 @@ events.push(new Event({
     epochMillis: moment("2020-11-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "red",
-    specialNumbers: [46], // A new president would be the 46th
     tags: [TAGS.QUIRKY],
+    useDateAndTimeInMilestones: false,
+    useManualEntryInMilestones: true,
+    manualEntryNumbers: [46], // A new president would be the 46th
 }));
 
 /*

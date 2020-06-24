@@ -19,7 +19,7 @@ import i18n from '../i18n/i18n'
 import MyText, { MyTextXLarge } from '../components/MyText'
 import MySwitch from '../components/MySwitch'
 import MyPrimaryButton from '../components/MyPrimaryButton'
-import { getInterestingNumbersForTime } from '../utils/milestones'
+import { getInterestingNumbersForEventTime } from '../utils/milestones'
 
 
 /* jmr - After move function, move this ?? */
@@ -34,19 +34,20 @@ function AddOrEditEvent(props) {
   const navigation = useNavigation();
 
   const oldEvent = route.params?.oldEvent ?? null;
-  const newEvent = oldEvent ? cloneEvent(oldEvent) : null;
+  const clonedEvent = oldEvent ? cloneEvent(oldEvent) : null;
   const isCreate = !oldEvent;
 
-  const [title, setTitle] = useState(newEvent ? newEvent.title : '');
-  const [selectedDate, setSelectedDate] = useState(newEvent ? (new Date(newEvent.epochMillis)) : null);
+  const [title, setTitle] = useState(clonedEvent ? clonedEvent.title : '');
+  const [selectedDate, setSelectedDate] = useState(clonedEvent ? (new Date(clonedEvent.epochMillis)) : null);
   // If it was undefined, use true
-  const initialIsFullDay = (newEvent && newEvent.isFullDay === false) ? newEvent.isFullDay : true;
+  const initialIsFullDay = (clonedEvent && clonedEvent.isFullDay === false) ? clonedEvent.isFullDay : true;
   const [useFullDay, setUseFullDay] = useState(initialIsFullDay);
+  const [useDateAndTimeInMilestones, setUseDateAndTimeInMilestones] = useState(clonedEvent ? clonedEvent.useDateAndTimeInMilestones : true);
+  const initialManualEntryInput = (clonedEvent && clonedEvent.manualEntryNumbers && clonedEvent.manualEntryNumbers.length > 0) ? String(clonedEvent.manualEntryNumbers[0]) : '';
+  const [manualEntryInput, setManualEntryInput] = useState(initialManualEntryInput);
+  const [isManualEntryInvalid, setIsManualEntryInvalid] = useState(false);
 
 
-  const [useDateAndTimeInMilestones, setUseDateAndTimeInMilestones] = useState(newEvent ? newEvent.useDateAndTimeInMilestones : false);
-
-  const [extraNumbersForMilestones, setExtraNumbersForMilesteons] = useState(newEvent ? (newEvent.extraNumbersForMilestones || []) : []);
 
   const isIos = Platform.OS === 'ios';
 
@@ -64,6 +65,16 @@ function AddOrEditEvent(props) {
     marginTop: 20,
   };
 
+  const manualInputStyle = {
+    fontSize: myThemeContext.FONT_SIZE_LARGE,
+    color: (isManualEntryInvalid ? myThemeContext.colors.danger : myThemeContext.colors.text),
+    borderColor: myThemeContext.colors.text,
+    borderWidth: 0,
+    borderRadius: 3,
+    padding: 5,
+    marginTop: 0,
+  };
+
   /**
    * Save event if there's not one by the same title.
    * If there is, throw an Alert informing them.
@@ -74,20 +85,36 @@ function AddOrEditEvent(props) {
 
     const newTitle = title.trim();
 
+    const manualEntryNumbers = [];
+    if (manualEntryInput) {
+      try {
+        const num = Number(manualEntryInput);
+        if (!Number.isNaN(num)) {
+          manualEntryNumbers.push(num);
+        }
+      } catch (err) {
+        logger.error("Error while trying to convert manual entry to number ", err);
+      }
+    }
+
+
     let event;
     if (isCreate) {
       event = new Event({
         title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
         isCustom: true, selected: true, ignoreIfPast: false,
-        useDateAndTimeInMilestones: useDateAndTimeInMilestones, extraNumbersForMilestones: extraNumbersForMilestones
+        useDateAndTimeInMilestones: useDateAndTimeInMilestones,
+        useManualEntryInMilestones: (manualEntryNumbers.length > 0),
+        manualEntryNumbers: manualEntryNumbers,
       });
     } else {
-      event = newEvent;
+      event = clonedEvent;
       event.title = newTitle;
       event.epochMillis = selectedDate.getTime();
       event.isFullDay = useFullDay;
       event.useDateAndTimeInMilestones = useDateAndTimeInMilestones;
-      event.extraNumbersForMilestones = extraNumbersForMilestones;
+      event.useManualEntryInMilestones = (manualEntryNumbers.length > 0);
+      event.manualEntryNumbers = manualEntryNumbers;
     }
 
     if (eventsAndMilestonesContext.getCustomEventWithTitle(newTitle)
@@ -133,82 +160,17 @@ function AddOrEditEvent(props) {
         </View>
       ),
     });
-  }, [navigation, title, selectedDate, useFullDay, useDateAndTimeInMilestones, extraNumbersForMilestones]);
-
-
-  // const getSampleNumbers = (isFullDay, epochTime) => {
-  //   let theMoment = moment(epochTime);
-
-
-  //   /* Some of these might be unneeded for some months and days
-  //   (e.g. MDYYYY and MMDYYYY and MDDYYYY could all be 10192020),
-  //   but to get all possibilities we try everything and store it in a 
-  //   map so duplicates are not present.
-  //   */
-  //   let extraDecimals = {};
-
-  //   let tmpDecimal;
-  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).div(parseInt(theMoment.format('M'))).div(parseInt(theMoment.format('D')));
-  //   extraDecimals[theMoment.format('YYYY/M/D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
-
-  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('M')))).div(parseInt(theMoment.format('D')));
-  //   extraDecimals[theMoment.format('M/D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
-
-  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('D')))).div(parseInt(theMoment.format('M')));
-  //   extraDecimals[theMoment.format('D/M') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
-
-  //   tmpDecimal = (new Decimal(parseInt(theMoment.format('YYYY')))).minus(parseInt(theMoment.format('M'))).minus(parseInt(theMoment.format('D')));
-  //   extraDecimals[theMoment.format('YYYY-M-D') + '=' + tmpDecimal.valueOf()] = tmpDecimal;
-
-  //   tmpDecimal = (new Decimal(parseFloat(theMoment.format('M.D'))));
-  //   extraDecimals[theMoment.format('M.D')] = tmpDecimal;
-
-  //   tmpDecimal = (new Decimal(parseFloat(theMoment.format('D.M'))));
-  //   extraDecimals[theMoment.format('D.M')] = tmpDecimal;
-
-  //   const dateFormats = [
-  //     'YYYYMD', 'YYYYMMDD', 'YYYYMDD', 'YYYYMMD',
-  //     'MDYYYY', 'MMDDYYYY', 'MDDYYYY', 'MMDYYYY',
-  //     'MDYY', 'MMDDYY', 'MDDYY', 'MMDYY',
-  //     'DMYYYY', 'DDMMYYYY', 'DDMYYYY', 'DMMYYYY',
-  //   ];
-  //   for (let idx = 0; idx < dateFormats.length; idx++) {
-  //     // Doing parseInt and then myInt.toString() will get rid of leading zero
-  //     let myInt = parseInt(theMoment.format(dateFormats[idx]), 10);
-  //     extraDecimals[myInt.toString()] = new Decimal(myInt);
-
-  //     if (!isFullDay) {
-  //       /* Use year, month, and day combinations with time combinations */
-  //       myInt = parseInt(theMoment.format(dateFormats[idx] + 'hhmm'), 10);
-  //       extraDecimals[myInt.toString()] = new Decimal(myInt);
-  //       myInt = parseInt(theMoment.format(dateFormats[idx] + 'Hmm'), 10);
-  //       extraDecimals[myInt.toString()] = new Decimal(myInt);
-  //     }
-  //   }
+  }, [navigation, title, selectedDate, useFullDay, useDateAndTimeInMilestones, manualEntryInput]); // jmr - putting manualEntryInput temporarily. It doesn't make sense.
 
 
 
-  //   return "jmr " + Object.keys(extraDecimals);
-  // }
+  let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useFullDay, undefined) : null;
 
-
-
-  let sampleNumbers = selectedDate ? getInterestingNumbersForTime(selectedDate.getTime(), useFullDay, undefined) : null;
-
-  
-  // if (sampleNumbers) {
-  //   const keys = Object.keys(sampleNumbers);
-    
-  //   sampleNumbers = sampleNumbers.filter((value, index, arr) => {
-  //     // jmr - only show the description
-  //   });
-  //   let filtered = prevState.allMilestones.filter(function (value, index, arr) {
-  //     return (value.event && value.event.title !== event.title);
-  //   });
-
-  // } else {
-  //   sampleNumbers = "JMR: Enter date to find out";
-  // }
+  let useDatetimeLabel = i18n.t("useDatetimeNumbers");
+  if (eventDatetimeNumbers && eventDatetimeNumbers.length > 0) {
+    // Show one example.
+    useDatetimeLabel = i18n.t('useDatetimeNumbersWithExample', { someValue: eventDatetimeNumbers[0].descriptor });
+  }
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
@@ -243,7 +205,7 @@ function AddOrEditEvent(props) {
         </View>
 
         <View style={styles.switch}>
-          <MyText>{i18n.t("useNumbersLikeThese", { someValue: sampleNumbers })}</MyText>
+          <MyText style={{ maxWidth: 210 }}>{useDatetimeLabel}</MyText>
           <MySwitch
             value={useDateAndTimeInMilestones}
             onValueChange={isYes => {
@@ -252,15 +214,56 @@ function AddOrEditEvent(props) {
           />
         </View>
 
+        <View style={styles.manualEntryView}>
+          <MyText>{i18n.t("useOwnNumbers")}</MyText>
+          <TextInput
+            style={[manualInputStyle]}
+            multiline={false}
+            keyboardType={'decimal-pad'}
+            onChangeText={(text) => {
+
+              let isInvalid = false;
+              try {
+                if (text) {
+                  const num = Number(text);
+                  if (Number.isNaN(num)) {
+                    isInvalid = true;
+                  }
+                } else {
+                  isInvalid = true;
+                }
+              } catch (err) {
+                console.warn("Not able to convert manualEntryInput to a number", err);
+                isInvalid = true;
+              }
+              setIsManualEntryInvalid(isInvalid);
+              text ? setManualEntryInput(text) : setManualEntryInput('');
+            }}
+            onEndEditing={() => {
+              /* Make sure we can convert it to a number.  If not, we'll wipe it out after they leave the textinput */
+              try {
+                if (manualEntryInput) {
+                  const num = Number(manualEntryInput);
+                  if (Number.isNaN(num)) {
+                    setManualEntryInput('');
+                  }
+                } else {
+                  setManualEntryInput('');
+                }
+              } catch (err) {
+                console.warn("Not able to convert manualEntryInput to a number", err);
+                setManualEntryInput('');
+              }
+            }}
+            placeholder={i18n.t('enterNumber')}
+            maxLength={20}
+            value={manualEntryInput}
+          />
+        </View>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
 }
-/*
-  useNumbersLikeThese: 'Use numbers like these: {{someValue}}',
-  ownNumbersForMilestones: "Enter own numbers to be used in milestones",
-  */
-
 
 export default AddOrEditEvent;
 
@@ -292,6 +295,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 50,
+  },
+  manualEntryView: {
+    flex: 0,
+    paddingTop: 50,
+    paddingBottom: 50,
   },
 });
 
