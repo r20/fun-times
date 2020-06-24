@@ -389,7 +389,7 @@ function MyCalendarProvider(props) {
     setCalendarMilestoneEventsMap(newMap);
 
     const newWrappedCalendarEvent = wrapCalendarEventObject(newCalendarEvent, true, milestoneKey);
-    logger.warn("New wrapped calendar event is ", newWrappedCalendarEvent);
+    logger.log("New wrapped calendar event is ", newWrappedCalendarEvent);
 
 
     /* find where to insert/replace the newWrappedCalendarEvent to efficiently

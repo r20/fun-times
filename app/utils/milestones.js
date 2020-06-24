@@ -380,8 +380,12 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
     if (numToRemove > 0) {
         milestoneList.splice(0, numToRemove); // splice removes from original array
     }
+    if (event.selected) {
+        console.warn("jmr === numToRemove", numToRemove, milestoneList.length);
+    }
 
     return milestoneList;
+
 
 }
 export const createMilestones = nanomemoize(unmemoizedCreateMilestones);

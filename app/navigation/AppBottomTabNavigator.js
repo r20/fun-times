@@ -10,7 +10,7 @@ import MyThemeContext from '../context/MyThemeContext'
 import AppStackNavigator from '../navigation/AppStackNavigator'
 import EventsScreen from '../screens/EventsScreen'
 import Today from '../screens/Today'
-import MilestoneCalendar from '../screens/MilestoneCalendar'
+import Milestones from '../screens/Milestones'
 import CalendarScreen from '../screens/CalendarScreen'
 import More from '../screens/More'
 import i18n from '../i18n/i18n'
@@ -35,7 +35,7 @@ function MyTabs(props) {
   //     const stateName = route.state.routeNames[route.state.index];
   //     if (stateName === "Today") {
   //       title = i18n.t("headerTodayTitle");
-  //     } else if (stateName === "MilestoneCalendar") {
+  //     } else if (stateName === "Milestones") {
   //       title = i18n.t("headerUpcomingMilestonesScreenTitle");
   //     } else if (stateName === "CalendarScreen") {
   //       title = i18n.t("headerCalendar");
@@ -82,7 +82,7 @@ function MyTabs(props) {
         options={eventsStackOptions} />
       <Tab.Screen name="Today" component={Today} tabBarAccessibilityLabel={i18n.t("menuTodayTitle")}
         options={todayOptions} />
-      <Tab.Screen name="MilestoneCalendar" component={MilestoneCalendar} tabBarAccessibilityLabel={i18n.t("menuMilestoneSuggestionsTitle")}
+      <Tab.Screen name="Milestones" component={Milestones} tabBarAccessibilityLabel={i18n.t("menuMilestoneSuggestionsTitle")}
         options={milestoneOptions} />
       <Tab.Screen name="CalendarScreen" component={CalendarScreen} tabBarAccessibilityLabel={i18n.t("menuCalendarTitle")}
         options={calendarOptions} />

@@ -5,7 +5,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useScrollToTop } from '@react-navigation/native'
 
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
-
 import CalendarContext, {
   howManyDaysAheadCalendar, howManyDaysAgoCalendar,
   getIsMilestoneFullDay, makeMilestoneClipboardContentForMilestone,
@@ -16,7 +15,6 @@ import * as logger from '../utils/logger'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import { shouldShowMilestoneForNumberType } from '../utils/milestones'
 import ClipboardCopyable from '../components/ClipboardCopyable'
-
 import AppSettingsContext from '../context/AppSettingsContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import MyText, { MyTextLarge } from './MyText'
@@ -24,7 +22,7 @@ import MyText, { MyTextLarge } from './MyText'
 // This is only used to differentiate between old and new events, so no need to update
 const nowTime = (new Date()).getTime();
 
-// Don't know how this works, but it's the height without margin??
+// This is height without margin
 const ITEM_HEIGHT = 72;
 const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
 const eventCardHeightStyle = { height: ITEM_HEIGHT };
@@ -60,7 +58,7 @@ export default function UpcomingMilestonesList(props) {
           if (!props.maxNumMilestonesPerEvent) {
             // No max was specified
             return true;
-          } else if (numMilestonesPerEventMap[milestone.event.title] <= props.maxNumMilestonesPerEvent) {
+          } else if (numMilestonesPerEventMap[milestone.event.title] < props.maxNumMilestonesPerEvent) {
             // A max limit was specified, and we haven't shown too many yet
             numMilestonesPerEventMap[milestone.event.title] = numMilestonesPerEventMap[milestone.event.title] + 1;
             return true;

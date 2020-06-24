@@ -60,7 +60,7 @@ export const en = {
   datePickerHelpMessage: "Press the year at the top of the date picker to change year.",
   emptyCustomEventsMessage: "Add birthdays, anniversaries, and other special occasions to discover interesting upcoming milestones.",
   emptyTodayMessage: "After marking events with a star, come back to see how long it has been or how much time remaining until each event.",
-  emptyMilestoneCalendarMessage: "After marking events with a star, come back to see upcoming milestones.",
+  emptyMilestonesMessage: "After marking events with a star, come back to see upcoming milestones.",
   emptyCalendarMessage: "There are no events on your Fun Times calendar within \{{someValue}}\ days.",
   emptyMilestoneMessage: "There are no milestones within \{{someValue}}\ days.",
   removeCalendarEntriesButton: "Remove All Calendar Entries",

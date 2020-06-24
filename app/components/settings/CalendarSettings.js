@@ -38,10 +38,10 @@ function CalendarSettings(props) {
   }
 
   /*  
-      jmr - Should add these:
+      TBD - Should add these:
       Alert settings for new calendar entries
       All day (9am day of)
-      non- all day ( 2 hours before)
+      non all day ( 2 hours before, unless it's in middle of night)
 
       // 9am on the day of event if all day, else 2 hours before
       const offsetMinutes = allDay ? 9 * 60 : -120;
@@ -50,13 +50,20 @@ function CalendarSettings(props) {
 
   return (
     <React.Fragment>
-
-
-      <MyPrimaryButton onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
-
+      <View style={styles.container}>
+        <MyPrimaryButton onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
+      </View>
     </React.Fragment>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 0,
+    marginTop: 30, // Until more calendar settings added, add some space so the remove button isn't so close
+  },
+});
 
 export default CalendarSettings;
 

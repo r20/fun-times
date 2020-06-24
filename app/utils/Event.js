@@ -19,11 +19,10 @@ export default class Event {
         ignoreIfPast // Only show this event if it is in the future
         selected // Whether the event is selected/visible in non-events screens
         isSelectedByDefault // For standard events
-        specialNumbers // jmr TBD - need to figure out how to implement this.  This is other numbers (besides what's in date) that are significant. E.g. Super Bowl LX would have 60 as special 
         tags
-        useDateAndTimeInMilestones
+        useDateAndTimeInMilestones // Whether we use date/time in milestone calculations
         useManualEntryInMilestones
-        manualEntryNumbers
+        manualEntryNumbers // Other numbers (besides what's in date) that are significant. E.g. [60] for Super Bowl LX
 
     */
     constructor(options = {}) {

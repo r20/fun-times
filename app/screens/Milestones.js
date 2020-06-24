@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 
 
 
-function MilestoneCalendar(props) {
+function Milestones(props) {
 
   const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
   const appSettingsContext = useContext(AppSettingsContext);
@@ -73,9 +73,9 @@ function MilestoneCalendar(props) {
     {!empty &&
       <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
-    {empty && <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestoneCalendarMessage')}</MyTextLarge></View>}
+    {empty && <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestonesMessage')}</MyTextLarge></View>}
   </View>
   );
 }
 
-export default MilestoneCalendar;
+export default Milestones;
