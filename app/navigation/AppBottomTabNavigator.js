@@ -21,7 +21,7 @@ import AppSettingsContext from '../context/AppSettingsContext'
 const Tab = createBottomTabNavigator();
 function MyTabs(props) {
 
-  const dots ="more-horiz"; // Platform.OS === "ios" ? "more-horiz" : 'more-vert';
+  const dots ="more-horiz"; // ios wants horiz, but I likeit for both ios and android
 
   const myThemeContext = useContext(MyThemeContext);
 
@@ -33,7 +33,6 @@ function MyTabs(props) {
     inactiveBackgroundColor: myThemeContext.colors.footerBackground,
     style: {
       borderTopWidth: 1,
-      // No border if dark theme
       borderTopColor: myThemeContext.colors.tabBorder,
     },
 
