@@ -9,10 +9,7 @@ import * as logger from '../utils/logger'
 import MyText, { MyTextSmall, MyTextLarge, MyTextXLarge } from '../components/MyText'
 
 
-
-
-/* This was created in case need to style all dividers
-(such as based on dark/light theme).  We can just do styling here. */
+/* This was created for styling (such as based on dark/light theme).  */
 const MyScreenHeader = (props) => {
     const myThemeContext = useContext(MyThemeContext);
 

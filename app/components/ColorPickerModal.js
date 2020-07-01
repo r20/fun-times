@@ -21,7 +21,7 @@ export default function ColorPickerModal(props) {
         },
         card: {
             width: screenWidth - 40,
-            backgroundColor: myThemeContext.colors.background, // TBD - is this even needed?
+            backgroundColor: myThemeContext.colors.background,
         },
     });
 

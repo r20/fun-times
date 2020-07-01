@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react'
+import React, { useState, useEffect, createContext, useContext, useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import * as Calendar from 'expo-calendar'
 import * as Localization from 'expo-localization'
@@ -17,6 +17,10 @@ export const numMillisecondsPerDay = 24 * 60 * 60000;
 
 const CALENDAR_TITLE = 'Fun Times Milestones Calendar';
 
+
+export const calendarNotificationDaytime = 2;
+export const calendarNotificationNighttimeHoursPm = 8; // TBD - to localize this, do it differently so can use 24 hour clock
+export const calendarNotificationAllDayHoursAm = 9;
 
 // Assuming not changing timezones while app is open
 const TIMEZONEOFFSET_MILLISECONDS = (new Date()).getTimezoneOffset() * 60000;
@@ -139,10 +143,10 @@ const CalendarContext = createContext({
   toggleCalendarScreenCalendarEvent: () => { },
   getIsMilestoneInCalendar: () => { },
   removeFunTimesCalendarEventsAsync: () => { },
-  getMilestoneOnCalendarColorStyle: () => { },
-  getMilestoneNotOnCalendarColorStyle: () => { },
-  getMilestoneOnCalendarCardStyle: () => { },
-  getMilestoneNotOnCalendarCardStyle: () => { },
+  milestoneColorStyle: {},
+  milestoneCardStyle: {},
+  areAnyMilestonesOnCalendar: () => { },
+  changeCalendarColorAsync: () => { },
 });
 
 /**
@@ -161,19 +165,17 @@ function MyCalendarProvider(props) {
   const [isCalendarReady, setIsCalendarReady] = useState(false);
 
 
-  function createMilestoneOnCalendarColorStyle(colorToUse) {
+  /* Memoize these for performance */
+  const milestoneColorStyle = useMemo(() => {
+    const colorToUse = myThemeContext.colors.calendar;
     return {
       color: myThemeContext.getContrastFontColor(colorToUse),
       backgroundColor: colorToUse,
     }
-  }
-  function createMilestoneNotOnCalendarColorStyle(colorToUse) {
-    return {
-      color: myThemeContext.getContrastFontColor(colorToUse),
-      backgroundColor: colorToUse,
-    }
-  }
-  function createMilestoneOnCalendarCardStyle(colorToUse) {
+  }, [myThemeContext.colors.calendar, myThemeContext.isThemeDark]);
+
+  const milestoneCardStyle = useMemo(() => {
+    const colorToUse = myThemeContext.colors.calendar;
     return {
       color: myThemeContext.getContrastFontColor(colorToUse),
       backgroundColor: colorToUse,
@@ -181,43 +183,8 @@ function MyCalendarProvider(props) {
       borderWidth: 0,
       borderStyle: 'solid',
     }
-  }
-  function createMilestoneNotOnCalendarCardStyle(colorToUse) {
-    return {
-      color: myThemeContext.getContrastFontColor(colorToUse),
-      backgroundColor: colorToUse,
-      borderColor: colorToUse,
-      borderWidth: 0,
-      borderStyle: 'solid',
-    }
-  }
+  }, [myThemeContext.colors.calendar, myThemeContext.isThemeDark]);
 
-  const [milestoneOnCalendarColorStyle, setMilestoneOnCalendarColorStyle] = useState(createMilestoneOnCalendarColorStyle(initialColor));
-  const [milestoneNotOnCalendarColorStyle, setMilestoneNotOnCalendarColorStyle] = useState(createMilestoneNotOnCalendarColorStyle(initialColor));
-  const [milestoneOnCalendarCardStyle, setMilestoneOnCalendarCardStyle] = useState(createMilestoneOnCalendarCardStyle(initialColor));
-  const [milestoneNotOnCalendarCardStyle, setMilestoneNotOnCalendarCardStyle] = useState(createMilestoneNotOnCalendarCardStyle(initialColor));
-
-  /* The style objects are created here in CalendarContext so we can create the objects once and then re-use them no matter how much cards
-  are re-rendered (As long as color stays the same, the same object is used.). */
-  const setStyleStates = (colorToUse) => {
-    setMilestoneOnCalendarColorStyle(createMilestoneOnCalendarColorStyle(colorToUse));
-    setMilestoneNotOnCalendarColorStyle(createMilestoneNotOnCalendarColorStyle(colorToUse));
-    setMilestoneOnCalendarCardStyle(createMilestoneOnCalendarCardStyle(colorToUse));
-    setMilestoneNotOnCalendarCardStyle(createMilestoneNotOnCalendarCardStyle(colorToUse));
-  }
-
-  function getMilestoneOnCalendarColorStyle() {
-    return milestoneOnCalendarColorStyle;
-  }
-  function getMilestoneNotOnCalendarColorStyle() {
-    return milestoneNotOnCalendarColorStyle;
-  }
-  function getMilestoneOnCalendarCardStyle() {
-    return milestoneOnCalendarCardStyle;
-  }
-  function getMilestoneNotOnCalendarCardStyle() {
-    return milestoneNotOnCalendarCardStyle;
-  }
 
   const getCalendarReadyAsync = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -231,7 +198,7 @@ function MyCalendarProvider(props) {
         if (cal.title === CALENDAR_TITLE) {
           calFound = true;
           theCalendarId = cal.id;
-          setStyleStates(cal.color); // Change styles for calendar screen, but not cards for other screens
+          myThemeContext.setCalendarColor(cal.color); // Set theme calendar color to what it is.  On ios user could change it on their calendar. Let's use it.
           logger.log('We found the calendar.', cal);
           break;
         }
@@ -243,7 +210,8 @@ function MyCalendarProvider(props) {
         */
 
         logger.log("Didn't find calendar, so we'll create one.");
-        theCalendarId = await createCalendarAsync();
+        const colorToUse = initialColor;
+        theCalendarId = await createCalendarAsync(colorToUse);
 
       }
       setCalendarId(theCalendarId);
@@ -252,7 +220,7 @@ function MyCalendarProvider(props) {
       await getCalendarEventsAsync(theCalendarId);
       setIsCalendarReady(true);
     } else {
-      logger.warn("Don't have permission to use calendar.");
+      logger.warn("We don't have permission to use calendar.");
     }
   }
 
@@ -290,18 +258,16 @@ function MyCalendarProvider(props) {
     return defaultCalendars[0].source;
   }
 
-  async function createCalendarAsync() {
+
+  async function createCalendarAsync(hexcolor) {
     const defaultCalendarSource =
       Platform.OS === 'ios'
         ? await getDefaultCalendarSourceAsync()
         : { isLocalAccount: true, name: 'Fun Times Calendar' };
 
-    const colorToUse = initialColor;
-    setStyleStates(colorToUse);
-
     const newCalendarId = await Calendar.createCalendarAsync({
       title: CALENDAR_TITLE,
-      color: colorToUse,
+      color: hexcolor,
       entityType: Calendar.EntityTypes.EVENT,
       sourceId: defaultCalendarSource.id,
       source: defaultCalendarSource,
@@ -317,7 +283,76 @@ function MyCalendarProvider(props) {
 
   }
 
+  /* 
+  Use this to change color on the device's calendar, and it 
+  also sets the theme for the color shown in this app. 
 
+ Android doesn't support calendar color change, so we
+ replace the old calendar with a new one in the right color.
+
+ Also note that the colors shown in the device calendar app
+ are slightly different than what its passed.
+ Maybe they have fixed colors and they use a closest match??
+ I haven't investigated why.
+  */
+  const changeCalendarColorAsync = async (hexcolor) => {
+
+    if (Platform.OS === 'ios') {
+      // TBD - test this on ios
+      await Calendar.updateCalendarAsync(calendarId, { color: hexcolor });
+    } else {
+      /* For Android change name of calendar, create a new one and add events, then delete old calendar.
+        Note that if they've added additional personal things on the calendar this would blow them away. */
+
+      // Change name of old calendar
+      const oldCalendarId = calendarId;
+      await Calendar.updateCalendarAsync(oldCalendarId, { title: "OLD " + CALENDAR_TITLE });
+
+      // Create new
+      const newCalendarId = await createCalendarAsync(hexcolor);
+
+      // Add events to new calendar, makeing a new calendarMilestoneEventsMap and new wrappedCalendarEventsList
+      const newWrappedCalendarEventsList = [];
+      const newMap = Object.assign({}, calendarMilestoneEventsMap);
+
+      for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+        const wrappedCalendarEvent = wrappedCalendarEventsList[idx];
+        const milestoneKey = wrappedCalendarEvent.milestoneKey; // this might not exist (if they added stuff to the calendar)
+        if (wrappedCalendarEvent.isOnCalendar) {
+          const newCalendarEvent = Object.assign({}, wrappedCalendarEvent.calendarEvent);
+          delete newCalendarEvent.id;
+          const eventId = await Calendar.createEventAsync(newCalendarId, newCalendarEvent);
+          newCalendarEvent.id = eventId;
+          const newWrappedCalendarEvent = wrapCalendarEventObject(newCalendarEvent, true, milestoneKey);
+          if (milestoneKey) {
+            newMap[milestoneKey] = eventId;
+          }
+          newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
+        } else {
+          newWrappedCalendarEventsList.push(wrappedCalendarEvent);
+        }
+      }
+
+      // Remove old
+      await Calendar.deleteCalendarAsync(oldCalendarId);
+
+      // Update states
+      setCalendarMilestoneEventsMap(newMap);
+      setCalendarId(newCalendarId);
+      myThemeContext.setCalendarColor(hexcolor);
+      setWrappedCalendarEventsList(newWrappedCalendarEventsList);
+    }
+  }
+
+  /* Returns true if any milestones are on the calendar */
+  const areAnyMilestonesOnCalendar = () => {
+    for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+      if (wrappedCalendarEventsList[idx].isOnCalendar) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   const getCalendarEventsAsync = async (theCalendarId) => {
     const endDate = new Date(nowTime + (howManyDaysAheadCalendar + 1) * numMillisecondsPerDay); // get one more day's worth just in case.
@@ -387,10 +422,9 @@ function MyCalendarProvider(props) {
     const mapEntry = {};
     mapEntry[milestoneKey] = eventId;
     const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
-    setCalendarMilestoneEventsMap(newMap);
 
     const newWrappedCalendarEvent = wrapCalendarEventObject(newCalendarEvent, true, milestoneKey);
-    logger.log("New wrapped calendar event is ", newWrappedCalendarEvent);
+    logger.warn("New wrapped calendar event is ", newWrappedCalendarEvent);
 
 
     /* find where to insert/replace the newWrappedCalendarEvent to efficiently
@@ -398,21 +432,37 @@ function MyCalendarProvider(props) {
     let newWrappedCalendarEventsList = [];
     let hasBeenAdded = false;
     for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+      logger.warn("wrappedCalendarEventsList[idx] is ", wrappedCalendarEventsList[idx]);
+
       if (hasBeenAdded) {
         // We've dealt with the new one, just add the rest
         newWrappedCalendarEventsList.push(wrappedCalendarEventsList[idx]);
       } else {
 
-        if (newWrappedCalendarEvent.milestoneKey === wrappedCalendarEventsList[idx].milestoneKey) {
-          /* We need to replace this one with the new one
-            Don't just look at startTime being equal, because there can be more than one
-            milestone with the same startTime and we want both on the calendar. */
+        if (newWrappedCalendarEvent.startTime === wrappedCalendarEventsList[idx].startTime &&
+          newWrappedCalendarEvent.calendarEvent.title === wrappedCalendarEventsList[idx].calendarEvent.title &&
+          newWrappedCalendarEvent.milestoneKey === wrappedCalendarEventsList[idx].milestoneKey) {
+          /*  Don't just look at startTime being equal, because there can be more than one
+            milestone with the same startTime and we want both on the calendar.
+            Also, milestoneKey could be undefined (if they created their own calendar entries w/ the devices calendar app
+             and see them in this app and are toggling them on/off)
+             So we compare a few things. */
+
+          /* This is an entry that was on the calendar and removed, and now we're adding it back.
+            We need to replace this one with the new one.
+            */
           newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
           hasBeenAdded = true;
         } else {
-          // This is not a replacement
-          if (newWrappedCalendarEvent.startTime <= wrappedCalendarEventsList[idx].startTime) {
-            // Add the new before we put 
+          // Look to see if this is a new event and we're at the right idx position to add.
+          if ((newWrappedCalendarEvent.startTime < wrappedCalendarEventsList[idx].startTime)
+            || (newWrappedCalendarEvent.startTime === wrappedCalendarEventsList[idx].startTime &&
+              idx === wrappedCalendarEventsList.length - 1)) {
+            /* The startTime is before that at idx,
+            or it's equal to that at idx and this is the last position 
+            We do this instead of comparing startTime <= because if there are multiple events with the same
+            startTime we want to add this at the end to make sure we don't miss out on a replacement. */
+            // Add the new
             newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
             hasBeenAdded = true;
           }
@@ -424,6 +474,8 @@ function MyCalendarProvider(props) {
       // It goes at the end
       newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
     }
+
+    setCalendarMilestoneEventsMap(newMap);
     setWrappedCalendarEventsList(newWrappedCalendarEventsList);
 
   }
@@ -435,7 +487,7 @@ function MyCalendarProvider(props) {
     Additionally, leaving it in wrappedCalendarEventsList allows the user to still see what they just 
     took off and to add it back.
   */
-  const removeCalendarEventFromCalendar = (calendarEventId, milestoneKey) => {
+  const removeCalendarEventFromCalendarAsync = async (calendarEventId, milestoneKey) => {
     /* milestoneKey is passed in separately because it might be undefined if the
       user created their own calendar event without the app on this calendar.
       We can handle seeing those and toggling them.
@@ -448,7 +500,6 @@ function MyCalendarProvider(props) {
     }
 
     if (calendarEventId) {
-      Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
 
       // Mark its isOnCalendar as false, but keep it in the list
       let newWrappedCalendarEventsList = [];
@@ -464,6 +515,8 @@ function MyCalendarProvider(props) {
         newWrappedCalendarEventsList.push(newWrappedCalendarEvent);
       }
       setWrappedCalendarEventsList(newWrappedCalendarEventsList);
+      await Calendar.deleteEventAsync(calendarEventId, { futureEvents: true });
+
     }
 
   }
@@ -475,7 +528,7 @@ function MyCalendarProvider(props) {
     const milestoneKey = milestoneItem.key;
     const calendarEventId = calendarMilestoneEventsMap[milestoneKey];
     if (calendarEventId) {
-      removeCalendarEventFromCalendar(calendarEventId, milestoneKey);
+      removeCalendarEventFromCalendarAsync(calendarEventId, milestoneKey);
     } else {
 
       /* On Android, allDay events need to be set to midnight and timezone utc.
@@ -493,12 +546,28 @@ function MyCalendarProvider(props) {
       // for allDay, set end 24 hours later.  Otherwise end is start.
       const end = allDay ? new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0) : start;
 
-      // 9am on the day of event if all day, else 2 hours before
-      const offsetMinutes = allDay ? 9 * 60 : -120;
+      /* Set different alert times depending on whether it's 
+        all day, a day-time milestone, or a night-time milestone */
+      let offsetMinutes = calendarNotificationAllDayHoursAm * 60; // All-day
+      if (!allDay) {
+
+        const timeMoment = moment(start);
+
+        // find the notification time for the night before
+        const nightBefore = moment(start).add(-1, 'days').hours(calendarNotificationNighttimeHoursPm + 12).minutes(0).seconds(0);
+        const minutesBefore = timeMoment.diff(nightBefore, 'minutes');
+
+        if (minutesBefore > (9 + 12 - calendarNotificationNighttimeHoursPm) * 60) {
+          // compare time with 9am the next day.  If we're later than that, this is a day-time notification
+          offsetMinutes = -60 * calendarNotificationDaytime;
+        } else {
+          // This is a night time notification, and we should do it the night before
+          offsetMinutes = -1 * minutesBefore;
+        }
+
+      }
 
       const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
-
-
 
       const newCalendarEvent = {
         alarms: [{ relativeOffset: offsetMinutes, method: Calendar.AlarmMethod.ALERT }],
@@ -519,7 +588,7 @@ function MyCalendarProvider(props) {
     const milestoneKey = wrappedCalendarEvent.milestoneKey; // this might not exist (if they added stuff to the calendar)
     const calendarEventId = wrappedCalendarEvent.id;
     if (wrappedCalendarEvent.isOnCalendar) {
-      removeCalendarEventFromCalendar(calendarEventId, milestoneKey);
+      removeCalendarEventFromCalendarAsync(calendarEventId, milestoneKey);
     } else {
       addCalendarEventToCalendarAsync(wrappedCalendarEvent.calendarEvent, milestoneKey);
     }
@@ -534,10 +603,10 @@ function MyCalendarProvider(props) {
       toggleCalendarScreenCalendarEvent: toggleCalendarScreenCalendarEvent,
       getIsMilestoneInCalendar: getIsMilestoneInCalendar,
       removeFunTimesCalendarEventsAsync: removeFunTimesCalendarEventsAsync,
-      getMilestoneOnCalendarColorStyle: getMilestoneOnCalendarColorStyle,
-      getMilestoneNotOnCalendarColorStyle: getMilestoneNotOnCalendarColorStyle,
-      getMilestoneOnCalendarCardStyle: getMilestoneOnCalendarCardStyle,
-      getMilestoneNotOnCalendarCardStyle: getMilestoneNotOnCalendarCardStyle,
+      milestoneColorStyle: milestoneColorStyle,
+      milestoneCardStyle: milestoneCardStyle,
+      changeCalendarColorAsync: changeCalendarColorAsync,
+      areAnyMilestonesOnCalendar: areAnyMilestonesOnCalendar,
     }}>
       {props.children}
     </CalendarContext.Provider>

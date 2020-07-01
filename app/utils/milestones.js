@@ -85,6 +85,14 @@ const numberTypes = Object.keys(sortedInterestingNumbersMap);
  */
 export const getInterestingNumbersForEventTime = (epochTime, isFullDay, event) => {
 
+    /* TBD - whether in here or another control, 
+    I should use the next anniversary number in milestones.  
+    E.g. if someone will be 22 years it could be good to show
+    22 days until they are 22 years  
+    Maybe it's an optional number for milestons calculations??
+    
+    */
+
     let theMoment = moment(epochTime);
 
     function makeInterestingInfo(num, descriptor, event) {

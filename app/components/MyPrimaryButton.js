@@ -8,8 +8,7 @@ import MyThemeContext from '../context/MyThemeContext'
 
 
 
-/* This was created in case need to style all dividers
-(such as based on dark/light theme).  We can just do styling here. */
+/* This was created for styling (such as based on dark/light theme).  */
 const MyPrimaryButton = (props) => {
     const myThemeContext = useContext(MyThemeContext);
 

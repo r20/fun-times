@@ -7,7 +7,7 @@ import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 import AppSettingsContext from '../context/AppSettingsContext'
-import Divider from '../components/Divider'
+import MyDivider from '../components/MyDivider'
 import MyText from './MyText'
 import MySlider from './MySlider'
 import MyPrimaryButton from './MyPrimaryButton'
@@ -96,7 +96,7 @@ function EventDateTimePickerIos(props) {
   const is24HourFormat = true;
 
   /* TBD -look at use of spaceBetweenDateAndTime
-  Use Divider ?? */
+  Use MyDivider ?? */
   return (
     <React.Fragment>
       <View >
@@ -104,7 +104,7 @@ function EventDateTimePickerIos(props) {
       </View>
       {showDatePicker &&
         <React.Fragment>
-          <Divider />
+          <MyDivider />
           <DateTimePicker
             testID="dateTimePicker"
             value={startingDate}
@@ -115,7 +115,7 @@ function EventDateTimePickerIos(props) {
             minuteInterval={1}
             maximumDate={theMaxDate}
             minimumDate={theMinDate} />
-          <Divider />
+          <MyDivider />
         </React.Fragment>
       }
 
@@ -136,7 +136,7 @@ function EventDateTimePickerIos(props) {
           </View>
           {showTimePicker &&
             <React.Fragment>
-              <Divider />
+              <MyDivider />
               <DateTimePicker
                 testID="dateTimePicker"
                 value={startingDate}
@@ -147,7 +147,7 @@ function EventDateTimePickerIos(props) {
                 minuteInterval={1}
                 maximumDate={theMaxDate}
                 minimumDate={theMinDate} />
-              <Divider />
+              <MyDivider />
             </React.Fragment>
           }
 

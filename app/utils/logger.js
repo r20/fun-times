@@ -1,6 +1,9 @@
 
-
 let isLogOn = false;
+
+if (process.env.NODE_ENV === 'development') {
+    // isLogOn = true
+}
 
 export function turnLogOff() {
     isLogOn = false;

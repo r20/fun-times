@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, ScrollView, Switch, Alert } from 'react-native'
+import { StyleSheet, View, Switch, Alert } from 'react-native'
 
-import CalendarContext from '../../context/CalendarContext'
+import CalendarContext, { calendarNotificationDaytime, calendarNotificationNighttimeHoursPm, calendarNotificationAllDayHoursAm } from '../../context/CalendarContext'
 import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import MyPrimaryButton from '../../components/MyPrimaryButton'
+import MyText from '../MyText'
 
 function CalendarSettings(props) {
 
@@ -37,21 +38,15 @@ function CalendarSettings(props) {
     );
   }
 
-  /*  
-      TBD - Should add these:
-      Alert settings for new calendar entries
-      All day (9am day of)
-      non all day ( 2 hours before, unless it's in middle of night)
-
-      // 9am on the day of event if all day, else 2 hours before
-      const offsetMinutes = allDay ? 9 * 60 : -120;
-
-      */
+  /* TBD - I should have a button for removing all old calendar entries */
 
   return (
     <React.Fragment>
       <View style={styles.container}>
-        <MyPrimaryButton onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
+        <MyText>{i18n.t('calendarNotificationDaytime', { someValue: calendarNotificationDaytime })}</MyText>
+        <MyText style={styles.space}>{i18n.t('calendarNotificationNighttime', { someValue: calendarNotificationNighttimeHoursPm })}</MyText>
+        <MyText style={styles.space}>{i18n.t('calendarNotificationAllDay', { someValue: calendarNotificationAllDayHoursAm })}</MyText>
+        <MyPrimaryButton containerStyle={styles.moreSpace} onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
       </View>
     </React.Fragment>
   );
@@ -61,8 +56,14 @@ function CalendarSettings(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 0,
-    marginTop: 30, // Until more calendar settings added, add some space so the remove button isn't so close
   },
+  space: {
+    marginTop: 10,
+  },
+  moreSpace: {
+    marginTop: 20,
+  },
+
 });
 
 export default CalendarSettings;

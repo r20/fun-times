@@ -18,6 +18,7 @@ import ClipboardCopyable from '../components/ClipboardCopyable'
 import AppSettingsContext from '../context/AppSettingsContext'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import MyText, { MyTextLarge } from './MyText'
+import MyCalendarDivider from './MyCalendarDivider'
 
 // This is only used to differentiate between old and new events, so no need to update
 const nowTime = (new Date()).getTime();
@@ -26,6 +27,13 @@ const nowTime = (new Date()).getTime();
 const ITEM_HEIGHT = 72;
 const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
 const eventCardHeightStyle = { height: ITEM_HEIGHT };
+
+
+/* To optimize and improve FlatList performance, use fixed height
+  items */
+const getItemLayout = (data, index) => {
+  return { length: heightWithMargin, offset: heightWithMargin * index, index };
+};
 
 
 export default function UpcomingMilestonesList(props) {
@@ -45,7 +53,6 @@ export default function UpcomingMilestonesList(props) {
     eventTitleMap[props.events[idx].title] = true;
     numMilestonesPerEventMap[props.events[idx].title] = 0;
   }
-
 
   /* Memoize for performance using allMilestones which is already sorted
   */
@@ -72,22 +79,28 @@ export default function UpcomingMilestonesList(props) {
 
   const isEmpty = specials.length === 0;
 
-
-  /* To optimize and improve FlatList performance, use fixed height
-    items */
-  const getItemLayout = (data, index) => {
-    return { length: heightWithMargin, offset: heightWithMargin * index, index };
-  };
+  /* Render all past plus enough milestones to more than fill up screen on any supported device.
+Note that there seems to be some bug where it won't render what it should if there are only
+a few and you can't scroll to get more. Not sure if that's the cause or not. */
+  let initialNumToRender = 0;
 
   /* Find starting index position (don't show a bunch of past events when first go to screen)
   this prop to FlatList also needs getItemLayout */
   let initialScrollIndexOnlyIfGreaterThanZero = {};
   for (let idx = 0; idx < specials.length; idx++) {
+    initialNumToRender++;
     if (specials[idx].time >= nowTime) {
       initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
       break;
     }
   }
+  initialNumToRender = initialNumToRender + 12;
+
+  const colorStyle = calendarContext.milestoneColorStyle;
+  const cardStyle = calendarContext.milestoneCardStyle;
+
+  let inPast = true;
+  let firstNotInPastKey = null;
 
   const renderItem = ({ item, index, separators }) => {
 
@@ -101,27 +114,33 @@ export default function UpcomingMilestonesList(props) {
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
     const opacityStyle = (item.time < nowTime) ? styles.lessOpacity : styles.fullOpacity;
 
-    const colorStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarColorStyle() : calendarContext.getMilestoneNotOnCalendarColorStyle();
-    const cardStyle = isOnCalendar ? calendarContext.getMilestoneOnCalendarCardStyle() : calendarContext.getMilestoneNotOnCalendarCardStyle();
+    /* Finding first item not in past so we can have divider */
+    if (inPast && item.time >= nowTime) {
+      inPast = false;
+      firstNotInPastKey = item.key;
+    }
 
+    /* We only want between past and future divider if it's not first item (so we also look at index)*/
+    return (<React.Fragment>{(firstNotInPastKey === item.key) && index > 0 && <MyCalendarDivider />}
+      <EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
+        <View style={[styles.eventCardTextWrapper, opacityStyle]}>
 
-    return (<EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
-      <View style={[styles.eventCardTextWrapper, opacityStyle]}>
-        <ClipboardCopyable onPressGetContentFunction={() => {
-          return makeMilestoneClipboardContentForMilestone(item);
-        }}>
-          <EventCardHeader style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
-          <EventCardBodyText style={colorStyle}>{desc}</EventCardBodyText>
-        </ClipboardCopyable>
-      </View>
-      {calendarContext.isCalendarReady &&
-        <View style={opacityStyle}>
-          <TouchableOpacity onPress={() => calendarContext.toggleMilestoneScreenCalendarEvent(item)} style={styles.calendarButton}>
-            <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
-          </TouchableOpacity>
+          <ClipboardCopyable onPressGetContentFunction={() => {
+            return makeMilestoneClipboardContentForMilestone(item);
+          }}>
+            <EventCardHeader style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
+            <EventCardBodyText style={colorStyle}>{desc}</EventCardBodyText>
+          </ClipboardCopyable>
         </View>
-      }
-    </EventCard>);
+        {calendarContext.isCalendarReady &&
+          <View style={opacityStyle}>
+            <TouchableOpacity onPress={() => calendarContext.toggleMilestoneScreenCalendarEvent(item)} style={styles.calendarButton}>
+              <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
+            </TouchableOpacity>
+          </View>
+        }
+      </EventCard>
+    </React.Fragment>);
   }
 
   return (
@@ -133,7 +152,7 @@ export default function UpcomingMilestonesList(props) {
           ListHeaderComponent={props.listHeaderComponent}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={renderItem}
-          initialNumToRender={10}
+          initialNumToRender={initialNumToRender}
           getItemLayout={getItemLayout}
           {...initialScrollIndexOnlyIfGreaterThanZero}
         />

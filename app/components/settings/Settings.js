@@ -14,7 +14,7 @@ import MilestonTypesSettings from './MilestoneTypesSettings'
 import CalendarSettings from './CalendarSettings'
 
 import * as logger from '../../utils/logger'
-import Divider from '../../components/Divider'
+import MyDivider from '../../components/MyDivider'
 import i18n from '../../i18n/i18n'
 import MyText, { MyTextLarge } from '../MyText'
 import MyThemeContext from '../../context/MyThemeContext';
@@ -61,7 +61,7 @@ function Settings(props) {
 
   const _renderSectionTile = section => {
     // Put a divider above each section
-    return <Divider style={styles.divider} />
+    return <MyDivider style={styles.divider} />
   }
 
   const _renderHeader = section => {
@@ -90,7 +90,7 @@ function Settings(props) {
             onChange={setActiveSections}
           />
 
-          <Divider style={styles.divider} />
+          <MyDivider style={styles.divider} />
           <MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsAbout")}</MyTextLarge>
           <MyText >{i18n.t("settingsVersion", { someValue: Constants.manifest.version })}</MyText>
         </ScrollView>

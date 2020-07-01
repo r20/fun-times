@@ -228,7 +228,7 @@ function AddOrEditEvent(props) {
                   isInvalid = true;
                 }
               } catch (err) {
-                console.warn("Not able to convert manualEntryInput to a number", err);
+                logger.warn("Not able to convert manualEntryInput to a number", err);
                 isInvalid = true;
               }
               setIsManualEntryInvalid(isInvalid);
@@ -246,7 +246,7 @@ function AddOrEditEvent(props) {
                   setManualEntryInput('');
                 }
               } catch (err) {
-                console.warn("Not able to convert manualEntryInput to a number", err);
+                logger.warn("Not able to convert manualEntryInput to a number", err);
                 setManualEntryInput('');
               }
             }}

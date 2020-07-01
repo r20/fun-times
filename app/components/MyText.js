@@ -19,8 +19,7 @@ function addPropsStyle(defaultStyle, style) {
 }
 
 
-/* This was created in case need to style all dividers
-(such as based on dark/light theme).  We can just do styling here. */
+/* This was created for styling (such as based on dark/light theme).  */
 const MyText = (props) => {
     const myThemeContext = useContext(MyThemeContext);
     const { style, ...otherProps } = props;
