@@ -191,7 +191,7 @@ events.push(new Event({
     tags: [TAGS.QUIRKY],
     useDateAndTimeInMilestones: false,
     useManualEntryInMilestones: true,
-    manualEntryNumbers: [46], // A new president would be the 46th
+    manualEntryNumbers: [2020, 46], // A new president would be the 46th
 }));
 
 /*
