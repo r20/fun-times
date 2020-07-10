@@ -43,9 +43,9 @@ function CalendarSettings(props) {
   return (
     <React.Fragment>
       <View style={styles.container}>
-        <MyText>{i18n.t('calendarNotificationDaytime', { someValue: calendarNotificationDaytime })}</MyText>
+        <MyText >{i18n.t('calendarNotificationAllDay', { someValue: calendarNotificationAllDayHoursAm })}</MyText>
+        <MyText style={styles.space}>{i18n.t('calendarNotificationDaytime', { someValue: calendarNotificationDaytime })}</MyText>
         <MyText style={styles.space}>{i18n.t('calendarNotificationNighttime', { someValue: calendarNotificationNighttimeHoursPm })}</MyText>
-        <MyText style={styles.space}>{i18n.t('calendarNotificationAllDay', { someValue: calendarNotificationAllDayHoursAm })}</MyText>
         <MyPrimaryButton containerStyle={styles.moreSpace} onPress={onRequestRemoveCalendar} title={i18n.t("removeCalendarEntriesButton")} />
       </View>
     </React.Fragment>
