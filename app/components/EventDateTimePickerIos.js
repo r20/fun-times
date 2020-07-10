@@ -61,23 +61,14 @@ function EventDateTimePickerIos(props) {
   };
 
 
-  /*
-  For prototype, this supports only within a certain range.
-  TBD - The DateTimePicker library crashes if value is 2039 or beyond.
-  Until I figure that out, restrict selecting date to end of 2038.
-  It also crashes if less than Jan 1, 1900.
-  (However, right now nothing is stopping code from using this component and 
-    passing a props.date past that.)
-*/
-  const theMaxDate = new Date(2038, 11, 31);
-
   // NOTE: must have dates within maxNumberOfYearsAway
-  // const theMinDate = new Date();
-  // theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
-  const theMinDate = new Date(1900, 0, 1); // app crashes when date older than this
+  const theMaxDate = new Date();
+  theMaxDate.setFullYear(theMaxDate.getFullYear() + maxNumberOfYearsAway);
+  const theMinDate = new Date();
+  theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
+
 
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
-
   const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
 
   const toggleShowDatePicker = () => {

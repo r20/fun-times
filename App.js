@@ -35,6 +35,10 @@ if (process.env.NODE_ENV !== 'development') {
 See https://docs.expo.io/versions/latest/guides/using-sentry/ 
 
 Still need to add error boundaries too.
+
+// jmr -
+Fix app icon, see  https://stackoverflow.com/questions/47900639/android-oreo-shows-icon-inside-white-round
+
 */
 
 /* Don't render this stuff until the AppSettingsContext has done its initial load */

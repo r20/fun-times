@@ -6,7 +6,7 @@ import * as logger from './logger'
 import { numberToFormattedString, capitalize } from './Utils'
 
 
-export const maxNumberOfYearsAway = 200; // If you ever change this, search for it's use and read about implications
+export const maxNumberOfYearsAway = 300; // If you ever change this, search for it's use and read about implications
 
 /*
   This file has useful functions for finding interesting times.
@@ -388,7 +388,7 @@ export function getSortedInterestingNumbersMap() {
   const start = new Decimal(100); // For our set types of numbers that apply to all events, must be at least this big to be interesting
 
   /* If an event was older than maxNumberOfYearsAway it'd mess us up.
-  This could happen if a standard evnet was created that was older, or if maxNumberOfYearsAway
+  This could happen if a standard event was created that was older, or if maxNumberOfYearsAway
   changed, or if created an event then waited more than 10 years using the app. */
   const bigNumberOfSeconds = (maxNumberOfYearsAway + 10) * 366 * 24 * 3600
   const end = new Decimal(bigNumberOfSeconds);

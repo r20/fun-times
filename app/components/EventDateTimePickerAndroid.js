@@ -13,9 +13,10 @@ import MyPrimaryButton from './MyPrimaryButton'
 import MySwitch from './MySwitch'
 
 /* 
-  Start on a date that makes it convenient for using the spinner.
+  This used to try to start on a date that makes it convenient for changing the year,
+  but users were confused and expected it to start on today's date.
  */
-const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
+const defaultStartingDate = new Date();
 
 
 function EventDateTimePickerAndroid(props) {
@@ -68,20 +69,16 @@ function EventDateTimePickerAndroid(props) {
     showMode('time');
   };
 
-  /*
-  For prototype, this supports only within a certain range.
-  TBD - The DateTimePicker library crashes if value is 2039 or beyond.
-  Until I figure that out, restrict selecting date to end of 2038.
-  It also crashes if less than Jan 1, 1900.
-  (However, right now nothing is stopping code from using this component and 
-    passing a props.date past that.)
-*/
-  const theMaxDate = new Date(2038, 11, 31);
+  /* TBD - although the library doens't crash anymore when picing old dates, when re-opening the picker
+    when setting to an old date the date shown is 1900.  You can still change and pick an older date, but
+    that's a bug withthe library. */
+
 
   // NOTE: must have dates within maxNumberOfYearsAway
-  // const theMinDate = new Date();
-  // theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
-  const theMinDate = new Date(1900, 0, 1); // app crashes when date older than this
+  const theMaxDate = new Date();
+  theMaxDate.setFullYear(theMaxDate.getFullYear() + maxNumberOfYearsAway);
+  const theMinDate = new Date();
+  theMinDate.setFullYear(theMinDate.getFullYear() - maxNumberOfYearsAway);
 
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 
@@ -121,8 +118,7 @@ function EventDateTimePickerAndroid(props) {
           display="default"
           onChange={onChange}
           minuteInterval={1}
-          maximumDate={theMaxDate}
-          minimumDate={theMinDate}
+   
         />
       )}
     </React.Fragment>
