@@ -56,7 +56,7 @@ export const en = {
   fullDay: 'Full Day',
   useDatetimeNumbers: 'Use date/time in milestone calculations',
   useDatetimeNumbersWithExample: 'Use date/time in milestone calculations (e.g. {{someValue}})',
-  useOwnNumbers: 'Optional number for milestone calculations',
+  useOwnNumbers: "Milestones will be calculated using interesting numbers based on app settings.  You may specify an additional number to use in milestone calculations for this event.",
   selectTime: 'Select Time',
   selectDate: 'Select Date',
   enterNumber: "Enter number",

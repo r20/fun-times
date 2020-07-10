@@ -159,13 +159,13 @@ function AddOrEditEvent(props) {
     ),
   });
 
-  let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useFullDay, undefined) : null;
-
-  let useDatetimeLabel = i18n.t("useDatetimeNumbers");
-  if (eventDatetimeNumbers && eventDatetimeNumbers.length > 0) {
-    // Show one example.
-    useDatetimeLabel = i18n.t('useDatetimeNumbersWithExample', { someValue: eventDatetimeNumbers[0].descriptor });
-  }
+  // Decided not to show control for using date/time for custom.  It's just always on.
+  // let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useFullDay, undefined) : null;
+  // let useDatetimeLabel = i18n.t("useDatetimeNumbers");
+  // if (eventDatetimeNumbers && eventDatetimeNumbers.length > 0) {
+  //   // Show one example.
+  //   useDatetimeLabel = i18n.t('useDatetimeNumbersWithExample', { someValue: eventDatetimeNumbers[0].descriptor });
+  // }
 
   /* 
     Wrapped with TouchableWithoutFeedback so when they click outside of the text input
@@ -198,7 +198,7 @@ function AddOrEditEvent(props) {
             />
           }
         </View>
-
+        {/* Decided not to show this control anymore.  It's just on for custom events.
         <View style={styles.switch}>
           <MyText style={{ maxWidth: 210 }}>{useDatetimeLabel}</MyText>
           <MySwitch
@@ -207,7 +207,7 @@ function AddOrEditEvent(props) {
               setUseDateAndTimeInMilestones(isYes);
             }}
           />
-        </View>
+        </View>*/}
 
         <View style={styles.manualEntryView}>
           <MyText>{i18n.t("useOwnNumbers")}</MyText>
