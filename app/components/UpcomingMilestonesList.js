@@ -79,22 +79,28 @@ export default function UpcomingMilestonesList(props) {
 
   const isEmpty = specials.length === 0;
 
-  /* Render all past plus enough milestones to more than fill up screen on any supported device.
-Note that there seems to be some bug where it won't render what it should if there are only
-a few and you can't scroll to get more. Not sure if that's the cause or not. */
-  let initialNumToRender = 0;
 
-  /* Find starting index position (don't show a bunch of past events when first go to screen)
-  this prop to FlatList also needs getItemLayout */
-  let initialScrollIndexOnlyIfGreaterThanZero = {};
-  for (let idx = 0; idx < specials.length; idx++) {
-    initialNumToRender++;
+  /* Find how many old events, and if there are at least 11 new */
+
+  let oldCount = 0;
+  let newCount = 0; for (let idx = 0; idx < specials.length; idx++) {
     if (specials[idx].time >= nowTime) {
-      initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-      break;
+      newCount++;
+      if (newCount > 11) {
+        // We've seen enough
+        break;
+      }
+    } else {
+      oldCount++;
     }
   }
-  initialNumToRender = initialNumToRender + 12;
+
+  /* This is added conditionally, because if there aren't many items it causes things to be un-rendered
+  after changing the max num per event.  There should be more shown, and they are not. 
+   This prop to FlatList also needs getItemLayout */
+  const initialScrollIndexOnlyIfMany = (newCount > 7 && oldCount > 1) ? { initialScrollIndex: oldCount } : {};
+
+  const initialNumToRender = 12;
 
   const colorStyle = calendarContext.milestoneColorStyle;
   const cardStyle = calendarContext.milestoneCardStyle;
@@ -154,7 +160,7 @@ a few and you can't scroll to get more. Not sure if that's the cause or not. */
           renderItem={renderItem}
           initialNumToRender={initialNumToRender}
           getItemLayout={getItemLayout}
-          {...initialScrollIndexOnlyIfGreaterThanZero}
+          {...initialScrollIndexOnlyIfMany}
         />
       }
       {isEmpty &&

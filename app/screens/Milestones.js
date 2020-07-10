@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
   sliderWrapper: {
     flex: 0,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: 15,
+    paddingBottom: 10,
   },
   subtitle: {
     paddingHorizontal: 15,
@@ -47,7 +47,8 @@ function Milestones(props) {
     return eventsAndMilestonesContext.isEventSelected(value);
   });
 
-  // It seems a little more responsive to use a local state variable, and then also set the context one.
+  /* It seems a little more responsive to use a local state variable, and then also set the context one.
+  Plus it allows uer to see the number as they make slide adjustments. */
   const [sliderValue, setSliderValue] = useState((appSettingsContext.calendarMaxNumberMilestonesPerEvent || 3));
 
   const empty = !filtered.length;
@@ -64,12 +65,12 @@ function Milestones(props) {
   // TBD - move slider to settings??
   return (<View style={styles.container} >
     <MyScreenHeader title={i18n.t('headerUpcomingMilestonesScreenTitle')} />
-    <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>
     <View style={styles.sliderWrapper} >
       <MyTextSmall >{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</MyTextSmall>
       <MySlider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
         onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
+    <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>
     {!empty &&
       <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
