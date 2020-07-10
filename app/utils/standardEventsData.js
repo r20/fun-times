@@ -58,7 +58,7 @@ events.push(new Event({
 events.push(new Event({
     title: "New Year's Day",
     key: "New Year's Day",
-    isSelectedByDefault: false,
+    isSelectedByDefault: true,
     // If don't clone it will modify nowMoment and mess up other calculations
     epochMillis: nowMoment.clone().tz(Localization.timezone).startOf('year').add(1, 'years').valueOf(),
     isFullDay: false,
@@ -122,7 +122,7 @@ events.push(new Event({
 events.push(new Event({
     title: "Super Bowl LV",
     key: "Super Bowl",
-    isSelectedByDefault: false,
+    isSelectedByDefault: true,
     isFullDay: false,
     epochMillis: moment.tz("2021-02-07 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
@@ -147,7 +147,7 @@ events.push(new Event({
 events.push(new Event({
     title: "March Madness Tournament Begins",
     key: "March Madness Tournament Begins",
-    isSelectedByDefault: false,
+    isSelectedByDefault: true,
     epochMillis: moment("2021-03-16 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "orange",
@@ -184,7 +184,7 @@ events.push(new Event({
 events.push(new Event({
     title: "US Presidential Election",
     key: "US Presidential Election",
-    isSelectedByDefault: false,
+    isSelectedByDefault: true,
     epochMillis: moment("2020-11-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
     ignoreIfPast: true,
     color: "red",
