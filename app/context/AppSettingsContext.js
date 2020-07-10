@@ -10,7 +10,7 @@ const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
 const STORAGE_KEY_isThemeDefault = '@isThemeDefault';
-
+const STORAGE_KEY_eventsLastSelectedScreen = '@eventsLastSelectedScreen';
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -22,7 +22,7 @@ const DATEPICKER_YEAR_TIP_STATES = {
 const AppSettingsContext = createContext({
   helpWithDatePicker: () => { },
   setCalendarMaxNumberMilestonesPerEvent: (maxNum) => { },
-  // These are on or off
+  setEventsLastSelectedScreen: (screenName) => { },
   setUseRound: () => { },
   setUseCount: () => { },
   setUseRepDigits: () => { },
@@ -82,6 +82,12 @@ export class AppSettingsContextProvider extends React.Component {
         calendarMaxNumberMilestonesPerEvent = JSON.parse(calendarMaxNumberMilestonesPerEvent);
       }
       this.setState({ calendarMaxNumberMilestonesPerEvent });
+    } catch (e) {
+      logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
+    }
+    try {
+      let eventsLastSelectedScreen = await AsyncStorage.getItem(STORAGE_KEY_eventsLastSelectedScreen) || "standard";
+      this.setState({ eventsLastSelectedScreen });
     } catch (e) {
       logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
     }
@@ -198,7 +204,18 @@ export class AppSettingsContextProvider extends React.Component {
       logger.warn("Error. Expected number for calendarMaxNumberMilestonesPerEvent, but received: ", maxNum);
     }
   }
-
+  setEventsLastSelectedScreen = async (screenName) => {
+    if (typeof screenName === "string") {
+      this.setState({ eventsLastSelectedScreen: screenName });
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY_eventsLastSelectedScreen, screenName);
+      } catch (e) {
+        logger.warn("Error from trying to save eventsLastSelectedScreen: ", screenName, e);
+      }
+    } else {
+      logger.warn("Error. Expected string for eventsLastSelectedScreen, but received: ", screenName);
+    }
+  }
 
   /**
    * Set and save isThemeDefault
@@ -282,6 +299,7 @@ export class AppSettingsContextProvider extends React.Component {
         ...this.state,
         helpWithDatePicker: this.helpWithDatePicker,
         setCalendarMaxNumberMilestonesPerEvent: this.setCalendarMaxNumberMilestonesPerEvent,
+        setEventsLastSelectedScreen: this.setEventsLastSelectedScreen,
         setUseRound: this.setUseRound,
         setUseCount: this.setUseCount,
         setUseRepDigits: this.setUseRepDigits,

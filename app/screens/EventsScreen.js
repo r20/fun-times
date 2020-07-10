@@ -9,6 +9,7 @@ import CustomEvents from '../screens/CustomEvents'
 import MyText from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
 import MyScreenHeader from '../components/MyScreenHeader'
+import AppSettingsContext from '../context/AppSettingsContext'
 
 const styles = StyleSheet.create({
   container: {
@@ -20,17 +21,25 @@ const styles = StyleSheet.create({
 function EventsScreen(props) {
 
   const myThemeContext = useContext(MyThemeContext);
+  const appSettingsContext = useContext(AppSettingsContext);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedIndex = appSettingsContext.eventsLastSelectedScreen === 'custom' ? 1 : 0;
 
-  const buttons = [i18n.t('custom'), i18n.t('standard')];
+  const handleChangeScreen = (newIdx) => {
+    if (newIdx === 1) {
+      appSettingsContext.setEventsLastSelectedScreen('custom');
+    } else {
+      appSettingsContext.setEventsLastSelectedScreen('standard');
+    }
+  }
+  const buttons = [i18n.t('standard'), i18n.t('custom')];
   return (
 
     <View style={styles.container}>
 
       <MyScreenHeader title={i18n.t('headerEventsTitle')} />
       <ButtonGroup
-        onPress={setSelectedIndex}
+        onPress={handleChangeScreen}
         selectedIndex={selectedIndex}
         buttons={buttons}
         innerBorderStyle={{ width: 0 }}
@@ -51,8 +60,8 @@ function EventsScreen(props) {
         }}
       />
       {selectedIndex ?
-        <StandardEvents /> :
-        <CustomEvents />
+        <CustomEvents /> :
+        <StandardEvents />
       }
     </View>
   );
