@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import Constants from 'expo-constants';
 import {
-  StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard, Alert, Platform,
+  StyleSheet, View, ScrollView, TouchableWithoutFeedback, Keyboard, Alert, Platform, TouchableHighlight
 } from 'react-native'
 
 import { useScrollToTop } from '@react-navigation/native'
@@ -81,6 +81,7 @@ function Settings(props) {
           <GeneralSettings />
           <Accordion
             expandMultiple={true}
+            touchableComponent={(props) => <TouchableHighlight {...props} />}
             underlayColor={myThemeContext.colors.background}
             sections={SECTIONS}
             activeSections={activeSections}
