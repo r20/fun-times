@@ -112,13 +112,14 @@ function EventDateTimePickerAndroid(props) {
       {show && (
         <DateTimePicker
           testID="dateTimePicker"
+          maximumDate={theMaxDate}
+          minimumDate={theMinDate}
           value={startingDate}
           mode={mode}
           is24Hour={is24HourFormat}
           display="default"
           onChange={onChange}
           minuteInterval={1}
-   
         />
       )}
     </React.Fragment>
