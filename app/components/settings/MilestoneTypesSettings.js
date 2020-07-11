@@ -13,7 +13,7 @@ import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import { INTERESTING_CONSTANTS, getDecimalDisplayValueForKey } from '../../utils/interestingNumbersFinder'
-import MyText from '../MyText'
+import MyText, { MyTextLarge } from '../MyText'
 import MySwitch from '../MySwitch'
 import MySlider from '../MySlider'
 import MyThemeContext from '../../context/MyThemeContext'
@@ -35,8 +35,13 @@ function MilestoneTypesSettings(props) {
 
   const appSettingsContext = useContext(AppSettingsContext);
 
+  /* 
 
-  /* Things seem a little more responsive if I use local state and then update appSettingsContext
+  Note: These used to be sliders with values from 0 to 3 for how much to use the constants.
+  Now, they are a switch with on/off and depending on the constant on means 1-3.
+
+  OLD COMMENT:
+  Things seem a little more responsive if I use local state and then update appSettingsContext
   when the slider is done changing rather than only use appSettingsContext for
   value and onValueChange in the slider */
   const [howMuchPi, setHowMuchPi] = useState(appSettingsContext.numberTypeUseMap.pi);
@@ -115,80 +120,130 @@ function MilestoneTypesSettings(props) {
           </View>
 
 
-          <MyText style={styles.howMuchTitle}>{i18n.t("settingsHeaderHowMuchConstants")}</MyText>
+          <MyTextLarge style={styles.howMuchTitle}>{i18n.t("settingsHeaderConstants")}</MyTextLarge>
 
-          <MyText style={styles.sliderTitle}>{translationKeyMap.pi}</MyText>
-          <MySlider value={howMuchPi} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchPi}
-            onSlidingComplete={(newVal) => {
-              setHowMuchPi(newVal);
-              appSettingsContext.setUsePi(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.speedOfLight}</MyText>
-          <MySlider value={howMuchSpeedOfLight} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchSpeedOfLight}
-            onSlidingComplete={(newVal) => {
-              setHowMuchSpeedOfLight(newVal);
-              appSettingsContext.setUseSpeedOfLight(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.gravity}</MyText>
-          <MySlider value={howMuchGravity} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchGravity}
-            onSlidingComplete={(newVal) => {
-              setHowMuchGravity(newVal);
-              appSettingsContext.setUseGravity(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.euler}</MyText>
-          <MySlider value={howMuchEuler} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchEuler}
-            onSlidingComplete={(newVal) => {
-              setHowMuchEuler(newVal);
-              appSettingsContext.setUseEuler(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.phi}</MyText>
-          <MySlider value={howMuchPhi} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchPhi}
-            onSlidingComplete={(newVal) => {
-              setHowMuchPhi(newVal);
-              appSettingsContext.setUsePhi(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.pythagoras}</MyText>
-          <MySlider value={howMuchPythagoras} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchPythagoras}
-            onSlidingComplete={(newVal) => {
-              setHowMuchPythagoras(newVal);
-              appSettingsContext.setUsePythagoras(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.mole}</MyText>
-          <MySlider value={howMuchMole} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchMole}
-            onSlidingComplete={(newVal) => {
-              setHowMuchMole(newVal);
-              appSettingsContext.setUseMole(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.rGas}</MyText>
-          <MySlider value={howMuchRGas} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchRGas}
-            onSlidingComplete={(newVal) => {
-              setHowMuchRGas(newVal);
-              appSettingsContext.setUseRGas(newVal);
-            }}
-          />
-          <MyText style={styles.sliderTitle}>{translationKeyMap.faraday}</MyText>
-          <MySlider value={howMuchFaraday} step={1} minimumValue={0} maximumValue={3}
-            onValueChange={setHowMuchFaraday}
-            onSlidingComplete={(newVal) => {
-              setHowMuchFaraday(newVal);
-              appSettingsContext.setUseFaraday(newVal);
-            }}
-          />
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("settingsUseMathAndScienceConstantsForStandardEvents")}</MyText>
+            <MySwitch
+              value={appSettingsContext.settingsUseMathAndScienceConstantsForStandardEvents}
+              onValueChange={isYes => {
+                appSettingsContext.setSettingsUseMathAndScienceConstantsForStandardEvents(isYes);
+              }}
+            />
+          </View>
+
+          <View style={styles.switchSelection}>
+            <MyText >{i18n.t("settingsUseMathAndScienceConstantsForCustomEvents")}</MyText>
+            <MySwitch
+              value={appSettingsContext.settingsUseMathAndScienceConstantsForCustomEvents}
+              onValueChange={isYes => {
+                appSettingsContext.setSettingsUseMathAndScienceConstantsForCustomEvents(isYes);
+              }}
+            />
+          </View>
+
+          <MyText style={styles.howMuchTitle}>{i18n.t("settingsHeaderWhichConstants")}</MyText>
+
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.pi}</MyText>
+            <MySwitch
+              value={(howMuchPi > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchPi(newVal);
+                appSettingsContext.setUsePi(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.speedOfLight}</MyText>
+            <MySwitch
+              value={(howMuchSpeedOfLight > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchSpeedOfLight(newVal);
+                appSettingsContext.setUseSpeedOfLight(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.gravity}</MyText>
+            <MySwitch
+              value={(howMuchGravity > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchGravity(newVal);
+                appSettingsContext.setUseGravity(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.euler}</MyText>
+            <MySwitch
+              value={(howMuchEuler > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchEuler(newVal);
+                appSettingsContext.setUseEuler(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.phi}</MyText>
+            <MySwitch
+              value={(howMuchPhi > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchPhi(newVal);
+                appSettingsContext.setUsePhi(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.pythagoras}</MyText>
+            <MySwitch
+              value={(howMuchPythagoras > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchPythagoras(newVal);
+                appSettingsContext.setUsePythagoras(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.mole}</MyText>
+            <MySwitch
+              value={(howMuchMole > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchMole(newVal);
+                appSettingsContext.setUseMole(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.rGas}</MyText>
+            <MySwitch
+              value={(howMuchRGas > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchRGas(newVal);
+                appSettingsContext.setUseRGas(newVal);
+              }}
+            />
+          </View>
+          <View style={styles.switchSelection}>
+            <MyText >{translationKeyMap.faraday}</MyText>
+            <MySwitch
+              value={(howMuchFaraday > 0)}
+              onValueChange={isYes => {
+                const newVal = isYes ? 2 : 0;
+                setHowMuchFaraday(newVal);
+                appSettingsContext.setUseFaraday(newVal);
+              }}
+            />
+          </View>
+
 
         </ScrollView>
       </React.Fragment>

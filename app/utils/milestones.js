@@ -45,7 +45,12 @@ function createMilestone(event, unit, description, numberType, numberCode, time)
 }
 
 
-
+/* 
+Look in the milestone and the numberTypeUseMap to see if this milestone should be shown.
+ 
+NOTE that new settings were added to determine whether math/science constants should be
+shown for custom and standard events separately. That's not checked for in this function.
+Caller needs to check. */
 export function shouldShowMilestoneForNumberType(milestone, numberTypeUseMap) {
 
     if (milestone.numberType === EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME) {

@@ -5,12 +5,15 @@ import { Appearance } from 'react-native-appearance'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
 import { INTERESTING_TYPES, INTERESTING_CONSTANTS } from '../utils/interestingNumbersFinder'
+import { standardEventsData } from '../utils/standardEventsData'
 
 const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
 const STORAGE_KEY_isThemeDefault = '@isThemeDefault';
 const STORAGE_KEY_eventsLastSelectedScreen = '@eventsLastSelectedScreen';
+const STORAGE_KEY_settingsUseMathAndScienceConstantsForCustomEvents = '@settingsUseMathAndScienceConstantsForCustomEvents';
+const STORAGE_KEY_settingsUseMathAndScienceConstantsForStandardEvents = '@settingsUseMathAndScienceConstantsForStandardEvents';
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -22,6 +25,8 @@ const DATEPICKER_YEAR_TIP_STATES = {
 const AppSettingsContext = createContext({
   helpWithDatePicker: () => { },
   setCalendarMaxNumberMilestonesPerEvent: (maxNum) => { },
+  setSettingsUseMathAndScienceConstantsForCustomEvents: (isYes) => { },
+  setSettingsUseMathAndScienceConstantsForStandardEvents: (isYes) => { },
   setEventsLastSelectedScreen: (screenName) => { },
   setUseRound: () => { },
   setUseCount: () => { },
@@ -58,6 +63,9 @@ export class AppSettingsContextProvider extends React.Component {
       // Default values
       datePickerYearTipState: DATEPICKER_YEAR_TIP_STATES.FIRST_TIME,
       calendarMaxNumberMilestonesPerEvent: 3,
+      eventsLastSelectedScreen: 'standard',
+      settingsUseMathAndScienceConstantsForCustomEvents: true,
+      settingsUseMathAndScienceConstantsForStandardEvents: false,
       numberTypeUseMap: {}, // has usePowers, useBinary, useGravity, etc. attributes. 
       isThemeDefault: true,
       isInitialSettingsLoaded: false,
@@ -85,11 +93,19 @@ export class AppSettingsContextProvider extends React.Component {
     } catch (e) {
       logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
     }
+
     try {
       let eventsLastSelectedScreen = await AsyncStorage.getItem(STORAGE_KEY_eventsLastSelectedScreen) || "standard";
-      this.setState({ eventsLastSelectedScreen });
+
+      let settingsUseMathAndScienceConstantsForCustomEvents = await AsyncStorage.getItem(STORAGE_KEY_settingsUseMathAndScienceConstantsForCustomEvents) || "true";
+      settingsUseMathAndScienceConstantsForCustomEvents = settingsUseMathAndScienceConstantsForCustomEvents === 'true';
+
+      let settingsUseMathAndScienceConstantsForStandardEvents = await AsyncStorage.getItem(STORAGE_KEY_settingsUseMathAndScienceConstantsForStandardEvents) || "false";
+      settingsUseMathAndScienceConstantsForStandardEvents = settingsUseMathAndScienceConstantsForStandardEvents === 'true';
+
+      this.setState({ eventsLastSelectedScreen, settingsUseMathAndScienceConstantsForCustomEvents, settingsUseMathAndScienceConstantsForStandardEvents });
     } catch (e) {
-      logger.warn("Error from failing to load calendarMaxNumberMilestonesPerEvent: ", e);
+      logger.warn("Error from failing to load some async storage settings ", e);
     }
     try {
       // If not in async storage, use empty object and we'll set defaults  just below
@@ -217,6 +233,24 @@ export class AppSettingsContextProvider extends React.Component {
     }
   }
 
+  setSettingsUseMathAndScienceConstantsForCustomEvents = async (isYes) => {
+    this.setState({ settingsUseMathAndScienceConstantsForCustomEvents: isYes });
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_settingsUseMathAndScienceConstantsForCustomEvents, JSON.stringify(isYes));
+    } catch (e) {
+      logger.warn("Error from trying to save settingsUseMathAndScienceConstantsForCustomEvents: ", isYes, e);
+    }
+  }
+
+  setSettingsUseMathAndScienceConstantsForStandardEvents = async (isYes) => {
+    this.setState({ settingsUseMathAndScienceConstantsForStandardEvents: isYes });
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_settingsUseMathAndScienceConstantsForStandardEvents, JSON.stringify(isYes));
+    } catch (e) {
+      logger.warn("Error from trying to save settingsUseMathAndScienceConstantsForStandardEvents: ", isYes, e);
+    }
+  }
+
   /**
    * Set and save isThemeDefault
    */
@@ -300,6 +334,8 @@ export class AppSettingsContextProvider extends React.Component {
         helpWithDatePicker: this.helpWithDatePicker,
         setCalendarMaxNumberMilestonesPerEvent: this.setCalendarMaxNumberMilestonesPerEvent,
         setEventsLastSelectedScreen: this.setEventsLastSelectedScreen,
+        setSettingsUseMathAndScienceConstantsForCustomEvents: this.setSettingsUseMathAndScienceConstantsForCustomEvents,
+        setSettingsUseMathAndScienceConstantsForStandardEvents: this.setSettingsUseMathAndScienceConstantsForStandardEvents,
         setUseRound: this.setUseRound,
         setUseCount: this.setUseCount,
         setUseRepDigits: this.setUseRepDigits,

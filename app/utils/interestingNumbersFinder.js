@@ -331,7 +331,7 @@ export const INTERESTING_CONSTANTS = {
   rGas: { defaultUse: 0, decimal: new Decimal(8.31446261815324), units: "J⋅K−1⋅mol−1" },
   faraday: { defaultUse: 0, decimal: new Decimal(96485.3321233100184), units: "C⋅mol−1" }, //  (magnitude of electrical charge per mole of electrons)
   gravity: { defaultUse: 0, decimal: (new Decimal(6.67430)).mul((new Decimal(10)).toPower(-11)), units: "m3⋅kg−1⋅s−2" },
-  speedOfLight: { defaultUse: 1, decimal: new Decimal(299792458), units: "m/s" },
+  speedOfLight: { defaultUse: 2, decimal: new Decimal(299792458), units: "m/s" },
 
 }
 
@@ -428,14 +428,6 @@ export function getSortedInterestingNumbersMap() {
       let descriptor;
       if (factor === 1) {
         translationKey = "constantExact";
-        descriptor = i18n.t(translationKey, {
-          numberName: i18n.t("numberName" + capitalize(numberKey)),
-          someValue: numberToFormattedString(decimalInteresting, true), // don't use units for descriptor
-        });
-
-      } else if (Number.isInteger(Math.log10(factor))) {
-        // The factor is in form 10^n (which means the decimalInteresting has the same digits as the constant)
-        translationKey = "constantTenMultiple";
         descriptor = i18n.t(translationKey, {
           numberName: i18n.t("numberName" + capitalize(numberKey)),
           someValue: numberToFormattedString(decimalInteresting, true), // don't use units for descriptor

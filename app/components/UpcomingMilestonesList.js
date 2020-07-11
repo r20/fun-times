@@ -60,6 +60,20 @@ export default function UpcomingMilestonesList(props) {
     return eventsAndMilestonesContext.allMilestones.filter(function (milestone, index, arr) {
       if (milestone.event && eventTitleMap[milestone.event.title]) {
         // yes this milestone is for one of the events
+
+        /* New settings were added to determine whether math/science constants should be
+          shown for custom and standard events separately. Check for that here instead of in shouldShowMilestoneForNumberType */
+        if (milestone.numberCode) {
+          // This is for a math/science constant
+          if (milestone.event.isCustom && !appSettingsContext.settingsUseMathAndScienceConstantsForCustomEvents) {
+            // This math/science constant but setting is off to show them for custom events
+            return false;
+          }
+          if (!milestone.event.isCustom && !appSettingsContext.settingsUseMathAndScienceConstantsForStandardEvents) {
+            // This math/science constant but setting is off to show them for standard events
+            return false;
+          }
+        }
         if (shouldShowMilestoneForNumberType(milestone, appSettingsContext.numberTypeUseMap)) {
           // Yes we should show this type of milestone
           if (!props.maxNumMilestonesPerEvent) {
