@@ -19,7 +19,8 @@ const STORAGE_KEY_STANDARD_EVENTS_KEY_TO_SELECTED_MAP = '@save_standard_events_k
 const maxNumPastMilestonesPerEvent = 2;
 
 /* To keep us from re-rendering because now changed just use the same now */
-const nowTime = (new Date()).getTime();
+const nowDate = new Date();
+const nowTime = nowDate.getTime();
 
 
 /**
@@ -80,19 +81,37 @@ export class EventsAndMilestonesContextProvider extends React.Component {
   }
 
   /* 
-  TBD If make a code change that would break old stored events, put stuff in this function
-    to upgrade them. 
+  This makes updates to the custom events as needed. 
+  * If they are in the past they should have their tme set to end of day
+  * If I might make a code change that would break old events, 
     I could change code to store the event object version (or code version) and
     look at its version compared to current version and do update only if needed. */
-  updateCustomEventsForAppUpdate = (customEvents) => {
+  updateCustomEventsReadFromAsyncStorage = (customEvents) => {
     try {
       let needsSaved = false;
       for (var idx = 0; idx < customEvents.length; idx++) {
         const event = customEvents[idx];
-        if (!event.tags) {
-          needsSaved = true;
-          event.tags = [];
+
+        // Make sure all day events in the past are at end of day, and future are at beginning of day
+        if (event.isFullDay) {
+          const endOfEventDayEpochMillis = getMomentFromEvent(event).endOf('day').toDate().getTime();
+          if (nowTime > endOfEventDayEpochMillis) {
+            // should be at end of day
+            if (event.epochMillis !== endOfEventDayEpochMillis) {
+              needsSaved = true;
+              event.epochMillis = endOfEventDayEpochMillis;
+            }
+          } else {
+            // should be at start of day
+            const startOfEventDayEpochMillis = getMomentFromEvent(event).startOf('day').toDate().getTime();
+            if (event.epochMillis !== startOfEventDayEpochMillis) {
+              needsSaved = true;
+              event.epochMillis = startOfEventDayEpochMillis;
+            }
+          }
         }
+
+        // I could put code here to change event object between versions
       }
 
       if (needsSaved) {
@@ -118,6 +137,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
       logger.warn("Failed to load customEvents.");
       logger.log("Error from failing to load customEvents: ", e);
     }
+    customEvents = this.updateCustomEventsReadFromAsyncStorage(customEvents);
 
     const nowMillis = (new Date()).getTime();
     let standardEvents = standardEventsData || [];
@@ -164,10 +184,8 @@ export class EventsAndMilestonesContextProvider extends React.Component {
 
     // Generate milestones for all events
     let allMilestones = [];
-    customEvents = this.updateCustomEventsForAppUpdate(customEvents);
     for (let event of customEvents) {
       allMilestones = allMilestones.concat(this.getMilestonesForEvent(event));
-
     }
     for (let event of standardEvents) {
       allMilestones = allMilestones.concat(this.getMilestonesForEvent(event));
@@ -275,7 +293,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
    * based on its title, and removes associated milestones.
    */
   removeCustomEventAndMilestones = (eventToRemove) => {
-    
+
     try {
       if (eventToRemove && eventToRemove.title) {
         var filtered = this.state.customEvents.filter(function (value, index, arr) {
@@ -441,10 +459,10 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     }
   }
 
-/* jmr - change this.  Here's email reminder:
-I chose today and says 15 hours since, doesn't make sense, seems like 0 would make sense if chose today
-After thinking about it more, I probably will change this.  If it's an all day event, all the times will show zero if it's today.  If it's in the future I'll use 0:00 (start of day) and if it's in the past I'll use 23:59:59 (end of day) to calculate times.
-*/
+  /* jmr - change this.  Here's email reminder:
+  I chose today and says 15 hours since, doesn't make sense, seems like 0 would make sense if chose today
+  After thinking about it more, I probably will change this.  If it's an all day event, all the times will show zero if it's today.  If it's in the future I'll use 0:00 (start of day) and if it's in the past I'll use 23:59:59 (end of day) to calculate times.
+  */
 
 
   /**

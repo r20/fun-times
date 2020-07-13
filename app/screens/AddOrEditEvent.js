@@ -97,11 +97,21 @@ function AddOrEditEvent(props) {
       }
     }
 
+    let theTime = selectedDate.getTime();
+
+    /* For all day events, set time to beginning or end of day */
+    if (useFullDay) {
+      theTime = moment(selectedDate.getTime()).startOf('day').toDate().getTime();
+      if ((new Date()).getTime() >= theTime) {
+        // If it's after the start of the day, set to end of day
+        theTime = moment(selectedDate.getTime()).endOf('day').toDate().getTime();
+      }
+    }
 
     let event;
     if (isCreate) {
       event = new Event({
-        title: newTitle, epochMillis: selectedDate.getTime(), isFullDay: useFullDay,
+        title: newTitle, epochMillis: theTime, isFullDay: useFullDay,
         isCustom: true, selected: true, ignoreIfPast: false,
         useDateAndTimeInMilestones: useDateAndTimeInMilestones,
         useManualEntryInMilestones: (manualEntryNumbers.length > 0),
@@ -110,7 +120,7 @@ function AddOrEditEvent(props) {
     } else {
       event = clonedEvent;
       event.title = newTitle;
-      event.epochMillis = selectedDate.getTime();
+      event.epochMillis = theTime;
       event.isFullDay = useFullDay;
       event.useDateAndTimeInMilestones = useDateAndTimeInMilestones;
       event.useManualEntryInMilestones = (manualEntryNumbers.length > 0);
