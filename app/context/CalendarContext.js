@@ -371,7 +371,7 @@ function MyCalendarProvider(props) {
         if (milestoneKey) {
           tmpcalendarMilestoneEventsMap[milestoneKey] = calendarEvent.id;
         }
-        logger.log("Calendar event is ", calendarEvent);
+        logger.warn("Calendar event is ", calendarEvent);
 
         // Make an object that wraps calendarEvent
         tmpwrappedCalendarEventsList.push(wrapCalendarEventObject(calendarEvent, true, milestoneKey));
@@ -411,8 +411,10 @@ function MyCalendarProvider(props) {
 
   /* Add it to calendar and change isOnCalendar. The id will change too. */
   const addCalendarEventToCalendarAsync = async (calendarEvent, milestoneKey) => {
+
     const newCalendarEvent = Object.assign({}, calendarEvent);
     delete newCalendarEvent.id;
+    // jmr - Doesn't work with new release of expo and expo-calendar 8.2.1
     const eventId = await Calendar.createEventAsync(calendarId, newCalendarEvent);
     newCalendarEvent.id = eventId;
 
@@ -542,9 +544,9 @@ function MyCalendarProvider(props) {
       // Set to UTC midnight for allDay events. Android needs it that way.
       const allDay = getIsMilestoneFullDay(milestoneItem);
 
-      const start = allDay ? new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0) : (new Date(milestoneItem.time));
+      const start = allDay ? new Date(new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0)) : (new Date(milestoneItem.time));
       // for allDay, set end 24 hours later.  Otherwise end is start.
-      const end = allDay ? new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0) : start;
+      const end = allDay ? new Date(new Date(milestoneItem.time + 24 * 60 * 60000).setUTCHours(0, 0, 0, 0)) : start;
 
       /* Set different alert times depending on whether it's 
         all day, a day-time milestone, or a night-time milestone */
@@ -577,7 +579,7 @@ function MyCalendarProvider(props) {
         endDate: end,
         allDay: allDay,
         timeZone: allDay ? "UTC" : Localization.timezone, // string, required on Android
-        endTimeZone: null,
+        endTimeZone: null, // string, Android but I could only get alarm to work if this is null
       };
       addCalendarEventToCalendarAsync(newCalendarEvent, milestoneKey);
     }
