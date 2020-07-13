@@ -14,7 +14,7 @@ export default class Event {
         epochMillis
         color (not used anymore)
         keywords
-        isFullDay
+        isAllDay
         isCustom
         ignoreIfPast // Only show this event if it is in the future
         selected // Whether the event is selected/visible in non-events screens
@@ -29,7 +29,7 @@ export default class Event {
         // Take the this object, add in some defaults, then add in passed in options (which may override defaults)
         Object.assign(this, {
             tags: [],
-            isFullDay: true,
+            isAllDay: true,
             specialNumbers: [],
             keywords: [],
             isSelectedByDefault: false,

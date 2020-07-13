@@ -85,10 +85,10 @@ const numberTypes = Object.keys(sortedInterestingNumbersMap);
  * (This is similar to the object in interestingNumbersFinder except it has an optional event tag with it.)
  * 
  * @param {*} epochTime (number): Epoch millisecond time to generate numbers from
- * @param {*} isFullDay (boolean): Determines whether numbers generated include hour and minute
+ * @param {*} isAllDay (boolean): Determines whether numbers generated include hour and minute
  * @param {*} event     (Object): optional. If passed as input parm, it's an attribute on the object returned.
  */
-export const getInterestingNumbersForEventTime = (epochTime, isFullDay, event) => {
+export const getInterestingNumbersForEventTime = (epochTime, isAllDay, event) => {
 
     /* TBD - whether in here or another control, 
     I should use the next anniversary number in milestones.  
@@ -152,7 +152,7 @@ export const getInterestingNumbersForEventTime = (epochTime, isFullDay, event) =
         let myInt = parseInt(theMoment.format(dateFormat), 10);
         numToInterestingInfo[myInt] = makeInterestingInfo(myInt, myInt + " (" + dateFormat + ")", event);
 
-        if (!isFullDay) {
+        if (!isAllDay) {
             /* Use year, month, and day combinations with time combinations */
             myInt = parseInt(theMoment.format(dateFormat + 'hhmm'), 10);
             numToInterestingInfo[myInt] = makeInterestingInfo(myInt, myInt + " (" + dateFormat + "hhmm)", event);
@@ -255,7 +255,7 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
         return null;
     };
 
-    const eventDatetimeNumbers = getInterestingNumbersForEventTime(event.epochMillis, event.isFullDay, event);
+    const eventDatetimeNumbers = getInterestingNumbersForEventTime(event.epochMillis, event.isAllDay, event);
 
     const units = ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
     for (let unitsIidx = 0; unitsIidx < units.length; unitsIidx++) {

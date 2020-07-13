@@ -171,7 +171,7 @@ export function capitalize(s) {
 export function getDisplayStringDateTimeForEvent(event) {
 
   if (event) {
-    return getDisplayStringDateTimeForEpoch(event.epochMillis, event.isFullDay);
+    return getDisplayStringDateTimeForEpoch(event.epochMillis, event.isAllDay);
   }
   logger.log("Something is wrong with the event");
   return '????-??-?? ????';

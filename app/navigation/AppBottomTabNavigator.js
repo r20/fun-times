@@ -38,7 +38,7 @@ function MyTabs(props) {
 
   };
   const eventsStackOptions = { tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> };
-  const todayOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-today" size={size} color={color} /> };
+  const todayOptions = { tabBarIcon: ({ focused, color, size }) => <Entypo name="stopwatch" size={size} color={color} /> };
   const milestoneOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> };
   const calendarOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-check" size={size} color={color} /> };
   const moreOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> };

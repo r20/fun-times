@@ -36,8 +36,8 @@ function AddOrEditEvent(props) {
   const [title, setTitle] = useState(clonedEvent ? clonedEvent.title : '');
   const [selectedDate, setSelectedDate] = useState(clonedEvent ? (new Date(clonedEvent.epochMillis)) : null);
   // If it was undefined, use true
-  const initialIsFullDay = (clonedEvent && clonedEvent.isFullDay === false) ? clonedEvent.isFullDay : true;
-  const [useFullDay, setUseFullDay] = useState(initialIsFullDay);
+  const initialIsAllDay = (clonedEvent && clonedEvent.isAllDay === false) ? clonedEvent.isAllDay : true;
+  const [useAllDay, setUseAllDay] = useState(initialIsAllDay);
   const [useDateAndTimeInMilestones, setUseDateAndTimeInMilestones] = useState(clonedEvent ? clonedEvent.useDateAndTimeInMilestones : true);
   const initialManualEntryInput = (clonedEvent && clonedEvent.manualEntryNumbers && clonedEvent.manualEntryNumbers.length > 0) ? String(clonedEvent.manualEntryNumbers[0]) : '';
   const [manualEntryInput, setManualEntryInput] = useState(initialManualEntryInput);
@@ -100,7 +100,7 @@ function AddOrEditEvent(props) {
     let theTime = selectedDate.getTime();
 
     /* For all day events, set time to beginning or end of day */
-    if (useFullDay) {
+    if (useAllDay) {
       theTime = moment(selectedDate.getTime()).startOf('day').toDate().getTime();
       if ((new Date()).getTime() >= theTime) {
         // If it's after the start of the day, set to end of day
@@ -111,7 +111,7 @@ function AddOrEditEvent(props) {
     let event;
     if (isCreate) {
       event = new Event({
-        title: newTitle, epochMillis: theTime, isFullDay: useFullDay,
+        title: newTitle, epochMillis: theTime, isAllDay: useAllDay,
         isCustom: true, selected: true, ignoreIfPast: false,
         useDateAndTimeInMilestones: useDateAndTimeInMilestones,
         useManualEntryInMilestones: (manualEntryNumbers.length > 0),
@@ -121,7 +121,7 @@ function AddOrEditEvent(props) {
       event = clonedEvent;
       event.title = newTitle;
       event.epochMillis = theTime;
-      event.isFullDay = useFullDay;
+      event.isAllDay = useAllDay;
       event.useDateAndTimeInMilestones = useDateAndTimeInMilestones;
       event.useManualEntryInMilestones = (manualEntryNumbers.length > 0);
       event.manualEntryNumbers = manualEntryNumbers;
@@ -170,7 +170,7 @@ function AddOrEditEvent(props) {
   });
 
   // Decided not to show control for using date/time for custom.  It's just always on.
-  // let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useFullDay, undefined) : null;
+  // let eventDatetimeNumbers = selectedDate ? getInterestingNumbersForEventTime(selectedDate.getTime(), useAllDay, undefined) : null;
   // let useDatetimeLabel = i18n.t("useDatetimeNumbers");
   // if (eventDatetimeNumbers && eventDatetimeNumbers.length > 0) {
   //   // Show one example.
@@ -196,14 +196,14 @@ function AddOrEditEvent(props) {
         />
         <View style={styles.eventDateTimePickerWrapper} >
           {isIos &&
-            <EventDateTimePickerIos date={selectedDate} useFullDay={useFullDay}
-              onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+            <EventDateTimePickerIos date={selectedDate} useAllDay={useAllDay}
+              onSelectDate={setSelectedDate} onSetUseAllDay={setUseAllDay}
               spaceBetweenDateAndTime={spaceAmount}
             />
           }
           {!isIos &&
-            <EventDateTimePickerAndroid date={selectedDate} useFullDay={useFullDay}
-              onSelectDate={setSelectedDate} onSetUseFullDay={setUseFullDay}
+            <EventDateTimePickerAndroid date={selectedDate} useAllDay={useAllDay}
+              onSelectDate={setSelectedDate} onSetUseAllDay={setUseAllDay}
               onShowAndroidPicker={Keyboard.dismiss} spaceBetweenDateAndTime={spaceAmount}
             />
           }

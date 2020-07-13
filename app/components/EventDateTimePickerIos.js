@@ -69,7 +69,7 @@ function EventDateTimePickerIos(props) {
 
 
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
-  const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
+  const timePickerTitle = (!props.useAllDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
 
   const toggleShowDatePicker = () => {
     setShowDatePicker(!showDatePicker);
@@ -110,20 +110,20 @@ function EventDateTimePickerIos(props) {
         </React.Fragment>
       }
 
-      <View style={[styles.fullDaySelection, { marginTop: props.spaceBetweenDateAndTime }]}>
-        <MyText>{i18n.t("fullDay")}</MyText>
+      <View style={[styles.allDaySelection, { marginTop: props.spaceBetweenDateAndTime }]}>
+        <MyText>{i18n.t("allDay")}</MyText>
         <MySwitch
-          value={props.useFullDay}
+          value={props.useAllDay}
           onValueChange={isYes => {
-            props.onSetUseFullDay(isYes);
+            props.onSetUseAllDay(isYes);
           }}
         />
       </View>
-      {!props.useFullDay && (
+      {!props.useAllDay && (
         <React.Fragment>
 
           <View >
-            <MyPrimaryButton disabled={props.useFullDay} onPress={toggleShowTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
+            <MyPrimaryButton disabled={props.useAllDay} onPress={toggleShowTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
           </View>
           {showTimePicker &&
             <React.Fragment>
@@ -150,16 +150,16 @@ function EventDateTimePickerIos(props) {
 
 EventDateTimePickerIos.propTypes = {
   date: PropTypes.object,
-  useFullDay: PropTypes.bool.isRequired,
+  useAllDay: PropTypes.bool.isRequired,
   onSelectDate: PropTypes.func.isRequired,
-  onSetUseFullDay: PropTypes.func.isRequired,
+  onSetUseAllDay: PropTypes.func.isRequired,
   spaceBetweenDateAndTime: PropTypes.number.isRequired, // How much space to put between select date button and time controls
 };
 
 export default EventDateTimePickerIos;
 
 const styles = StyleSheet.create({
-  fullDaySelection: {
+  allDaySelection: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',

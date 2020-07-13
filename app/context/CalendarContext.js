@@ -73,8 +73,8 @@ function wrapCalendarEventObject(calendarEvent, isOnCalendar, milestoneKey) {
 }
 
 
-export function getIsMilestoneFullDay(milestoneItem) {
-  return milestoneItem.event.isFullDay && (['hours', 'minutes', 'seconds'].indexOf(milestoneItem.unit) < 0);
+export function getIsMilestoneAllDay(milestoneItem) {
+  return milestoneItem.event.isAllDay && (['hours', 'minutes', 'seconds'].indexOf(milestoneItem.unit) < 0);
 }
 
 /* 
@@ -119,7 +119,7 @@ const makeMilestoneClipboardContent = (milestoneTime, isAllDay, description) => 
 
 
 export const makeMilestoneClipboardContentForMilestone = (milestoneItem) => {
-  const allDay = getIsMilestoneFullDay(milestoneItem);
+  const allDay = getIsMilestoneAllDay(milestoneItem);
   const verboseDesc = getMilestoneVerboseDescription(milestoneItem);
   return makeMilestoneClipboardContent(milestoneItem.time, allDay, verboseDesc);
 
@@ -542,7 +542,7 @@ function MyCalendarProvider(props) {
 
       const milestoneKey = milestoneItem.key;
       // Set to UTC midnight for allDay events. Android needs it that way.
-      const allDay = getIsMilestoneFullDay(milestoneItem);
+      const allDay = getIsMilestoneAllDay(milestoneItem);
 
       const start = allDay ? new Date(new Date(milestoneItem.time).setUTCHours(0, 0, 0, 0)) : (new Date(milestoneItem.time));
       // for allDay, set end 24 hours later.  Otherwise end is start.

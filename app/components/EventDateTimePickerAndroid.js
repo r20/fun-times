@@ -82,7 +82,7 @@ function EventDateTimePickerAndroid(props) {
 
   const datePickerTitle = props.date ? Utils.getDisplayStringForDate(props.date) : i18n.t("selectDate");
 
-  const timePickerTitle = (!props.useFullDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
+  const timePickerTitle = (!props.useAllDay && props.date) ? Utils.getDisplayStringForTime(props.date) : i18n.t("selectTime");
 
 
 
@@ -97,17 +97,17 @@ function EventDateTimePickerAndroid(props) {
       <View style={{ marginBottom: props.spaceBetweenDateAndTime }}>
         <MyPrimaryButton onPress={showDatePicker} title={datePickerTitle} accessibilityLabel="Open date picker for this event" />
       </View>
-      <View style={styles.fullDaySelection}>
-        <MyText>{i18n.t("fullDay")}</MyText>
+      <View style={styles.allDaySelection}>
+        <MyText>{i18n.t("allDay")}</MyText>
         <MySwitch
-          value={props.useFullDay}
+          value={props.useAllDay}
           onValueChange={isYes => {
-            props.onSetUseFullDay(isYes);
+            props.onSetUseAllDay(isYes);
           }}
         />
       </View>
       <View style={{ marginTop: 20 }}>
-        <MyPrimaryButton disabled={props.useFullDay} onPress={showTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
+        <MyPrimaryButton disabled={props.useAllDay} onPress={showTimePicker} title={timePickerTitle} accessibilityLabel="Open time picker for this event" />
       </View>
       {show && (
         <DateTimePicker
@@ -128,9 +128,9 @@ function EventDateTimePickerAndroid(props) {
 
 EventDateTimePickerAndroid.propTypes = {
   date: PropTypes.object,
-  useFullDay: PropTypes.bool.isRequired,
+  useAllDay: PropTypes.bool.isRequired,
   onSelectDate: PropTypes.func.isRequired,
-  onSetUseFullDay: PropTypes.func.isRequired,
+  onSetUseAllDay: PropTypes.func.isRequired,
   onShowAndroidPicker: PropTypes.func, // If picker is shown, this gets called
   spaceBetweenDateAndTime: PropTypes.number.isRequired, // How much space to put between select date button and time controls
 };
@@ -138,7 +138,7 @@ EventDateTimePickerAndroid.propTypes = {
 export default EventDateTimePickerAndroid;
 
 const styles = StyleSheet.create({
-  fullDaySelection: {
+  allDaySelection: {
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',

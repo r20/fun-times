@@ -4,7 +4,7 @@
  */
 export const en = {
   menuEventsTitle: "Events",
-  menuTodayTitle: "Today",
+  menuTodayTitle: "Time",
   menuMilestoneSuggestionsTitle: "Milestone Suggestions",
   menuCalendarTitle: "Milestones on Calendar",
   menuMoreTitle: "Settings",
@@ -13,7 +13,7 @@ export const en = {
   custom: "Custom",
   headerAddEventTitle: "Add Event",
   headerEditEventTitle: "Edit Event",
-  headerTodayTitle: "Today",
+  headerTodayTitle: "Time",
   headerUpcomingMilestonesScreenTitle: "Milestones",
   subtitleMilestonesScreen: "Milestones generated from starred events, based on current settings.",
   headerCalendar: "Milestones on Calendar",
@@ -53,10 +53,10 @@ export const en = {
   calendarChangeColorTitle: 'Change Calendar Color',
   selectColor: 'Select Color',
   calendarMaxNumMilestonesPerEventLabel: 'Max number per event: {{someValue}}',
-  fullDay: 'Full Day',
+  allDay: 'All Day',
   useDatetimeNumbers: 'Use date/time in milestone calculations',
   useDatetimeNumbersWithExample: 'Use date/time in milestone calculations (e.g. {{someValue}})',
-  useOwnNumbers: "Milestones will be calculated using interesting numbers based on app settings.  You may specify an additional number to use in milestone calculations for this event.",
+  useOwnNumbers: "Milestones will be calculated using interesting numbers based on app settings.  You may also specify an additional number to use in milestone calculations for this event.",
   selectTime: 'Select Time',
   selectDate: 'Select Date',
   enterNumber: "Enter number",
@@ -111,25 +111,5 @@ export const en = {
  * These would need translated.
  */
 export const es = {
-  menuStandardEventsTitle: "Standard Events",
-  menuCustomEventsTitle: "Custom Events",
-  menuTodayTitle: "Today",
-  menuUpcomingTitle: "Upcoming",
-  menuMoreTitle: "Settings",
-  headerStandardEventsTitle: "Standard Events",
-  headerCustomEventsTitle: "Custom Events",
-  headerTodayTitle: "Today",
-  headerUpcomingMilestonesScreenTitle: "Starred Events' Milestones",
-  headerMoreTitle: "Settings",
-  upcomingFutureEventCountdownTitle: "Upcoming Milestones",
-  upcomingPastEventMilestoneTitle: "Upcoming Milestones",
-  timeSinceEventTitle: 'Tiempo Desde {{someValue}}',
-  timeUntilEventTitle: 'Time Until {{someValue}}',
-  quarters: '{{someValue}} cuarteles',
-  months: '{{someValue}} mes',
-  weeks: '{{someValue}} semanas',
-  days: '{{someValue}} dias',
-  hours: '{{someValue}} horas',
-  minutes: '{{someValue}} minutos',
-  seconds: '{{someValue}} segundos',
+
 };

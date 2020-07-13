@@ -48,7 +48,7 @@ events.push(new Event({
     epochMillis: getNextMomentForDate(moment("2019-12-25 0:00", 'YYYY-MM-DD HH:mm')).valueOf(), // Day and/or time it starts
     ignoreIfPast: true, // don't use this if it's past. (Eventually I'll update code above to do next one)
     keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
-    isFullDay: true, // If event is whole day, not a specific time
+    isAllDay: true, // If event is whole day, not a specific time
     color: "red",
     tags: [TAGS.HOLIDAY, TAGS.RELIGION],
     useDateAndTimeInMilestones: true,
@@ -61,7 +61,7 @@ events.push(new Event({
     isSelectedByDefault: true,
     // If don't clone it will modify nowMoment and mess up other calculations
     epochMillis: nowMoment.clone().tz(Localization.timezone).startOf('year').add(1, 'years').valueOf(),
-    isFullDay: false,
+    isAllDay: false,
     color: "silver",
     tags: [TAGS.HOLIDAY],
     useDateAndTimeInMilestones: true,
@@ -74,7 +74,7 @@ events.push(new Event({
     isSelectedByDefault: false,
     epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
     ignoreIfPast: true,
-    isFullDay: false, // True if want to calculate times to 1:59:25
+    isAllDay: false, // True if want to calculate times to 1:59:25
     color: "orange",
     tags: [TAGS.QUIRKY, 'pi'],
     useDateAndTimeInMilestones: false,
@@ -123,7 +123,7 @@ events.push(new Event({
     title: "Super Bowl LV",
     key: "Super Bowl",
     isSelectedByDefault: true,
-    isFullDay: false,
+    isAllDay: false,
     epochMillis: moment.tz("2021-02-07 18:30", 'YYYY-MM-DD HH:mm', 'America/New_York').valueOf(),
     ignoreIfPast: true,
     color: "brown",

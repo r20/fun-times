@@ -7,7 +7,7 @@ import { useScrollToTop } from '@react-navigation/native'
 import { getDisplayStringDateTimeForEvent, getDisplayStringDateTimeForEpoch } from '../utils/Utils'
 import CalendarContext, {
   howManyDaysAheadCalendar, howManyDaysAgoCalendar,
-  getIsMilestoneFullDay, makeMilestoneClipboardContentForMilestone,
+  getIsMilestoneAllDay, makeMilestoneClipboardContentForMilestone,
   getMilestoneVerboseDescription
 } from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
@@ -124,7 +124,7 @@ export default function UpcomingMilestonesList(props) {
 
   const renderItem = ({ item, index, separators }) => {
 
-    const noShowTimeOfDay = getIsMilestoneFullDay(item);
+    const noShowTimeOfDay = getIsMilestoneAllDay(item);
     const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
 
     const verboseDesc = getMilestoneVerboseDescription(item);

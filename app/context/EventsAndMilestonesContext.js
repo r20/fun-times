@@ -93,7 +93,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
         const event = customEvents[idx];
 
         // Make sure all day events in the past are at end of day, and future are at beginning of day
-        if (event.isFullDay) {
+        if (event.isAllDay) {
           const endOfEventDayEpochMillis = getMomentFromEvent(event).endOf('day').toDate().getTime();
           if (nowTime > endOfEventDayEpochMillis) {
             // should be at end of day
