@@ -58,7 +58,7 @@ function Today(props) {
 
     return (<EventCard >
       <EventCardHeader >{title}</EventCardHeader>
-      <EventComparedToNow event={item} nowMillis={nowMillis} />
+      <EventComparedToNow event={item} />
     </EventCard>
     );
   }

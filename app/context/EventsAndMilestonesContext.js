@@ -459,12 +459,6 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     }
   }
 
-  /* jmr - change this.  Here's email reminder:
-  I chose today and says 15 hours since, doesn't make sense, seems like 0 would make sense if chose today
-  After thinking about it more, I probably will change this.  If it's an all day event, all the times will show zero if it's today.  If it's in the future I'll use 0:00 (start of day) and if it's in the past I'll use 23:59:59 (end of day) to calculate times.
-  */
-
-
   /**
    * Save the selected map for standard events.
    */

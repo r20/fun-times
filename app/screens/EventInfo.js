@@ -102,7 +102,7 @@ function EventInfo(props) {
     <React.Fragment>
       <EventCard >
         <EventCardHeader >{cardHeaderTitleNow}</EventCardHeader>
-        <EventComparedToNow event={event} nowMillis={nowMillis} />
+        <EventComparedToNow event={event} />
       </EventCard>
 
       <MyTextLarge style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</MyTextLarge>
