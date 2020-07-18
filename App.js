@@ -13,6 +13,7 @@ import { MyThemeProvider } from './app/context/MyThemeContext'
 import AppBottomTabNavigator from './app/navigation/AppBottomTabNavigator'
 import MyText, { MyTextLarge } from './app/components/MyText'
 import MyActivityIndicatorWithFullScreenSemiTransparent from './app/components/MyActivityIndicatorWithFullScreenSemiTransparent'
+import i18n from './app/i18n/i18n'
 
 // Before rendering any navigation stack, to optimize memory usage and performance
 import { enableScreens } from 'react-native-screens';
@@ -52,7 +53,7 @@ const InnerApp = (props) => {
   if (appSettingsContext.isInitialSettingsLoaded && calendarContext.isCalendarReady && eventsAndMilestonesContext.isInitialLoadComplete) {
     return <MenuProvider><AppBottomTabNavigator /></MenuProvider>
   } else {
-    return <React.Fragment><MyActivityIndicatorWithFullScreenSemiTransparent /><View style={styles.container} ><MyTextLarge>Calcualting milestones...</MyTextLarge></View></React.Fragment>;
+    return <React.Fragment><MyActivityIndicatorWithFullScreenSemiTransparent /><View style={styles.container} ><MyTextLarge>{i18n.t('calculatingMilestones')}</MyTextLarge></View></React.Fragment>;
   }
 }
 

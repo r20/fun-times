@@ -3,6 +3,7 @@
  * This is for using i18n.
  */
 export const en = {
+  calculatingMilestones: 'Calculating milestones...',
   menuEventsTitle: "Events",
   menuTodayTitle: "Time",
   menuMilestoneSuggestionsTitle: "Milestone Suggestions",
