@@ -46,7 +46,7 @@ const MyActivityIndicatorWithFullScreenSemiTransparent = (props) => {
 
 
 MyActivityIndicatorWithFullScreenSemiTransparent.propTypes = {
-    top: PropTypes.number, // Amount of space fro mtop of screen to show spinner.  Default is 95
+    top: PropTypes.number, // Amount of space from top of screen to show spinner.  Default is 95
 };
 
 export default MyActivityIndicatorWithFullScreenSemiTransparent;

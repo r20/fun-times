@@ -4,13 +4,15 @@ import * as Font from 'expo-font'
 import { MenuProvider } from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
 import { AppearanceProvider, useColorScheme } from 'react-native-appearance'
+import { StyleSheet, View } from 'react-native'
 
-import { EventsAndMilestonesContextProvider } from './app/context/EventsAndMilestonesContext'
+import EventsAndMilestonesContext, { EventsAndMilestonesContextProvider } from './app/context/EventsAndMilestonesContext'
 import AppSettingsContext, { AppSettingsContextProvider } from './app/context/AppSettingsContext'
 import CalendarContext, { CalendarProvider } from './app/context/CalendarContext'
 import { MyThemeProvider } from './app/context/MyThemeContext'
 import AppBottomTabNavigator from './app/navigation/AppBottomTabNavigator'
-import MyText from './app/components/MyText'
+import MyText, { MyTextLarge } from './app/components/MyText'
+import MyActivityIndicatorWithFullScreenSemiTransparent from './app/components/MyActivityIndicatorWithFullScreenSemiTransparent'
 
 // Before rendering any navigation stack, to optimize memory usage and performance
 import { enableScreens } from 'react-native-screens';
@@ -43,12 +45,14 @@ const InnerApp = (props) => {
 
   const appSettingsContext = useContext(AppSettingsContext);
   const calendarContext = useContext(CalendarContext);
+  const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
+
   // Have these loaded and ready first so colors don't switch right after it opens.
 
-  if (appSettingsContext.isInitialSettingsLoaded && calendarContext.isCalendarReady) {
-    return <EventsAndMilestonesContextProvider ><MenuProvider><AppBottomTabNavigator /></MenuProvider></EventsAndMilestonesContextProvider>
+  if (appSettingsContext.isInitialSettingsLoaded && calendarContext.isCalendarReady && eventsAndMilestonesContext.isInitialLoadComplete) {
+    return <MenuProvider><AppBottomTabNavigator /></MenuProvider>
   } else {
-    return null;
+    return <React.Fragment><MyActivityIndicatorWithFullScreenSemiTransparent /><View style={styles.container} ><MyTextLarge>Calcualting milestones...</MyTextLarge></View></React.Fragment>;
   }
 }
 
@@ -58,8 +62,18 @@ export default (props) => {
   I thought it'd be nice to have the splash screen until the theme is ready, but I'm using contexts and I use them to get stuff ready.
   I need the provider components. */
 
-  return (<AppearanceProvider><AppSettingsContextProvider><MyThemeProvider><CalendarProvider>
+  return (<AppearanceProvider><AppSettingsContextProvider><MyThemeProvider><CalendarProvider><EventsAndMilestonesContextProvider >
     <InnerApp />
-  </CalendarProvider></MyThemeProvider></AppSettingsContextProvider></AppearanceProvider>);
+  </EventsAndMilestonesContextProvider></CalendarProvider></MyThemeProvider></AppSettingsContextProvider></AppearanceProvider>);
 
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    textAlign: 'center',
+  },
+});

@@ -72,6 +72,7 @@ export class EventsAndMilestonesContextProvider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isInitialLoadComplete: false,
       allMilestones: [],
       allEvents: [],
       customEvents: [],
@@ -198,7 +199,8 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     let allEvents = customEvents.concat(standardEvents);
     allEvents = allEvents.sort(eventSorter);
 
-    this.setState({ allEvents, customEvents, standardEvents, allMilestones });
+    const isInitialLoadComplete = true;
+    this.setState({ allEvents, customEvents, standardEvents, allMilestones, isInitialLoadComplete });
   }
 
   getMilestonesForEvent = (event) => {

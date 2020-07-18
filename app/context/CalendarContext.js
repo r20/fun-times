@@ -414,7 +414,7 @@ function MyCalendarProvider(props) {
 
     const newCalendarEvent = Object.assign({}, calendarEvent);
     delete newCalendarEvent.id;
-    // jmr - Doesn't work with new release of expo and expo-calendar 8.2.1
+    // TBD This didn't work with new release of expo 38 and expo-calendar 8.2.1
     const eventId = await Calendar.createEventAsync(calendarId, newCalendarEvent);
     newCalendarEvent.id = eventId;
 
