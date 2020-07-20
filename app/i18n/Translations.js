@@ -3,11 +3,11 @@
  * This is for using i18n.
  */
 export const en = {
-  calculatingMilestones: 'Calculating milestones...',
+  calculatingMilestones: 'Finding celebration milestones...',
   menuEventsTitle: "Events",
   menuTodayTitle: "Time",
   menuMilestoneSuggestionsTitle: "Milestone Suggestions",
-  menuCalendarTitle: "Milestones on Calendar",
+  menuCalendarTitle: "Calendar",
   menuMoreTitle: "Settings",
   headerEventsTitle: "Events",
   standard: "Standard",
@@ -16,8 +16,9 @@ export const en = {
   headerEditEventTitle: "Edit Event",
   headerTodayTitle: "Time",
   headerUpcomingMilestonesScreenTitle: "Milestones",
-  subtitleMilestonesScreen: "Milestones generated from starred events, based on current settings.",
-  headerCalendar: "Milestones on Calendar",
+  subtitleMilestonesScreen: "Suggested milestones for starred events, based on current settings.",
+  headerCalendar: "Calendar",
+  subtitleCalendarScreen: "All milestones on device calendar regardless of settings or stars.",
   headerMoreTitle: "Settings",
   upcomingFutureEventCountdownTitle: "Milestones",
   upcomingPastEventMilestoneTitle: "Milestones",

@@ -371,7 +371,7 @@ function MyCalendarProvider(props) {
         if (milestoneKey) {
           tmpcalendarMilestoneEventsMap[milestoneKey] = calendarEvent.id;
         }
-        logger.warn("Calendar event is ", calendarEvent);
+        logger.log("Calendar event is ", calendarEvent);
 
         // Make an object that wraps calendarEvent
         tmpwrappedCalendarEventsList.push(wrapCalendarEventObject(calendarEvent, true, milestoneKey));
@@ -414,7 +414,6 @@ function MyCalendarProvider(props) {
 
     const newCalendarEvent = Object.assign({}, calendarEvent);
     delete newCalendarEvent.id;
-    // TBD This didn't work with new release of expo 38 and expo-calendar 8.2.1
     const eventId = await Calendar.createEventAsync(calendarId, newCalendarEvent);
     newCalendarEvent.id = eventId;
 
@@ -426,7 +425,7 @@ function MyCalendarProvider(props) {
     const newMap = Object.assign({}, calendarMilestoneEventsMap, mapEntry);
 
     const newWrappedCalendarEvent = wrapCalendarEventObject(newCalendarEvent, true, milestoneKey);
-    logger.warn("New wrapped calendar event is ", newWrappedCalendarEvent);
+    logger.log("New wrapped calendar event is ", newWrappedCalendarEvent);
 
 
     /* find where to insert/replace the newWrappedCalendarEvent to efficiently
@@ -434,7 +433,7 @@ function MyCalendarProvider(props) {
     let newWrappedCalendarEventsList = [];
     let hasBeenAdded = false;
     for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
-      logger.warn("wrappedCalendarEventsList[idx] is ", wrappedCalendarEventsList[idx]);
+      logger.log("wrappedCalendarEventsList[idx] is ", wrappedCalendarEventsList[idx]);
 
       if (hasBeenAdded) {
         // We've dealt with the new one, just add the rest
@@ -579,7 +578,7 @@ function MyCalendarProvider(props) {
         endDate: end,
         allDay: allDay,
         timeZone: allDay ? "UTC" : Localization.timezone, // string, required on Android
-        endTimeZone: null, // string, Android but I could only get alarm to work if this is null
+        endTimeZone: allDay ? "UTC" : Localization.timezone, // string, Android but I could only get alarm to work if this is null
       };
       addCalendarEventToCalendarAsync(newCalendarEvent, milestoneKey);
     }

@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     paddingHorizontal: 15,
+    paddingBottom: 5,
   },
   emptyText: {
     alignSelf: 'center',

@@ -15,6 +15,11 @@ import MyText, { MyTextLarge } from './app/components/MyText'
 import MyActivityIndicatorWithFullScreenSemiTransparent from './app/components/MyActivityIndicatorWithFullScreenSemiTransparent'
 import i18n from './app/i18n/i18n'
 
+// Install moment-duration-format within moment
+import moment from 'moment-timezone'
+const momentDurationFormatSetup = require("moment-duration-format");
+momentDurationFormatSetup(moment);
+
 // Before rendering any navigation stack, to optimize memory usage and performance
 import { enableScreens } from 'react-native-screens';
 enableScreens();

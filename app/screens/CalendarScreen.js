@@ -15,7 +15,7 @@ import MyCalendarDivider from '../components/MyCalendarDivider'
 import i18n from '../i18n/i18n'
 import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
 import * as logger from '../utils/logger'
-import MyText, { MyTextLarge, MyTextXLarge } from '../components/MyText'
+import MyText, { MyTextLarge, MyTextXLarge, MyTextSmall } from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
 import MyScreenHeader from '../components/MyScreenHeader'
 
@@ -40,6 +40,10 @@ const styles = StyleSheet.create({
   },
   fullOpacity: {
     opacity: 1,
+  },
+  subtitle: {
+    paddingHorizontal: 15,
+    paddingBottom: 5,
   },
   calendarButton: {
     // padding is so touching close to it works too
@@ -150,6 +154,7 @@ function CalendarScreen(props) {
 
   return (<React.Fragment>
     <MyScreenHeader title={i18n.t('headerCalendar')} />
+    <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleCalendarScreen')}</MyTextSmall>
     {calendarContext.isCalendarReady && !isEmpty &&
       <FlatList
         ref={ref}
