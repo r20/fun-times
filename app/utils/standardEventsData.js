@@ -42,7 +42,7 @@ function getNextMomentForDate(theMoment) {
 }
 
 events.push(new Event({
-    title: "Christmas", // What user might see (later need to localize)
+    title: "Christmas 🎄", // What user might see (later need to localize)
     key: "Christmas", // Each holiday needs unique key.  Specify key if different than title.
     isSelectedByDefault: false,
     epochMillis: getNextMomentForDate(moment("2019-12-25 0:00", 'YYYY-MM-DD HH:mm')).valueOf(), // Day and/or time it starts
@@ -56,7 +56,7 @@ events.push(new Event({
     manualEntryNumbers: [],
 }));
 events.push(new Event({
-    title: "New Year's Day",
+    title: "New Year's Day 🎉",
     key: "New Year's Day",
     isSelectedByDefault: true,
     // If don't clone it will modify nowMoment and mess up other calculations
@@ -69,7 +69,7 @@ events.push(new Event({
     manualEntryNumbers: [],
 }));
 events.push(new Event({
-    title: "Pi Day",
+    title: "Pi Day 🥧",
     key: "Pi Day",
     isSelectedByDefault: false,
     epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
@@ -82,7 +82,7 @@ events.push(new Event({
     manualEntryNumbers: [], // Not using 3.14 because it would likely create duplicate entry
 }));
 events.push(new Event({
-    title: "US Independence Day",
+    title: "US Independence Day 🇺🇸",
     key: "US Independence Day",
     isSelectedByDefault: false,
     epochMillis: getNextMomentForDate(moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
@@ -94,7 +94,7 @@ events.push(new Event({
     manualEntryNumbers: [],
 }));
 events.push(new Event({
-    title: "US Independence Day 1776",
+    title: "US Independence Day 1776 🦅",
     key: "US Independence Day 1776",
     isSelectedByDefault: false,
     epochMillis: moment("1776-07-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
@@ -120,7 +120,7 @@ events.push(new Event({
 
 // These need updated by hand each year (for now)
 events.push(new Event({
-    title: "Super Bowl LV",
+    title: "Super Bowl LV 🏈",
     key: "Super Bowl",
     isSelectedByDefault: true,
     isAllDay: false,
@@ -133,7 +133,7 @@ events.push(new Event({
     manualEntryNumbers: [55],
 }));
 events.push(new Event({
-    title: "Easter",
+    title: "Easter 🐇⛪",
     key: "Easter",
     isSelectedByDefault: false,
     epochMillis: moment("2021-04-04 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
@@ -145,7 +145,7 @@ events.push(new Event({
     manualEntryNumbers: [],
 }));
 events.push(new Event({
-    title: "March Madness Tournament Begins",
+    title: "March Madness Tournament Begins 🏀",
     key: "March Madness Tournament Begins",
     isSelectedByDefault: true,
     epochMillis: moment("2021-03-16 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
@@ -157,7 +157,7 @@ events.push(new Event({
     manualEntryNumbers: [64],
 }));
 events.push(new Event({
-    title: "March Madness Final Four",
+    title: "March Madness Final Four 🏀🏆",
     key: "March Madness Final Four",
     isSelectedByDefault: false,
     epochMillis: moment("2021-04-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
@@ -169,7 +169,7 @@ events.push(new Event({
     manualEntryNumbers: [4, 64, 68],
 }));
 events.push(new Event({
-    title: "Thanksgiving",
+    title: "Thanksgiving 🦃",
     key: "Thanksgiving",
     isSelectedByDefault: false,
     epochMillis: moment("2020-11-26 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
@@ -182,7 +182,7 @@ events.push(new Event({
 }));
 
 events.push(new Event({
-    title: "US Presidential Election",
+    title: "US Presidential Election 🗳️",
     key: "US Presidential Election",
     isSelectedByDefault: true,
     epochMillis: moment("2020-11-03 0:00", 'YYYY-MM-DD HH:mm').valueOf(),
