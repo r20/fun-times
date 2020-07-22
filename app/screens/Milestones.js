@@ -23,10 +23,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingBottom: 10,
   },
-  subtitle: {
-    paddingHorizontal: 15,
-    paddingBottom: 5,
-  },
   emptyText: {
     alignSelf: 'center',
     textAlign: 'center',
@@ -63,15 +59,13 @@ function Milestones(props) {
     appSettingsContext.setCalendarMaxNumberMilestonesPerEvent(newVal);
   }
 
-  // TBD - move slider to settings??
-  return (<View style={styles.container} >
+   return (<View style={styles.container} >
     <MyScreenHeader title={i18n.t('headerUpcomingMilestonesScreenTitle')} />
     <View style={styles.sliderWrapper} >
       <MyTextSmall >{i18n.t('calendarMaxNumMilestonesPerEventLabel', { someValue: sliderValue })}</MyTextSmall>
       <MySlider value={sliderValue} step={1} minimumValue={1} maximumValue={20}
         onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
-    <MyTextSmall style={styles.subtitle}>{i18n.t('subtitleMilestonesScreen')}</MyTextSmall>
     {!empty &&
       <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
     }
