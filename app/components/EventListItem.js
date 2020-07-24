@@ -6,10 +6,18 @@ import { withNavigation } from '@react-navigation/compat'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import EventSelectedStar from '../components/EventSelectedStar'
-import EventCard, { EventCardHeader, EventCardBodyText } from '../components/EventCard'
+import MyCard, { MyCardHeader, MyCardBodyText } from '../components/MyCard'
 import * as logger from '../utils/logger'
+import MyThemeContext from '../context/MyThemeContext'
 
 function EventListItem(props) {
+
+  const myThemeContext = useContext(MyThemeContext);
+  const colorStyle = {
+    color: myThemeContext.colors.eventContrast,
+    backgroundColor: myThemeContext.colors.event,
+  }
+
 
   const title = props.event.title;
 
@@ -24,10 +32,10 @@ function EventListItem(props) {
     <View style={styles.container}>
       <EventSelectedStar event={props.event} containerStyle={styles.starStyle} />
       <TouchableOpacity style={styles.card} onPress={() => onPressEventInfo(props.event)}>
-        <EventCard>
-          <EventCardHeader >{title}</EventCardHeader>
-          <EventCardBodyText >{getDisplayStringDateTimeForEvent(props.event)}</EventCardBodyText>
-        </EventCard>
+        <MyCard style={colorStyle}>
+          <MyCardHeader style={colorStyle}>{title}</MyCardHeader>
+          <MyCardBodyText style={colorStyle}>{getDisplayStringDateTimeForEvent(props.event)}</MyCardBodyText>
+        </MyCard>
       </TouchableOpacity>
     </View>
   );

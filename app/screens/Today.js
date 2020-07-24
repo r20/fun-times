@@ -6,7 +6,7 @@ import { useFocusEffect, useScrollToTop, useNavigation } from '@react-navigation
 import i18n from '../i18n/i18n'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import EventComparedToNow from '../components/EventComparedToNow'
-import EventCard, { EventCardHeader } from '../components/EventCard'
+import MyCard, { MyCardHeader } from '../components/MyCard'
 import MyText, { MyTextLarge } from '../components/MyText'
 import MyScreenHeader from '../components/MyScreenHeader'
 
@@ -56,10 +56,10 @@ function Today(props) {
     const i18nKey = (item.epochMillis < nowMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
     const title = i18n.t(i18nKey, { someValue: item.title });
 
-    return (<EventCard >
-      <EventCardHeader >{title}</EventCardHeader>
+    return (<MyCard >
+      <MyCardHeader >{title}</MyCardHeader>
       <EventComparedToNow event={item} />
-    </EventCard>
+    </MyCard>
     );
   }
 

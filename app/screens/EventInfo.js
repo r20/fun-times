@@ -10,7 +10,7 @@ import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import i18n from '../i18n/i18n'
-import EventCard, { EventCardHeader } from '../components/EventCard'
+import MyCard, { MyCardHeader } from '../components/MyCard'
 import * as logger from '../utils/logger'
 import MyText, { MyTextLarge, MyTextXLarge } from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
@@ -100,10 +100,10 @@ function EventInfo(props) {
 
   const upcomingMilestoneListHeader = (
     <React.Fragment>
-      <EventCard >
-        <EventCardHeader >{cardHeaderTitleNow}</EventCardHeader>
+      <MyCard >
+        <MyCardHeader >{cardHeaderTitleNow}</MyCardHeader>
         <EventComparedToNow event={event} />
-      </EventCard>
+      </MyCard>
 
       <MyTextLarge style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</MyTextLarge>
     </React.Fragment>
@@ -119,7 +119,7 @@ function EventInfo(props) {
     <View style={styles.container}>
       <View style={styles.titleWrapper}><MyTextXLarge style={styles.title}>{event.title}</MyTextXLarge></View>
       <UpcomingMilestonesList listHeaderComponent={upcomingMilestoneListHeader}
-        showHeaderIfListEmpty={true} events={[event]} verboseDescription={false} />
+        showHeaderIfListEmpty={true} events={[event]} />
     </View>
   );
 

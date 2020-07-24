@@ -67,7 +67,7 @@ function Milestones(props) {
         onValueChange={onSliderValueChange} onSlidingComplete={onSlidingComplete} />
     </View>
     {!empty &&
-      <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} verboseDescription={true} />
+      <UpcomingMilestonesList maxNumMilestonesPerEvent={appSettingsContext.calendarMaxNumberMilestonesPerEvent} events={filtered} />
     }
     {empty && <View style={styles.container} ><MyTextLarge style={styles.emptyText}>{i18n.t('emptyMilestonesMessage')}</MyTextLarge></View>}
   </View>

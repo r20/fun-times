@@ -6,7 +6,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { getMomentFromEvent } from '../context/EventsAndMilestonesContext'
 import { numberToFormattedString } from '../utils/Utils'
 import i18n from '../i18n/i18n'
-import { EventCardBodyText } from './EventCard'
+import { MyCardBodyText } from './MyCard'
 
 
 export default function EventComparedToNow(props) {
@@ -43,14 +43,14 @@ export default function EventComparedToNow(props) {
   const isAllDayAndNow = (props.event.isAllDay && eventMoment.isSame(nowMoment, "day"));
 
   return (<React.Fragment>
-    <EventCardBodyText>{s}</EventCardBodyText>
+    <MyCardBodyText>{s}</MyCardBodyText>
     {
       timeUnits.map((tu) => {
         const num = Math.abs(eventMoment.diff(nowMoment, tu));
         if (isAllDayAndNow) {
-          return <EventCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(0) })}</EventCardBodyText>
+          return <MyCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(0) })}</MyCardBodyText>
         } else {
-          return <EventCardBodyText key={tu} >&nbsp;&nbsp;&nbsp;{i18n.t(tu, { someValue: numberToFormattedString(num) })}</EventCardBodyText>
+          return <MyCardBodyText key={tu} >&nbsp;&nbsp;&nbsp;{i18n.t(tu, { someValue: numberToFormattedString(num) })}</MyCardBodyText>
         }
       })
     }

@@ -29,7 +29,7 @@ function MilestoneTypesSettings(props) {
   TBD:  Here's a list of things that could be done to improve app
 
   Headers for milestones list (by date, like Month YYYY)
-  Have line between past and future milestones (possibly by changing EventCard of one of them to put it floating above/below)
+  Have line between past and future milestones (possibly by changing MyCard of one of them to put it floating above/below)
   More help and explanation when first open app.
   */
 

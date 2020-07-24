@@ -8,9 +8,7 @@ import * as logger from '../utils/logger'
 
 
 /**
- * Components in this file provide a way for consistent styling of information
- * about an event.
- * EventCard can have an EventHeader and one or more EventCardBodyText components within it.
+ * Component to put content on a clipboard when touched, and provide a copied to clipboard message
  */
 
 const ClipboardCopyable = (props) => {

@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { StyleSheet, View, Platform } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons'
+import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo, Fontisto } from '@expo/vector-icons'
 import { NavigationContainer } from '@react-navigation/native'
 // Search for available icons at https://expo.github.io/vector-icons/
 
@@ -37,11 +37,11 @@ function MyTabs(props) {
     },
 
   };
-  const eventsStackOptions = { tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> };
-  const todayOptions = { tabBarIcon: ({ focused, color, size }) => <Entypo name="stopwatch" size={size} color={color} /> };
-  const milestoneOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-multiselect" size={size} color={color} /> };
-  const calendarOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-check" size={size} color={color} /> };
-  const moreOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size} color={color} /> };
+  const eventsStackOptions = { tabBarIcon: ({ focused, color, size }) => <Fontisto name="nav-icon-list" size={size-4} color={color} /> };
+  const todayOptions = { tabBarIcon: ({ focused, color, size }) => <Entypo name="stopwatch" size={size+2} color={color} /> };
+  const milestoneOptions = { tabBarIcon: ({ focused, color, size }) => <FontAwesome name="birthday-cake" size={size} color={color} /> };
+  const calendarOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialCommunityIcons name="calendar-check" size={size+2} color={color} /> };
+  const moreOptions = { tabBarIcon: ({ focused, color, size }) => <MaterialIcons name={dots} size={size+2} color={color} /> };
 
   return (
     <Tab.Navigator initialRouteName="AppStackNavigator" lazy={true}

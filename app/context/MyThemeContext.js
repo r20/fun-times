@@ -30,7 +30,7 @@ const _getContrastFontColorForTheme = nanomemoize(function (hexcolor, isDarkThem
   var b = parseInt(hexcolor.substring(5, 7), 16);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
   // Have different cutoff threshold depending on if theme is dark
-  const cutoffVal = isDarkTheme ? 70 : 200;
+  const cutoffVal = isDarkTheme ? 70 : 180;
   // I think white looks best on colored cards/buttons and black looks best if color is light and theme is dark
   return yiq >= cutoffVal ? '#000000' : '#ffffff';
 });
@@ -39,11 +39,12 @@ const _getContrastFontColorForTheme = nanomemoize(function (hexcolor, isDarkThem
 let palette;
 /* 
   This helps pick colors:
-  https://coolors.co/296eb4-92d5e6-f4d35e-222222-96031a
+https://coolors.co/296eb4-f4d35e-aeecef-222222-96031a
 
   These colors are used for the app.  Palette colors are: 
         most buttons, starred,  +button, dark_tabbar, red */
 palette = ["#296EB4", "#296EB4", "#F4D35E", "#222222", "#96031A"];
+
 
 
 /** 
@@ -88,6 +89,10 @@ const lightThemeColors = {
   secondaryContrast: _getContrastFontColorForTheme(palette[1], tmpIsDarkTheme),
   calendar: initialCalendarColor,
   calendarContrast: _getContrastFontColorForTheme(initialCalendarColor, tmpIsDarkTheme),
+  event: '#EBEBEB',
+  eventContrast:  _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
+  card: '#EBEBEB',
+  cardContrast:  _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
   headerBackground: '#ffffff',
   footerBackground: '#ffffff',
   starred: palette[2],
@@ -114,6 +119,10 @@ const darkThemeColors = {
   secondaryContrast: _getContrastFontColorForTheme(palette[1], tmpIsDarkTheme),
   calendar: initialCalendarColor,
   calendarContrast: _getContrastFontColorForTheme(initialCalendarColor, tmpIsDarkTheme),
+  event: '#2C2C34',
+  eventContrast:  _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
+  card: '#2C2C34',
+  cardContrast:  _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
   headerBackground: '#000000',
   footerBackground: palette[3],
   starred: palette[2],

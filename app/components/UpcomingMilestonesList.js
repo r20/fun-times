@@ -12,7 +12,7 @@ import CalendarContext, {
 } from '../context/CalendarContext'
 import i18n from '../i18n/i18n'
 import * as logger from '../utils/logger'
-import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
+import MyCard, { MyCardHeader, MyCardBodyText, MY_CARD_MARGIN } from '../components/MyCard'
 import { shouldShowMilestoneForNumberType } from '../utils/milestones'
 import ClipboardCopyable from '../components/ClipboardCopyable'
 import AppSettingsContext from '../context/AppSettingsContext'
@@ -25,8 +25,8 @@ const nowTime = (new Date()).getTime();
 
 // This is height without margin
 const ITEM_HEIGHT = 72;
-const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
-const eventCardHeightStyle = { height: ITEM_HEIGHT };
+const heightWithMargin = ITEM_HEIGHT + 2 * MY_CARD_MARGIN;
+const myCardHeightStyle = { height: ITEM_HEIGHT };
 
 
 /* To optimize and improve FlatList performance, use fixed height
@@ -122,17 +122,18 @@ export default function UpcomingMilestonesList(props) {
   let inPast = true;
   let firstNotInPastKey = null;
 
+  // TBD - Could use useMemo for this if they did lots of scrolling back and forth
   const renderItem = ({ item, index, separators }) => {
 
     const noShowTimeOfDay = getIsMilestoneAllDay(item);
     const specialDisplayDateTime = getDisplayStringDateTimeForEpoch(item.time, noShowTimeOfDay);
 
-    const verboseDesc = getMilestoneVerboseDescription(item);
-    const desc = props.verboseDescription ? verboseDesc : i18n.t(item.unit, { someValue: item.description });
+    const desc = getMilestoneVerboseDescription(item);
 
     const isOnCalendar = calendarContext.getIsMilestoneInCalendar(item);
     const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
-    const opacityStyle = (item.time < nowTime) ? styles.lessOpacity : styles.fullOpacity;
+    const opacityStyle = !isOnCalendar ? styles.lessOpacity : styles.fullOpacity;
+    // jmr - change styles on calendar screen too (and opacity).  Use commmon code??
 
     /* Finding first item not in past so we can have divider */
     if (inPast && item.time >= nowTime) {
@@ -142,14 +143,14 @@ export default function UpcomingMilestonesList(props) {
 
     /* We only want between past and future divider if it's not first item (so we also look at index)*/
     return (<React.Fragment>{(firstNotInPastKey === item.key) && index > 0 && <MyCalendarDivider />}
-      <EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
-        <View style={[styles.eventCardTextWrapper, opacityStyle]}>
+      <MyCard style={[styles.card, cardStyle, myCardHeightStyle]}>
+        <View style={[styles.myCardTextWrapper, opacityStyle]}>
 
           <ClipboardCopyable onPressGetContentFunction={() => {
             return makeMilestoneClipboardContentForMilestone(item);
           }}>
-            <EventCardHeader style={colorStyle}>{specialDisplayDateTime}</EventCardHeader>
-            <EventCardBodyText style={colorStyle}>{desc}</EventCardBodyText>
+            <MyCardHeader style={colorStyle}>{specialDisplayDateTime}</MyCardHeader>
+            <MyCardBodyText style={colorStyle}>{desc}</MyCardBodyText>
           </ClipboardCopyable>
         </View>
         {calendarContext.isCalendarReady &&
@@ -159,7 +160,7 @@ export default function UpcomingMilestonesList(props) {
             </TouchableOpacity>
           </View>
         }
-      </EventCard>
+      </MyCard>
     </React.Fragment>);
   }
 
@@ -191,10 +192,6 @@ export default function UpcomingMilestonesList(props) {
 
 UpcomingMilestonesList.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object).isRequired,
-  /* 
-    If verboseDescription, include more info in the description including the event title.
-  */
-  verboseDescription: PropTypes.bool.isRequired,
   listHeaderComponent: PropTypes.element,
   showHeaderIfListEmpty: PropTypes.bool, // still show header even if list is empty
   maxNumMilestonesPerEvent: PropTypes.number, // If > 0 only show up to this many milestones per event
@@ -210,7 +207,7 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     padding: 15,
   },
-  eventCardTextWrapper: {
+  myCardTextWrapper: {
     flex: 1,
   },
   lessOpacity: {

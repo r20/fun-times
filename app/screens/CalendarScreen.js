@@ -13,7 +13,7 @@ import CalendarContext, {
 import ClipboardCopyable from '../components/ClipboardCopyable'
 import MyCalendarDivider from '../components/MyCalendarDivider'
 import i18n from '../i18n/i18n'
-import EventCard, { EventCardHeader, EventCardBodyText, EVENT_CARD_MARGIN } from '../components/EventCard'
+import MyCard, { MyCardHeader, MyCardBodyText, MY_CARD_MARGIN } from '../components/MyCard'
 import * as logger from '../utils/logger'
 import MyText, { MyTextLarge, MyTextXLarge, MyTextSmall } from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     padding: 15,
   },
-  eventCardTextWrapper: {
+  myCardTextWrapper: {
     flex: 1,
   },
   lessOpacity: {
@@ -66,8 +66,8 @@ const nowTime = (new Date()).getTime();
 
 // Don't know how this works, but it's the height without margin??
 const ITEM_HEIGHT = 72;
-const heightWithMargin = ITEM_HEIGHT + 2 * EVENT_CARD_MARGIN;
-const eventCardHeightStyle = { height: ITEM_HEIGHT };
+const heightWithMargin = ITEM_HEIGHT + 2 * MY_CARD_MARGIN;
+const myCardHeightStyle = { height: ITEM_HEIGHT };
 
 /* To optimize and improve FlatList performance, use fixed height
 items */
@@ -134,13 +134,13 @@ function CalendarScreen(props) {
     return (
       <React.Fragment>{
         (firstNotInPastKey === item.key) && index > 0 && <MyCalendarDivider />}
-        <EventCard style={[styles.card, cardStyle, eventCardHeightStyle]}>
-          <View style={[styles.eventCardTextWrapper, opacityStyle]}>
+        <MyCard style={[styles.card, cardStyle, myCardHeightStyle]}>
+          <View style={[styles.myCardTextWrapper, opacityStyle]}>
             <ClipboardCopyable onPressGetContentFunction={() => {
               return makeMilestoneClipboardContentForWrappedCalendarEvent(wrappedCalendarEvent);
             }}>
-              <EventCardHeader style={colorStyle}>{wrappedCalendarEvent.whenDescription}</EventCardHeader>
-              <EventCardBodyText style={colorStyle}>{wrappedCalendarEvent.whatDescription}</EventCardBodyText>
+              <MyCardHeader style={colorStyle}>{wrappedCalendarEvent.whenDescription}</MyCardHeader>
+              <MyCardBodyText style={colorStyle}>{wrappedCalendarEvent.whatDescription}</MyCardBodyText>
             </ClipboardCopyable>
           </View>
           <View style={opacityStyle}>
@@ -148,7 +148,7 @@ function CalendarScreen(props) {
               <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
             </TouchableOpacity>
           </View>
-        </EventCard>
+        </MyCard>
       </React.Fragment>);
   }
 
