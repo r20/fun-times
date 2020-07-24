@@ -10,10 +10,13 @@ import MyThemeContext from '../context/MyThemeContext'
 function EventSelectedStar(props) {
 
     const myThemeContext = useContext(MyThemeContext);
-
     const eventsAndMilestonesContext = useContext(EventsAndMilestonesContext);
     const event = props.event;
 
+    /* I thought of using a local state for showing which star, but it might get out of sync if
+    changed from other screen.  So keeping it simple for now. */
+
+    // Having a local state variable makes change in star a little more responseive
     const isSelected = eventsAndMilestonesContext.isEventSelected(event);
 
     const toggleSelected = () => {

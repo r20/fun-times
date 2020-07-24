@@ -311,7 +311,7 @@ function MyCalendarProvider(props) {
       // Create new
       const newCalendarId = await createCalendarAsync(hexcolor);
 
-      // Add events to new calendar, makeing a new calendarMilestoneEventsMap and new wrappedCalendarEventsList
+      // Add events to new calendar, making a new calendarMilestoneEventsMap and new wrappedCalendarEventsList
       const newWrappedCalendarEventsList = [];
       const newMap = Object.assign({}, calendarMilestoneEventsMap);
 

@@ -1,16 +1,10 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View, FlatList, TouchableOpacity, Platform } from 'react-native'
+import { StyleSheet, View, FlatList } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 
-import AppSettingsContext from '../context/AppSettingsContext'
-import CalendarContext, {
-  howManyDaysAheadCalendar,
-  howManyDaysAgoCalendar, makeMilestoneClipboardContentForWrappedCalendarEvent
-} from '../context/CalendarContext'
-import ClipboardCopyable from '../components/ClipboardCopyable'
+import CalendarContext, { howManyDaysAheadCalendar } from '../context/CalendarContext'
 import MyCalendarDivider from '../components/MyCalendarDivider'
 import i18n from '../i18n/i18n'
 import MyCard, { MyCardHeader, MyCardBodyText, MY_CARD_MARGIN } from '../components/MyCard'
@@ -18,6 +12,7 @@ import * as logger from '../utils/logger'
 import MyText, { MyTextLarge, MyTextXLarge, MyTextSmall } from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
 import MyScreenHeader from '../components/MyScreenHeader'
+import MilestoneListItem from '../components/MilestoneListItem'
 
 const styles = StyleSheet.create({
   container: {
@@ -32,30 +27,9 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     padding: 15,
   },
-  myCardTextWrapper: {
-    flex: 1,
-  },
-  lessOpacity: {
-    opacity: 0.5,
-  },
-  fullOpacity: {
-    opacity: 1,
-  },
   subtitle: {
     paddingHorizontal: 15,
     paddingBottom: 5,
-  },
-  calendarButton: {
-    // padding is so touching close to it works too
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderRadius: 5, // Not seen, but that's ok
-  },
-  card: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });
 
@@ -67,7 +41,6 @@ const nowTime = (new Date()).getTime();
 // Don't know how this works, but it's the height without margin??
 const ITEM_HEIGHT = 72;
 const heightWithMargin = ITEM_HEIGHT + 2 * MY_CARD_MARGIN;
-const myCardHeightStyle = { height: ITEM_HEIGHT };
 
 /* To optimize and improve FlatList performance, use fixed height
 items */
@@ -83,34 +56,40 @@ function CalendarScreen(props) {
 
   const myThemeContext = useContext(MyThemeContext);
   const calendarContext = useContext(CalendarContext);
-  const appSettingsContext = useContext(AppSettingsContext);
 
-  const wrappedCalendarEventsList = calendarContext.wrappedCalendarEventsList || [];
+  /* I used to show calendar events even after they were toggled off.  That's confusing,
+  especially if a bunch are added & removed from the milestones screen and then the user
+  goes to the calendar screen and there are a bunch of entries that are not on the calendar.
+  So, only show what's actually on the calendar. */
+
+  const tmp = calendarContext.wrappedCalendarEventsList || [];
+  //const wrappedCalendarEventsList = tmp;
+  const wrappedCalendarEventsList = tmp.filter(function (item, index, arr) {
+    return item.isOnCalendar;
+  });
 
   const isEmpty = wrappedCalendarEventsList.length === 0;
 
-  /* Render all past plus enough events to more than fill up screen on any supported device.
-  Note that there seems to be some bug where it won't render what it should if there are only
-  a few and you can't scroll to get more. Not sure if that's the cause or not. */
-  let initialNumToRender = 0;
-
-  /* Find starting index position (don't show a bunch of past events when first go to screen)
-  this prop to FlatList also needs getItemLayout */
-  let initialScrollIndexOnlyIfGreaterThanZero = {};
-
-  for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
-    initialNumToRender++;
-    const eventTime = wrappedCalendarEventsList[idx].startTime;
-    if (eventTime >= nowTime) {
-      initialScrollIndexOnlyIfGreaterThanZero = { initialScrollIndex: idx };
-      break;
+  /* Find how many old events, and if there are at least 11 new */
+  let oldCount = 0;
+  let newCount = 0; for (let idx = 0; idx < wrappedCalendarEventsList.length; idx++) {
+    if (wrappedCalendarEventsList[idx].startTime >= nowTime) {
+      newCount++;
+      if (newCount > 11) {
+        // We've seen enough
+        break;
+      }
+    } else {
+      oldCount++;
     }
   }
-  initialNumToRender = initialNumToRender + 12;
+  const initialNumToRender = 12;
 
+  /* This is added conditionally, because if there aren't many items it causes things to be un-rendered
+  after changing the max num per event.  There should be more shown, and they are not. 
+   This prop to FlatList also needs getItemLayout */
+  const initialScrollIndexOnlyIfMany = (newCount > 7 && oldCount > 1) ? { initialScrollIndex: oldCount } : {};
 
-  const colorStyle = calendarContext.milestoneColorStyle;
-  const cardStyle = calendarContext.milestoneCardStyle;
 
   /* Finding first item not in past so we can have divider */
   let inPast = true;
@@ -118,37 +97,15 @@ function CalendarScreen(props) {
 
   const renderItem = ({ item, index, separators }) => {
 
-    const wrappedCalendarEvent = item;
-
-    const isOnCalendar = wrappedCalendarEvent.isOnCalendar;
-    const eventTime = wrappedCalendarEvent.startTime;
-
-    const btnType = isOnCalendar ? "calendar-check" : "calendar-blank";
-    const opacityStyle = (eventTime < nowTime) ? styles.lessOpacity : styles.fullOpacity;
-
     if (inPast && item.startTime >= nowTime) {
       inPast = false;
       firstNotInPastKey = item.key;
     }
-
     return (
       <React.Fragment>{
         (firstNotInPastKey === item.key) && index > 0 && <MyCalendarDivider />}
-        <MyCard style={[styles.card, cardStyle, myCardHeightStyle]}>
-          <View style={[styles.myCardTextWrapper, opacityStyle]}>
-            <ClipboardCopyable onPressGetContentFunction={() => {
-              return makeMilestoneClipboardContentForWrappedCalendarEvent(wrappedCalendarEvent);
-            }}>
-              <MyCardHeader style={colorStyle}>{wrappedCalendarEvent.whenDescription}</MyCardHeader>
-              <MyCardBodyText style={colorStyle}>{wrappedCalendarEvent.whatDescription}</MyCardBodyText>
-            </ClipboardCopyable>
-          </View>
-          <View style={opacityStyle}>
-            <TouchableOpacity onPress={() => calendarContext.toggleCalendarScreenCalendarEvent(item)} style={styles.calendarButton}>
-              <MaterialCommunityIcons name={btnType} size={18} style={colorStyle} />
-            </TouchableOpacity>
-          </View>
-        </MyCard>
+        <MilestoneListItem wrappedCalendarEvent={item} toggleCalendarHandler={() => calendarContext.toggleCalendarScreenCalendarEvent(item)} />
+
       </React.Fragment>);
   }
 
@@ -162,8 +119,8 @@ function CalendarScreen(props) {
         contentContainerStyle={styles.contentContainerStyle}
         renderItem={renderItem}
         initialNumToRender={initialNumToRender}
-
-        {...initialScrollIndexOnlyIfGreaterThanZero}
+        getItemLayout={getItemLayout}
+        {...initialScrollIndexOnlyIfMany}
       />
     }
     {calendarContext.isCalendarReady && isEmpty &&
