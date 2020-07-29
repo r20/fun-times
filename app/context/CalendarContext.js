@@ -39,10 +39,11 @@ export const getMilestoneVerboseDescription = (milestoneItem) => {
   let nth;
   if (event.anniversaryNumber) {
     // TBD - If add i18n translations, these might need changed
-    if (event.anniversaryNumber === 1) {
-      nth = '1st';
-    } else if (event.anniversaryNumber === 2) {
-      nth = '2nd';
+    const lastDigit = event.anniversaryNumber % 10;
+    if (lastDigit === 1) {
+      nth = String(event.anniversaryNumber) + 'st';
+    } else if (lastDigit === 2) {
+      nth = String(event.anniversaryNumber) + 'nd';
     } else {
       nth = String(event.anniversaryNumber) + 'th';
     }
