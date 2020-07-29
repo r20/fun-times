@@ -23,8 +23,8 @@ export const en = {
   upcomingPastEventMilestoneTitle: "When To Celebrate",
   milestoneDescriptionFuture: "{{milestoneDesciption}} until {{eventTitle}} ({{eventDateTime}})",
   milestoneDescriptionPast: "{{milestoneDesciption}} since {{eventTitle}} ({{eventDateTime}})",
-  timeSinceEventTitle: 'Time Elapsed Since {{someValue}}',
-  timeUntilEventTitle: 'Time Remaining Until {{someValue}}',
+  timeSinceEventTitle: 'Time Elapsed Since {{eventTitle}} ({{eventDateTime}})',
+  timeUntilEventTitle: 'Time Remaining Until {{eventTitle}} ({{eventDateTime}})',
   years: '{{someValue}} years',
   quarters: '{{someValue}} quarters',
   months: '{{someValue}} months',
@@ -107,6 +107,7 @@ export const en = {
   milestonePastDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it was {{whatValue}}',
   milestonePastDescriptionWithDayOnly: 'On {{dayValue}} it was {{whatValue}}',
   anniversaryTitle: "anniversary of {{title}}",
+  anniversaryTitleUpper: "Anniversary of {{title}}",
 };
 
 

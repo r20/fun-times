@@ -10,7 +10,6 @@ import UpcomingMilestonesList from '../components/UpcomingMilestonesList'
 import EventsAndMilestonesContext from '../context/EventsAndMilestonesContext'
 import { getDisplayStringDateTimeForEvent } from '../utils/Utils'
 import i18n from '../i18n/i18n'
-import MyCard, { MyCardHeader } from '../components/MyCard'
 import * as logger from '../utils/logger'
 import MyText, { MyTextLarge, MyTextXLarge } from '../components/MyText'
 import MyThemeContext from '../context/MyThemeContext'
@@ -91,8 +90,6 @@ function EventInfo(props) {
 
   const now = new Date();
   const nowMillis = now.getTime();
-  const i18nKeyNow = (nowMillis > event.epochMillis) ? "timeSinceEventTitle" : "timeUntilEventTitle";
-  const cardHeaderTitleNow = i18n.t(i18nKeyNow, { someValue: getDisplayStringDateTimeForEvent(event) });
 
   const i18nKeyUpcoming = (nowMillis > event.epochMillis) ? "upcomingPastEventMilestoneTitle" : "upcomingFutureEventCountdownTitle";
   const cardHeaderTitleUpcoming = i18n.t(i18nKeyUpcoming, { someValue: getDisplayStringDateTimeForEvent(event) });
@@ -100,11 +97,7 @@ function EventInfo(props) {
 
   const upcomingMilestoneListHeader = (
     <React.Fragment>
-      <MyCard >
-        <MyCardHeader >{cardHeaderTitleNow}</MyCardHeader>
-        <EventComparedToNow event={event} />
-      </MyCard>
-
+      <EventComparedToNow event={event} />
       <MyTextLarge style={styles.upcomingHeader}>{cardHeaderTitleUpcoming}</MyTextLarge>
     </React.Fragment>
   );
