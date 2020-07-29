@@ -69,7 +69,7 @@ function EventDateTimePickerAndroid(props) {
     showMode('time');
   };
 
-  /* TBD - although the library doens't crash anymore when picing old dates, when re-opening the picker
+  /* TBD - although the library doens't crash anymore when picking old dates, when re-opening the picker
     when setting to an old date the date shown is 1900.  You can still change and pick an older date, but
     that's a bug withthe library. */
 
