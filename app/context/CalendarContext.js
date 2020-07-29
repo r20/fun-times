@@ -36,7 +36,9 @@ export const getMilestoneVerboseDescription = (milestoneItem) => {
 
   const isEventInFuture = (event.epochMillis > nowTime);
   const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
-  const desc = i18n.t(i18nKey, { milestoneDesciption: i18n.t(milestoneItem.unit, { someValue: milestoneItem.description }), eventTitle: event.title, eventDateTime: eventDisplayDateTime });
+  const title = event.isDerivativeAnniversaryEvent ? i18n.t('anniversaryTitle', { title: event.title }) : event.title;
+
+  const desc = i18n.t(i18nKey, { milestoneDesciption: i18n.t(milestoneItem.unit, { someValue: milestoneItem.description }), eventTitle: title, eventDateTime: eventDisplayDateTime });
   return desc;
 }
 

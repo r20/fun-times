@@ -1,5 +1,8 @@
 
+import moment from 'moment-timezone'
+
 import * as logger from '../utils/logger'
+import i18n from '../i18n/i18n'
 
 /**
  * Using a simple class with attributes only (no methods)
@@ -23,6 +26,7 @@ export default class Event {
         useDateAndTimeInMilestones // Whether we use date/time in milestone calculations
         useManualEntryInMilestones
         manualEntryNumbers // Other numbers (besides what's in date) that are significant. E.g. [60] for Super Bowl LX
+        isDerivativeAnniversaryEvent // These are NOT in any event list. Events with this are created and put in the event attribute of milestones to be able to find celebration times for upcoming anniversaries.
 
     */
     constructor(options = {}) {
@@ -36,6 +40,7 @@ export default class Event {
             ignoreIfPast: true,
             useDateAndTimeInMilestones: true,
             useManualEntryInMilestones: false,
+            isDerivativeAnniversaryEvent: false,
             manualEntryNumbers: [],
         }, options);
         // If key not specified, set it to title
@@ -52,6 +57,31 @@ export default class Event {
 export function cloneEvent(event) {
     /* Since not storing Date in object or anything too unusual, we can do deep clone with stringify */
     return JSON.parse(JSON.stringify(event));
+}
+
+const nowMoment = moment(new Date());
+
+export function getNextAnniversaryMoment(theMoment) {
+    let futureMoment = theMoment.clone();
+    while (futureMoment.isBefore(nowMoment, "minute")) {
+        futureMoment = futureMoment.year(futureMoment.year() + 1);
+    }
+    return futureMoment;
+}
+
+
+/* Make an event based off the input parameter event
+that has its year set so that it is within the next year.
+This is useful for finding the next anniversary of an event for example. */
+export function makeDerivedAnniversaryEvent(event) {
+    let clone = cloneEvent(event);
+    let tempMoment = moment(event.epochMillis);
+    let futureMoment = getNextAnniversaryMoment(tempMoment);
+
+    clone.epochMillis = futureMoment.valueOf();
+    clone.isDerivativeAnniversaryEvent = true;
+    return clone;
+
 }
 
 /**

@@ -70,11 +70,13 @@ export const en = {
   emptyCalendarMessage: "There are no celebration times on the Fun Times calendar within \{{someValue}}\ days.",
   emptyMilestoneMessage: "There are no celebration times for favorite events that meet the settings criteria within the next \{{someValue}}\ days.",
   removeCalendarEntriesButton: "Remove All Calendar Entries",
+  settingsStyle: "Style",
   settingsMilestoneNumberTypes: "Celebration Time Calculations",
   settingsCalendar: "Calendar",
   settingsAbout: "About",
   settingsVersion: "Version {{someValue}}",
   settingsDefaultTheme: "Device Default Theme",
+  useAnniversaryDerivativeEvent: "Calculate celebration times in anticipation of the anniversary of past custom events (e.g. 100 days until birthday)",
   useRound: "Round numbers (e.g. 1,000 or 4,000)",
   useCount: "Counting up or down (e.g. 12,345)",
   useRepDigits: "Repeating digits (e.g. 11,111)",
@@ -84,6 +86,7 @@ export const en = {
   settingsHeaderWhichConstants: "Which math and science constants should be used in calculations?",
   settingsUseMathAndScienceConstantsForCustomEvents: "Use math and science constants for custom events",
   settingsUseMathAndScienceConstantsForStandardEvents: "Use math and science constants for standard events",
+  settingsHeaderOther: "Other",
   numberNamePi: "Pi",
   numberNameEuler: "e (Euler's number)",
   numberNamePhi: "Phi (golden ratio)",
@@ -103,7 +106,7 @@ export const en = {
   milestoneTodayPastDescriptionWithDayAndTime: 'Today ({{dayValue}}) at {{timeValue}} it was {{whatValue}}',
   milestonePastDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it was {{whatValue}}',
   milestonePastDescriptionWithDayOnly: 'On {{dayValue}} it was {{whatValue}}',
-
+  anniversaryTitle: "anniversary of {{title}}",
 };
 
 

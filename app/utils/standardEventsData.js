@@ -2,7 +2,7 @@
 import moment from 'moment-timezone'
 import * as Localization from 'expo-localization'
 
-import Event, { TAGS } from './Event'
+import Event, { TAGS, getNextAnniversaryMoment } from './Event'
 import * as logger from '../utils/logger'
 
 
@@ -32,20 +32,12 @@ const events = [];
 
 const nowMoment = moment(new Date());
 
-/* If theMoment is in past, set it to the future by modifying the year (which may or may not be this year) */
-function getNextMomentForDate(theMoment) {
-    let futureMoment = theMoment.clone();
-    while (futureMoment.isBefore(nowMoment, "minute")) {
-        futureMoment = futureMoment.year(futureMoment.year() + 1);
-    }
-    return futureMoment;
-}
 
 events.push(new Event({
     title: "Christmas 🎄", // What user might see (later need to localize)
     key: "Christmas", // Each holiday needs unique key.  Specify key if different than title.
     isSelectedByDefault: false,
-    epochMillis: getNextMomentForDate(moment("2019-12-25 0:00", 'YYYY-MM-DD HH:mm')).valueOf(), // Day and/or time it starts
+    epochMillis: getNextAnniversaryMoment(moment("2019-12-25 0:00", 'YYYY-MM-DD HH:mm')).valueOf(), // Day and/or time it starts
     ignoreIfPast: true, // don't use this if it's past. (Eventually I'll update code above to do next one)
     keywords: ['christmas', 'x-mas', 'xmas'], // Have these all lower case
     isAllDay: true, // If event is whole day, not a specific time
@@ -72,7 +64,7 @@ events.push(new Event({
     title: "Pi Day 🥧",
     key: "Pi Day",
     isSelectedByDefault: false,
-    epochMillis: getNextMomentForDate(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
+    epochMillis: getNextAnniversaryMoment(moment("2005-03-14 1:59:25", 'YYYY-MM-DD HH:mm:ss', Localization.timezone)).valueOf(),
     ignoreIfPast: true,
     isAllDay: false, // True if want to calculate times to 1:59:25
     color: "orange",
@@ -85,7 +77,7 @@ events.push(new Event({
     title: "US Independence Day 🇺🇸",
     key: "US Independence Day",
     isSelectedByDefault: false,
-    epochMillis: getNextMomentForDate(moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
+    epochMillis: getNextAnniversaryMoment(moment("2020-07-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
     ignoreIfPast: true,
     color: "red",
     tags: [TAGS.HOLIDAY],
@@ -109,7 +101,7 @@ events.push(new Event({
     title: "May the Fourth (Star Wars Day)",
     key: "Star Wars Day",
     isSelectedByDefault: false,
-    epochMillis: getNextMomentForDate(moment("2020-05-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
+    epochMillis: getNextAnniversaryMoment(moment("2020-05-04 0:00", 'YYYY-MM-DD HH:mm')).valueOf(),
     ignoreIfPast: true,
     color: "black",
     tags: [TAGS.QUIRKY],

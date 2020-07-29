@@ -9,7 +9,7 @@ import { useScrollToTop } from '@react-navigation/native'
 import Accordion from 'react-native-collapsible/Accordion'
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
-import GeneralSettings from './GeneralSettings'
+import StyleSettings from './StyleSettings'
 import MilestonTypesSettings from './MilestoneTypesSettings'
 import CalendarSettings from './CalendarSettings'
 
@@ -27,7 +27,7 @@ function Settings(props) {
 
   const myThemeContext = useContext(MyThemeContext);
 
-  const [activeSections, setActiveSections] = useState([]);
+  const [activeSections, setActiveSections] = useState([0]); // Make style open to start with
 
 
   const styles = StyleSheet.create({
@@ -48,6 +48,10 @@ function Settings(props) {
   });
 
   const SECTIONS = [
+    {
+      title: (<MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsStyle")}</MyTextLarge>),
+      content:  <StyleSettings />,
+    },
     {
       title: (<MyTextLarge style={styles.settingsSectionHeaderText}>{i18n.t("settingsMilestoneNumberTypes")}</MyTextLarge>),
       content: <MilestonTypesSettings />,
@@ -78,7 +82,7 @@ function Settings(props) {
       <React.Fragment>
 
         <ScrollView ref={ref} contentContainerStyle={styles.container}>
-          <GeneralSettings />
+         
           <Accordion
             expandMultiple={true}
             touchableComponent={(props) => <TouchableHighlight {...props} />}

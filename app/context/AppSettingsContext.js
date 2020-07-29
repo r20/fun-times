@@ -11,9 +11,12 @@ const STORAGE_KEY_DATEPICKER_YEAR_TIP_STATE = '@datepicker_year_tip_state';
 const STORAGE_KEY_calendarMaxNumberMilestonesPerEvent = '@calendarMaxNumberMilestonesPerEvent';
 const STORAGE_KEY_numberTypeUseMap = '@numberTypeUseMap';
 const STORAGE_KEY_isThemeDefault = '@isThemeDefault';
+const STORAGE_KEY_useAnniversaryDerivativeEvent = '@useAnniversaryDerivativeEvent';
 const STORAGE_KEY_eventsLastSelectedScreen = '@eventsLastSelectedScreen';
 const STORAGE_KEY_settingsUseMathAndScienceConstantsForCustomEvents = '@settingsUseMathAndScienceConstantsForCustomEvents';
 const STORAGE_KEY_settingsUseMathAndScienceConstantsForStandardEvents = '@settingsUseMathAndScienceConstantsForStandardEvents';
+
+
 
 const DATEPICKER_YEAR_TIP_STATES = {
   FIRST_TIME: 'first',
@@ -44,6 +47,7 @@ const AppSettingsContext = createContext({
   setUseRGas: () => { },
   setUseFaraday: () => { },
   setIsThemeDefault: () => { },
+  setUseAnniversaryDerivativeEvent: () => { },
 });
 
 
@@ -68,6 +72,7 @@ export class AppSettingsContextProvider extends React.Component {
       settingsUseMathAndScienceConstantsForStandardEvents: false,
       numberTypeUseMap: {}, // has usePowers, useBinary, useGravity, etc. attributes. 
       isThemeDefault: true,
+      useAnniversaryDerivativeEvent: false,
       isInitialSettingsLoaded: false,
     };
   }
@@ -140,15 +145,19 @@ export class AppSettingsContextProvider extends React.Component {
       logger.warn("Error from failing to load use* number types: ", e);
     }
 
-    try {
 
+    try {
       let isThemeDefault = await AsyncStorage.getItem(STORAGE_KEY_isThemeDefault) || "true";
       isThemeDefault = JSON.parse(isThemeDefault);
-
       this.setState({ isThemeDefault: isThemeDefault });
+
+      let useAnniversaryDerivativeEvent = await AsyncStorage.getItem(STORAGE_KEY_useAnniversaryDerivativeEvent) || "false";
+      useAnniversaryDerivativeEvent = JSON.parse(useAnniversaryDerivativeEvent);
+      this.setState({ useAnniversaryDerivativeEvent: useAnniversaryDerivativeEvent });
     } catch (e) {
-      logger.warn("Error from failing to load isThemeDefault: ", e);
+      logger.warn("Error from failing to load isThemeDefault or useAnniversaryDerivativeEvent: ", e);
     }
+
 
     // After all settings are initially loaded set this
     setTimeout(() => {
@@ -265,6 +274,20 @@ export class AppSettingsContextProvider extends React.Component {
     }
   }
 
+  /**
+ * Set and save useAnniversaryDerivativeEvent
+ */
+  setUseAnniversaryDerivativeEvent = (isYes) => {
+    try {
+      this.setState({ useAnniversaryDerivativeEvent: isYes });
+
+      // Don't wait
+      AsyncStorage.setItem(STORAGE_KEY_useAnniversaryDerivativeEvent, JSON.stringify(isYes));
+    } catch (e) {
+      logger.warn("Error from trying to useAnniversaryDerivativeEvent: ", isYes, e);
+    }
+  }
+
 
   /**
  * Helper function to set attribute in numberTypeUseMap
@@ -351,6 +374,7 @@ export class AppSettingsContextProvider extends React.Component {
         setUseRGas: this.setUseRGas,
         setUseFaraday: this.setUseFaraday,
         setIsThemeDefault: this.setIsThemeDefault,
+        setUseAnniversaryDerivativeEvent: this.setUseAnniversaryDerivativeEvent,
       }}>
         {this.props.children}
       </AppSettingsContext.Provider>

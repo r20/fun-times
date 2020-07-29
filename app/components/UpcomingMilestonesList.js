@@ -54,6 +54,11 @@ export default function UpcomingMilestonesList(props) {
       if (milestone.event && eventTitleMap[milestone.event.title]) {
         // yes this milestone is for one of the events
 
+        if (!appSettingsContext.useAnniversaryDerivativeEvent && (milestone.event.isDerivativeAnniversaryEvent && milestone.event.isCustom)) {
+          // Don't show if it's for anniversary of custom event and !useAnniversaryDerivativeEvent
+          return false;
+        }
+
         /* New settings were added to determine whether math/science constants should be
           shown for custom and standard events separately. Check for that here instead of in shouldShowMilestoneForNumberType */
         if (milestone.numberCode) {
@@ -79,9 +84,10 @@ export default function UpcomingMilestonesList(props) {
           }
         }
       }
+
       return false;
     });
-  }, [eventsAndMilestonesContext.allMilestones, props.events, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap]);
+  }, [eventsAndMilestonesContext.allMilestones, props.events, props.maxNumMilestonesPerEvent, appSettingsContext.numberTypeUseMap, appSettingsContext.useAnniversaryDerivativeEvent]);
 
 
   const isEmpty = specials.length === 0;

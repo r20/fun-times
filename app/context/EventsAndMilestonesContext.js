@@ -1,9 +1,9 @@
-import React, { createContext } from 'react'
+import React, { createContext, useContext } from 'react'
 import { AsyncStorage } from 'react-native'
 import moment from 'moment-timezone'
 
 import { standardEventsData } from '../utils/standardEventsData'
-import { cloneEvent } from '../utils/Event'
+import { cloneEvent, makeDerivedAnniversaryEvent } from '../utils/Event'
 import * as logger from '../utils/logger'
 
 import { createMilestones } from '../utils/milestones'
@@ -205,7 +205,21 @@ export class EventsAndMilestonesContextProvider extends React.Component {
 
   getMilestonesForEvent = (event) => {
 
+
     let milestonesForEvent = createMilestones(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent);
+
+    if (event.epochMillis < nowTime) {
+      /* Create milestones for anniversary too. Do it no matter what current
+      appSettingsContext.useAnniversaryDerivativeEvent is.
+      That can be changed in settings and we want milestones already created. */
+      const anniversaryEvent = makeDerivedAnniversaryEvent(event);
+      const moreMilestones = createMilestones(anniversaryEvent, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent);
+      milestonesForEvent = milestonesForEvent.concat(moreMilestones);
+
+      // Sort after combining the 2 lists
+      milestonesForEvent = milestonesForEvent.sort((a, b) => { return (a.time - b.time); });
+
+    }
 
     return milestonesForEvent;
 
@@ -497,5 +511,6 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     );
   }
 }
+
 
 export default EventsAndMilestonesContext;

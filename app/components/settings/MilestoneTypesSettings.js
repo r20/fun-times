@@ -74,7 +74,7 @@ function MilestoneTypesSettings(props) {
         <ScrollView ref={ref} contentContainerStyle={styles.container}>
 
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("useRound")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("useRound")}</MyText>
             <MySwitch
               value={appSettingsContext.numberTypeUseMap.round}
               onValueChange={isYes => {
@@ -83,7 +83,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("useCount")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("useCount")}</MyText>
             <MySwitch
               value={appSettingsContext.numberTypeUseMap.count}
               onValueChange={isYes => {
@@ -92,7 +92,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("useRepDigits")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("useRepDigits")}</MyText>
             <MySwitch
               value={appSettingsContext.numberTypeUseMap.repDigits}
               onValueChange={isYes => {
@@ -101,7 +101,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("usePowers")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("usePowers")}</MyText>
             <MySwitch
               value={appSettingsContext.numberTypeUseMap.superPower}
               onValueChange={isYes => {
@@ -110,7 +110,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("useBinary")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("useBinary")}</MyText>
             <MySwitch
               value={appSettingsContext.numberTypeUseMap.binary}
               onValueChange={isYes => {
@@ -119,11 +119,10 @@ function MilestoneTypesSettings(props) {
             />
           </View>
 
-
           <MyTextLarge style={styles.howMuchTitle}>{i18n.t("settingsHeaderConstants")}</MyTextLarge>
 
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("settingsUseMathAndScienceConstantsForStandardEvents")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("settingsUseMathAndScienceConstantsForStandardEvents")}</MyText>
             <MySwitch
               value={appSettingsContext.settingsUseMathAndScienceConstantsForStandardEvents}
               onValueChange={isYes => {
@@ -133,7 +132,7 @@ function MilestoneTypesSettings(props) {
           </View>
 
           <View style={styles.switchSelection}>
-            <MyText >{i18n.t("settingsUseMathAndScienceConstantsForCustomEvents")}</MyText>
+            <MyText style={styles.switchText} >{i18n.t("settingsUseMathAndScienceConstantsForCustomEvents")}</MyText>
             <MySwitch
               value={appSettingsContext.settingsUseMathAndScienceConstantsForCustomEvents}
               onValueChange={isYes => {
@@ -142,10 +141,10 @@ function MilestoneTypesSettings(props) {
             />
           </View>
 
-          <MyText style={styles.howMuchTitle}>{i18n.t("settingsHeaderWhichConstants")}</MyText>
+          <MyText style={styles.switchText} style={styles.howMuchTitle}>{i18n.t("settingsHeaderWhichConstants")}</MyText>
 
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.pi}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.pi}</MyText>
             <MySwitch
               value={(howMuchPi > 0)}
               onValueChange={isYes => {
@@ -156,7 +155,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.speedOfLight}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.speedOfLight}</MyText>
             <MySwitch
               value={(howMuchSpeedOfLight > 0)}
               onValueChange={isYes => {
@@ -167,7 +166,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.gravity}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.gravity}</MyText>
             <MySwitch
               value={(howMuchGravity > 0)}
               onValueChange={isYes => {
@@ -178,7 +177,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.euler}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.euler}</MyText>
             <MySwitch
               value={(howMuchEuler > 0)}
               onValueChange={isYes => {
@@ -189,7 +188,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.phi}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.phi}</MyText>
             <MySwitch
               value={(howMuchPhi > 0)}
               onValueChange={isYes => {
@@ -200,7 +199,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.pythagoras}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.pythagoras}</MyText>
             <MySwitch
               value={(howMuchPythagoras > 0)}
               onValueChange={isYes => {
@@ -211,7 +210,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.mole}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.mole}</MyText>
             <MySwitch
               value={(howMuchMole > 0)}
               onValueChange={isYes => {
@@ -222,7 +221,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.rGas}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.rGas}</MyText>
             <MySwitch
               value={(howMuchRGas > 0)}
               onValueChange={isYes => {
@@ -233,7 +232,7 @@ function MilestoneTypesSettings(props) {
             />
           </View>
           <View style={styles.switchSelection}>
-            <MyText >{translationKeyMap.faraday}</MyText>
+            <MyText style={styles.switchText} >{translationKeyMap.faraday}</MyText>
             <MySwitch
               value={(howMuchFaraday > 0)}
               onValueChange={isYes => {
@@ -244,6 +243,17 @@ function MilestoneTypesSettings(props) {
             />
           </View>
 
+          <MyTextLarge style={styles.howMuchTitle}>{i18n.t("settingsHeaderOther")}</MyTextLarge>
+
+          <View style={styles.switchSelection}>
+            <MyText style={styles.switchText}>{i18n.t("useAnniversaryDerivativeEvent")}</MyText>
+            <MySwitch
+              value={appSettingsContext.useAnniversaryDerivativeEvent}
+              onValueChange={isYes => {
+                appSettingsContext.setUseAnniversaryDerivativeEvent(isYes);
+              }}
+            />
+          </View>
 
         </ScrollView>
       </React.Fragment>
@@ -265,11 +275,14 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   switchSelection: {
-    flex: 0,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 5,
   },
+  switchText: {
+    flex: 1,
+  }
 });
 

@@ -8,16 +8,16 @@ import { useScrollToTop } from '@react-navigation/native'
 
 import AppSettingsContext from '../../context/AppSettingsContext'
 import MyThemeContext from '../../context/MyThemeContext'
-import ColorPickerModal from '../../components/ColorPickerModal'
+import ColorPickerModal from '../ColorPickerModal'
 import * as Utils from '../../utils/Utils'
 import * as logger from '../../utils/logger'
 import i18n from '../../i18n/i18n'
 import MyText from '../MyText'
 import MySwitch from '../MySwitch'
 import CalendarContext from '../../context/CalendarContext'
-import MyActivityIndicatorWithFullScreenSemiTransparent from '../../components/MyActivityIndicatorWithFullScreenSemiTransparent'
+import MyActivityIndicatorWithFullScreenSemiTransparent from '../MyActivityIndicatorWithFullScreenSemiTransparent'
 
-function GeneralSettings(props) {
+function StyleSettings(props) {
 
   // This allows clicking tab navigator icon causing scroll to top.
   const ref = React.useRef(null);
@@ -113,7 +113,7 @@ function GeneralSettings(props) {
   );
 }
 
-export default GeneralSettings;
+export default StyleSettings;
 
 const styles = StyleSheet.create({
   container: {
