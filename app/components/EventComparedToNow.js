@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import PropTypes from 'prop-types'
 import moment from 'moment-timezone'
 import { useIsFocused } from '@react-navigation/native';
@@ -15,6 +15,8 @@ export default function EventComparedToNow(props) {
   const eventMoment = getMomentFromEvent(props.event);
 
   const [nowDate, setNowDate] = useState(new Date());
+  const [showMore, setShowMore] = useState(false);
+
   // useIsFocused() can't be called within the useEffect so do it here
   const isFocued = useIsFocused();
   const event = props.event;
@@ -61,26 +63,17 @@ export default function EventComparedToNow(props) {
 
   const isAllDayAndNow = (event.isAllDay && eventMoment.isSame(nowMoment, "day"));
 
+  const toggleShowMore = () => {
+    setShowMore(!showMore);
+  }
+  return (<TouchableOpacity onPress={toggleShowMore}>
 
-  return (<MyCard >
-    <MyCardHeader >{headerElapsed}</MyCardHeader>
-    <MyCardBodyText>{durationFormatted}</MyCardBodyText>
-    {
-      timeUnits.map((tu) => {
-        const num = Math.abs(eventMoment.diff(nowMoment, tu));
-        if (isAllDayAndNow) {
-          return <MyCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(0) })}</MyCardBodyText>
-        } else {
-          return <MyCardBodyText key={tu} >&nbsp;&nbsp;&nbsp;{i18n.t(tu, { someValue: numberToFormattedString(num) })}</MyCardBodyText>
-        }
-      })
-    }
-    {showAnniversary && <React.Fragment>
-      <MyCardHeader style={styles.space} >{headerAnniversary}</MyCardHeader>
-      <MyCardBodyText>{anniversaryDurationFormatted}</MyCardBodyText>
-      {
+    <MyCard >
+      <MyCardHeader >{headerElapsed}</MyCardHeader>
+      <MyCardBodyText>{durationFormatted}</MyCardBodyText>
+      {showMore &&
         timeUnits.map((tu) => {
-          const num = Math.abs(anniveraryMoment.diff(nowMoment, tu));
+          const num = Math.abs(eventMoment.diff(nowMoment, tu));
           if (isAllDayAndNow) {
             return <MyCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(0) })}</MyCardBodyText>
           } else {
@@ -88,8 +81,22 @@ export default function EventComparedToNow(props) {
           }
         })
       }
-    </React.Fragment>}
-  </MyCard>
+      {showAnniversary && <React.Fragment>
+        <MyCardHeader style={styles.space} >{headerAnniversary}</MyCardHeader>
+        <MyCardBodyText>{anniversaryDurationFormatted}</MyCardBodyText>
+        {showMore &&
+          timeUnits.map((tu) => {
+            const num = Math.abs(anniveraryMoment.diff(nowMoment, tu));
+            if (isAllDayAndNow) {
+              return <MyCardBodyText key={tu} >{i18n.t(tu, { someValue: numberToFormattedString(0) })}</MyCardBodyText>
+            } else {
+              return <MyCardBodyText key={tu} >&nbsp;&nbsp;&nbsp;{i18n.t(tu, { someValue: numberToFormattedString(num) })}</MyCardBodyText>
+            }
+          })
+        }
+      </React.Fragment>}
+    </MyCard>
+  </TouchableOpacity>
   );
 }
 
