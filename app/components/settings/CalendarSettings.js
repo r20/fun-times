@@ -38,7 +38,7 @@ function CalendarSettings(props) {
     );
   }
 
-  /* TBD - I should have a button for removing all old calendar entries */
+  /* TBD - I could have a button for removing all old calendar entries */
 
   return (
     <React.Fragment>

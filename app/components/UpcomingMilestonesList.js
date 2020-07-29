@@ -54,7 +54,7 @@ export default function UpcomingMilestonesList(props) {
       if (milestone.event && eventTitleMap[milestone.event.title]) {
         // yes this milestone is for one of the events
 
-        if (!appSettingsContext.useAnniversaryDerivativeEvent && (milestone.event.isDerivativeAnniversaryEvent && milestone.event.isCustom)) {
+        if (!appSettingsContext.useAnniversaryDerivativeEvent && (milestone.event.anniversaryNumber && milestone.event.isCustom)) {
           // Don't show if it's for anniversary of custom event and !useAnniversaryDerivativeEvent
           return false;
         }
@@ -118,7 +118,7 @@ export default function UpcomingMilestonesList(props) {
   let inPast = true;
   let firstNotInPastKey = null;
 
-  // TBD - Could use useMemo for this if they did lots of scrolling back and forth
+  // Could use useMemo for this if they did lots of scrolling back and forth. Probably not worth it though.
   const renderItem = ({ item, index, separators }) => {
 
     /* Finding first item not in past so we can have divider */

@@ -90,14 +90,6 @@ const numberTypes = Object.keys(sortedInterestingNumbersMap);
  */
 export const getInterestingNumbersForEventTime = (epochTime, isAllDay, event) => {
 
-    /* TBD - whether in here or another control, 
-    I should use the next anniversary number in milestones.  
-    E.g. if someone will be 22 years it could be good to show
-    22 days until they are 22 years  
-    Maybe it's an optional number for milestons calculations??
-    
-    */
-
     let theMoment = moment(epochTime);
 
     function makeInterestingInfo(num, descriptor, event) {
@@ -291,8 +283,6 @@ const unmemoizedCreateMilestones = (event, nowTime, pastDays, futureDays, maxNum
 
 
         /* Add in numbers that are based on the event date and time */
-        /* TBD: Should this be global setting or event specific???  If event specific we could check here. 
-         If global then always put them in here and the show* function will filter them */
         for (let jdx = 0; jdx < eventDatetimeNumbers.length; jdx++) {
             const info = eventDatetimeNumbers[jdx];
             const newMilestone = createMilestoneIfNeeded(unit, start, end, info.number, info.descriptor, EXTRA_NUMBER_TYPE_USE_EVENT_DATETIME, undefined);

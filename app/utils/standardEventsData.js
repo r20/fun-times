@@ -6,15 +6,9 @@ import Event, { TAGS, getNextAnniversaryMoment } from './Event'
 import * as logger from '../utils/logger'
 
 
-/* TBD - Need an easy way for users to see list of new events added to this list,
-especially the ones that will be on by default. */
-
 /* Some of the times depend on the user's time zone (e.g. New Year's Day)
     and some do not (e.g. start of Super Bowl).
     Creating with moment.tz() helps with that.
-    TBD: Some (or all) of these are only interesting in future. If in past, ignore.
-    TBD: Some I should calculate the next one programatically (e.g. Christmas)
-    TBD: Some custom events need recognized both past and maybe also the upcoming (e.g. birthday)
 
     Perhaps in future look in to using moment-holiday
     And add own custom holidays to that.

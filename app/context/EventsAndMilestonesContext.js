@@ -55,7 +55,6 @@ const EventsAndMilestonesContext = createContext({
   modifyEventAndMilestones: () => { },
   removeCustomEventAndMilestones: () => { },
   toggleEventSelected: () => { },
-  removeAllCustomEvents: () => { },
   isEventSelected: isEventSelected,
   getCustomEventWithTitle: () => { return null; },
 });
@@ -347,19 +346,6 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     }
   }
 
-  /**
-   * Remove all custom events.
-   * 
-   * TBD - This is unused.  If keep this, it needs to modify the milestones too
-   * We could iterate through standard events and make new miletones for those only
-   */
-  removeAllCustomEvents = () => {
-    try {
-      this.updateCustomEvents([]);
-    } catch (e) {
-      logger.log('Failed to remove custom events.');
-    }
-  }
 
   getEventWithTitle = (title) => {
     for (let event of this.state.allEvents) {
@@ -497,7 +483,6 @@ export class EventsAndMilestonesContextProvider extends React.Component {
     return (
       <EventsAndMilestonesContext.Provider value={{
         ...this.state,
-        removeAllCustomEvents: this.removeAllCustomEvents,
         addCustomEventAndMilestones: this.addCustomEventAndMilestones,
         modifyEventAndMilestones: this.modifyEventAndMilestones,
         getEventWithTitle: this.getEventWithTitle,

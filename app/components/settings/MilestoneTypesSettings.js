@@ -25,14 +25,6 @@ function MilestoneTypesSettings(props) {
   const ref = React.useRef(null);
   useScrollToTop(ref);
 
-  /*
-  TBD:  Here's a list of things that could be done to improve app
-
-  Headers for milestones list (by date, like Month YYYY)
-  Have line between past and future milestones (possibly by changing MyCard of one of them to put it floating above/below)
-  More help and explanation when first open app.
-  */
-
   const appSettingsContext = useContext(AppSettingsContext);
 
   /* 

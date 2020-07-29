@@ -1,7 +1,7 @@
 import React, { createContext } from 'react'
 /* TBD - I tried this but it doesn't work. Probably because I'm in Expo environment.
 So this context isn't used currently.  I could remove the library and remove this file.
-Or, try again and see if it's been fixed or check alternatives.
+Or, try again and see if it's been fixed since I've updated releases, or check alternatives.
 
 Could also try https://github.com/react-native-community/react-native-localize
 and its uses24HourClock

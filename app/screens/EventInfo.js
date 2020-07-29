@@ -103,11 +103,6 @@ function EventInfo(props) {
   );
 
 
-
-  /* TBD - if event is within N days (see other code that sets that limit and get it from there),
-    then should there be a message "Event within N days" ??
-    Use i18n
-    TBD - if title is really long, looks bad in EventInfo screen */
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}><MyTextXLarge style={styles.title}>{event.title}</MyTextXLarge></View>

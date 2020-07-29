@@ -36,7 +36,18 @@ export const getMilestoneVerboseDescription = (milestoneItem) => {
 
   const isEventInFuture = (event.epochMillis > nowTime);
   const i18nKey = isEventInFuture ? "milestoneDescriptionFuture" : "milestoneDescriptionPast";
-  const title = event.isDerivativeAnniversaryEvent ? i18n.t('anniversaryTitle', { title: event.title }) : event.title;
+  let nth;
+  if (event.anniversaryNumber) {
+    // TBD - If add i18n translations, these might need changed
+    if (event.anniversaryNumber === 1) {
+      nth = '1st';
+    } else if (event.anniversaryNumber === 2) {
+      nth = '2nd';
+    } else {
+      nth = String(event.anniversaryNumber) + 'th';
+    }
+  }
+  const title = event.anniversaryNumber ? i18n.t('nthAnniversaryTitle', { title: event.title, nth: nth }) : event.title;
 
   const desc = i18n.t(i18nKey, { milestoneDesciption: i18n.t(milestoneItem.unit, { someValue: milestoneItem.description }), eventTitle: title, eventDateTime: eventDisplayDateTime });
   return desc;

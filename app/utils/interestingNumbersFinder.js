@@ -8,17 +8,6 @@ import { numberToFormattedString, capitalize } from './Utils'
 
 export const maxNumberOfYearsAway = 300; // If you ever change this, search for it's use and read about implications
 
-/*
-  This file has useful functions for finding interesting times.
-
-  TBD - See https://www.janko.at/Humor/Wissenschaft/Runde%20Zahlen.htm
-  about round numbers.
-  Maybe we'll have categories for types of numbers people may be interested in
-  e.g. physicists, mathematicians, electricians, etc.
-*/
-
-
-
 
 /**
  * Find numbers with all the same digit, like 22222 or 777.

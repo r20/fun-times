@@ -26,7 +26,7 @@ export default class Event {
         useDateAndTimeInMilestones // Whether we use date/time in milestone calculations
         useManualEntryInMilestones
         manualEntryNumbers // Other numbers (besides what's in date) that are significant. E.g. [60] for Super Bowl LX
-        isDerivativeAnniversaryEvent // These are NOT in any event list. Events with this are created and put in the event attribute of milestones to be able to find celebration times for upcoming anniversaries.
+        anniversaryNumber // These are NOT in any event list. Events with this are created and put in the event attribute of milestones to be able to find celebration times for upcoming anniversaries. This tells which number anniversary.
 
     */
     constructor(options = {}) {
@@ -40,7 +40,7 @@ export default class Event {
             ignoreIfPast: true,
             useDateAndTimeInMilestones: true,
             useManualEntryInMilestones: false,
-            isDerivativeAnniversaryEvent: false,
+            anniversaryNumber: undefined,
             manualEntryNumbers: [],
         }, options);
         // If key not specified, set it to title
@@ -71,15 +71,24 @@ export function getNextAnniversaryMoment(theMoment) {
 
 
 /* Make an event based off the input parameter event
-that has its year set so that it is within the next year.
-This is useful for finding the next anniversary of an event for example. */
+    that has its year set so that it is within the next year.
+    This is useful for finding the next anniversary of an event for example.
+    We add the anniversary number to manualEntryNumbers, and set anniversaryNumber.
+    And set useManualEntryInMilestones true */
 export function makeDerivedAnniversaryEvent(event) {
     let clone = cloneEvent(event);
     let tempMoment = moment(event.epochMillis);
     let futureMoment = getNextAnniversaryMoment(tempMoment);
 
+    /* So we can say there are 17 days until anniversary for 17th anniversary */
+    let newManuals = clone.manualEntryNumbers || [];
+    const anniversaryNumber = Math.abs(futureMoment.diff(tempMoment, 'years'));
+    newManuals.push(anniversaryNumber);
+    clone.manualEntryNumbers = newManuals;
+    clone.useManualEntryInMilestones = true;
+    clone.anniversaryNumber = anniversaryNumber; // Which anniversary is this event for
+
     clone.epochMillis = futureMoment.valueOf();
-    clone.isDerivativeAnniversaryEvent = true;
     return clone;
 
 }

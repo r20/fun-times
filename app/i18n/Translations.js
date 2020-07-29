@@ -106,7 +106,7 @@ export const en = {
   milestoneTodayPastDescriptionWithDayAndTime: 'Today ({{dayValue}}) at {{timeValue}} it was {{whatValue}}',
   milestonePastDescriptionWithDayAndTime: 'On {{dayValue}} at {{timeValue}} it was {{whatValue}}',
   milestonePastDescriptionWithDayOnly: 'On {{dayValue}} it was {{whatValue}}',
-  anniversaryTitle: "anniversary of {{title}}",
+  nthAnniversaryTitle: "{{nth}} anniversary of {{title}}",
   anniversaryTitleUpper: "Anniversary of {{title}}",
 };
 
