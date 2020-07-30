@@ -13,10 +13,13 @@ const EXTRA_NUMBER_TYPE_MANUAL_ENTRY = "numberTypeManualEntry";
     Get a key for the milestone.
     Combination of event title and time would NOT be unique if a time had more than one representation
     that was interesting. Adding unit to that still isn't unique (e.g. 22 days and 3*pi days).
-    So, add numberType also.
+    So, add numberType also.  Also needed to add anniversaryNumber.
 */
 export function getMilestoneKey(milestoneItem) {
-    const theKey = "" + milestoneItem.time + "_" + milestoneItem.numberType + "_" + milestoneItem.unit + "_" + milestoneItem.event.title;
+    /* A milestone for a generated anniversary event could have similar attributes as 
+        one generated for original event, so inlcude anniversaryNumber to differentiate the two.*/
+    const tmp = milestoneItem.event.anniversaryNumber ? +'_' + String(milestoneItem.event.anniversaryNumber) : '';
+    const theKey = "" + milestoneItem.time + "_" + milestoneItem.numberType + "_" + milestoneItem.unit + "_" + milestoneItem.event.title + tmp;
     return theKey;
 }
 

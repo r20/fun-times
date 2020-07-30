@@ -89,6 +89,7 @@ export function makeDerivedAnniversaryEvent(event) {
     clone.anniversaryNumber = anniversaryNumber; // Which anniversary is this event for
 
     clone.epochMillis = futureMoment.valueOf();
+    // Don't need to change clone.key.  We want it to be based off of original event anyway, so that might be bad
     return clone;
 
 }

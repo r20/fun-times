@@ -207,12 +207,13 @@ export class EventsAndMilestonesContextProvider extends React.Component {
 
     let milestonesForEvent = createMilestones(event, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent);
 
-    if (event.epochMillis < nowTime) {
+    if (event.isCustom && event.epochMillis < nowTime) {
       /* Create milestones for anniversary too. Do it no matter what current
       appSettingsContext.useAnniversaryDerivativeEvent is.
       That can be changed in settings and we want milestones already created. */
       const anniversaryEvent = makeDerivedAnniversaryEvent(event);
       const moreMilestones = createMilestones(anniversaryEvent, nowTime, howManyDaysAgoCalendar, howManyDaysAheadCalendar, maxNumPastMilestonesPerEvent);
+      
       milestonesForEvent = milestonesForEvent.concat(moreMilestones);
 
       // Sort after combining the 2 lists
