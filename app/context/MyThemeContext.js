@@ -17,6 +17,10 @@ function adjustLighterOrDarker(color, amount) {
   return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
 }
 
+const darkThemeText = '#dddddd';
+const lightThemeText = '#333333';
+
+
 /** 
  * Return the color that works best (light or dark)
  * to use for contrasting with the input hexcolor.
@@ -29,10 +33,26 @@ const _getContrastFontColorForTheme = nanomemoize(function (hexcolor, isDarkThem
   var g = parseInt(hexcolor.substring(3, 5), 16);
   var b = parseInt(hexcolor.substring(5, 7), 16);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  // Have different cutoff threshold depending on if theme is dark
-  const cutoffVal = isDarkTheme ? 70 : 180;
-  // I think white looks best on colored cards/buttons and black looks best if color is light and theme is dark
-  return yiq >= cutoffVal ? '#000000' : '#ffffff';
+
+  /* Which contrast color depends on the brightness of the color (yiq)
+    but also on the theme (dark/light) */
+  if (isDarkTheme) {
+    if (yiq >= 80) {
+      // Show same as background
+      return '#000000';
+    } else {
+      return darkThemeText;
+    }
+  } else {
+    // light theme
+    if (yiq >= 180) {
+      return lightThemeText;
+    } else {
+      // Show same as background
+      return '#ffffff';
+    }
+  }
+
 });
 
 
@@ -70,8 +90,8 @@ const calendarColorPallete = [
 
 const initialCalendarColor = "#AEECEF";
 
+
 let tmpIsDarkTheme = false;
-const lightThemeText = '#333333';
 const lightThemeColors = {
   ...DefaultTheme.colors,
   primary: palette[0],
@@ -90,9 +110,9 @@ const lightThemeColors = {
   calendar: initialCalendarColor,
   calendarContrast: _getContrastFontColorForTheme(initialCalendarColor, tmpIsDarkTheme),
   event: '#EBEBEB',
-  eventContrast:  _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
+  eventContrast: _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
   card: '#EBEBEB',
-  cardContrast:  _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
+  cardContrast: _getContrastFontColorForTheme('#EBEBEB', tmpIsDarkTheme),
   headerBackground: '#ffffff',
   footerBackground: '#ffffff',
   starred: palette[2],
@@ -101,7 +121,6 @@ const lightThemeColors = {
 }
 
 tmpIsDarkTheme = true;
-const darkThemeText = '#ffffff';
 const darkThemeColors = {
   ...DefaultTheme.colors,
   primary: palette[0],
@@ -120,9 +139,9 @@ const darkThemeColors = {
   calendar: initialCalendarColor,
   calendarContrast: _getContrastFontColorForTheme(initialCalendarColor, tmpIsDarkTheme),
   event: '#2C2C34',
-  eventContrast:  _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
+  eventContrast: _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
   card: '#2C2C34',
-  cardContrast:  _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
+  cardContrast: _getContrastFontColorForTheme('#2C2C34', tmpIsDarkTheme),
   headerBackground: '#000000',
   footerBackground: palette[3],
   starred: palette[2],

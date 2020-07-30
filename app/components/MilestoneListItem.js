@@ -50,11 +50,13 @@ export default function MilestoneListItem(props) {
     props.toggleCalendarHandler();
   }
 
+  const calendarIconStyle = [{ color: myThemeContext.colors.text }, opacityStyle];
+
   return (
     <View style={styles.container}>
       <View style={{ flex: 0, justifyContent: 'center' }}>
         <TouchableOpacity onPress={onToggleCalendar} style={styles.calendarButton}>
-          <MaterialCommunityIcons name={btnType} size={24} style={opacityStyle} />
+          <MaterialCommunityIcons name={btnType} size={24} style={calendarIconStyle} />
         </TouchableOpacity>
       </View>
 
