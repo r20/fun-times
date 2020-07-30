@@ -58,7 +58,7 @@ export default function EventComparedToNow(props) {
   if (showAnniversary) {
     const anniversaryDuration = moment.duration(Math.abs(nowMoment.diff(anniveraryMoment)));
     anniversaryDurationFormatted = isAllDayAndNow ? '' : anniversaryDuration.format("y [years], M [months], d [days], h [hours], m [minutes], s [seconds]");
-    headerAnniversary = i18n.t('timeUntilEventTitle', { eventTitle: i18n.t('anniversaryTitleUpper', { title: event.title }), eventDateTime: getDisplayStringDateTimeForEpoch(anniversaryDuration.valueOf(), event.isAllDay) });
+    headerAnniversary = i18n.t('timeUntilEventTitle', { eventTitle: i18n.t('anniversaryTitleUpper', { title: event.title }), eventDateTime: getDisplayStringDateTimeForEpoch(anniveraryMoment.valueOf(), event.isAllDay) });
   }
 
   const isAllDayAndNow = (event.isAllDay && eventMoment.isSame(nowMoment, "day"));
