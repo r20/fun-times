@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import { StyleSheet, View, Platform } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { useNavigation, useRoute } from '@react-navigation/native'
 import { Ionicons, FontAwesome, MaterialCommunityIcons, MaterialIcons, Entypo, Fontisto } from '@expo/vector-icons'
 import { NavigationContainer } from '@react-navigation/native'
 // Search for available icons at https://expo.github.io/vector-icons/

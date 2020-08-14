@@ -7,16 +7,18 @@ import * as Utils from '../utils/Utils'
 import * as logger from '../utils/logger'
 import i18n from '../i18n/i18n'
 import AppSettingsContext from '../context/AppSettingsContext'
-import MyDivider from '../components/MyDivider'
 import MyText from './MyText'
 import MySlider from './MySlider'
 import MyPrimaryButton from './MyPrimaryButton'
 import { maxNumberOfYearsAway } from '../utils/interestingNumbersFinder'
+import MySwitch from './MySwitch'
+
 
 /* 
-  Start on a date that makes it convenient for using the spinner.
+  This used to try to start on a date that makes it convenient for changing the year,
+  but users were confused and expected it to start on today's date.
  */
-const defaultStartingDate = new Date(2005, 5, 15, 0, 0, 0);
+const defaultStartingDate = new Date();
 
 
 function EventDateTimePickerIos(props) {
@@ -86,8 +88,6 @@ function EventDateTimePickerIos(props) {
     later if desired. */
   const is24HourFormat = true;
 
-  /* TBD -look at use of spaceBetweenDateAndTime
-  Use MyDivider ?? */
   return (
     <React.Fragment>
       <View >
@@ -95,7 +95,6 @@ function EventDateTimePickerIos(props) {
       </View>
       {showDatePicker &&
         <React.Fragment>
-          <MyDivider />
           <DateTimePicker
             testID="dateTimePicker"
             value={startingDate}
@@ -106,11 +105,10 @@ function EventDateTimePickerIos(props) {
             minuteInterval={1}
             maximumDate={theMaxDate}
             minimumDate={theMinDate} />
-          <MyDivider />
         </React.Fragment>
       }
 
-      <View style={[styles.allDaySelection, { marginTop: props.spaceBetweenDateAndTime }]}>
+      <View style={[styles.allDaySelection, { marginTop: props.spaceBetweenDateAndTime, marginBottom: 10 }]}>
         <MyText>{i18n.t("allDay")}</MyText>
         <MySwitch
           value={props.useAllDay}
@@ -127,7 +125,6 @@ function EventDateTimePickerIos(props) {
           </View>
           {showTimePicker &&
             <React.Fragment>
-              <MyDivider />
               <DateTimePicker
                 testID="dateTimePicker"
                 value={startingDate}
@@ -138,7 +135,6 @@ function EventDateTimePickerIos(props) {
                 minuteInterval={1}
                 maximumDate={theMaxDate}
                 minimumDate={theMinDate} />
-              <MyDivider />
             </React.Fragment>
           }
 

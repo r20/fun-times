@@ -2,9 +2,10 @@ import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { TouchableOpacity, Clipboard } from 'react-native'
 import i18n from '../i18n/i18n'
-import { ToastAndroid } from 'react-native'; // TBD - need to find something for ios
+import Toast from 'react-native-root-toast'
 
 import * as logger from '../utils/logger'
+import MyThemeContext from '../context/MyThemeContext';
 
 
 /**
@@ -12,6 +13,8 @@ import * as logger from '../utils/logger'
  */
 
 const ClipboardCopyable = (props) => {
+
+    const myThemeContext = useContext(MyThemeContext);
 
     const copiedMessage = i18n.t('copiedToClipboard');
 
@@ -21,7 +24,11 @@ const ClipboardCopyable = (props) => {
             content = props.onPressGetContentFunction();
         }
         Clipboard.setString(content);
-        ToastAndroid.show(copiedMessage, ToastAndroid.SHORT);
+        Toast.show(copiedMessage, {
+            backgroundColor: myThemeContext.colors.background,
+            textColor: myThemeContext.colors.text,
+            position: -60,
+        });
     }
 
     return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext, useMemo } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Platform } from 'react-native'
 import * as Calendar from 'expo-calendar'
 import * as Localization from 'expo-localization'
 import moment from 'moment-timezone'
@@ -15,7 +15,7 @@ export const howManyDaysAgoCalendar = 3; // So user can see a little before toda
 
 export const numMillisecondsPerDay = 24 * 60 * 60000;
 
-const CALENDAR_TITLE = 'Fun Times Milestones Calendar';
+const CALENDAR_TITLE = 'Fun Times App';
 
 
 export const calendarNotificationDaytime = 2;
@@ -178,6 +178,7 @@ function MyCalendarProvider(props) {
   const [wrappedCalendarEventsList, setWrappedCalendarEventsList] = useState([]);
   const [isCalendarReady, setIsCalendarReady] = useState(false);
 
+  const isIos = Platform.OS === 'ios';
 
   /* Memoize these for performance */
   const milestoneColorStyle = useMemo(() => {
@@ -201,8 +202,12 @@ function MyCalendarProvider(props) {
 
 
   const getCalendarReadyAsync = async () => {
-    const { status } = await Calendar.requestCalendarPermissionsAsync();
-    if (status === 'granted') {
+    const calendarStatus = (await Calendar.requestCalendarPermissionsAsync()).status;
+
+    // ios devices also need reminders permission. Don't do it for Android though.
+    const remindersStatus = isIos ? (await Calendar.requestRemindersPermissionsAsync()).status : 'granted';
+
+    if (calendarStatus === 'granted' && remindersStatus === 'granted') {
 
       // Get calendar
       const calendars = await Calendar.getCalendarsAsync();

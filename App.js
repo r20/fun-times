@@ -24,6 +24,9 @@ momentDurationFormatSetup(moment);
 import { enableScreens } from 'react-native-screens';
 enableScreens();
 
+
+import { RootSiblingParent } from 'react-native-root-siblings'; // For react-native-root-toast
+
 // TBD - use for optimization
 // if (process.env.NODE_ENV === 'development') {
 //   console.warn("Using whydidyourender");
@@ -68,9 +71,9 @@ export default (props) => {
   I thought it'd be nice to have the splash screen until the theme is ready, but I'm using contexts and I use them to get stuff ready.
   I need the provider components. */
 
-  return (<AppearanceProvider><AppSettingsContextProvider><MyThemeProvider><CalendarProvider><EventsAndMilestonesContextProvider >
+  return (<RootSiblingParent><AppearanceProvider><AppSettingsContextProvider><MyThemeProvider><CalendarProvider><EventsAndMilestonesContextProvider >
     <InnerApp />
-  </EventsAndMilestonesContextProvider></CalendarProvider></MyThemeProvider></AppSettingsContextProvider></AppearanceProvider>);
+  </EventsAndMilestonesContextProvider></CalendarProvider></MyThemeProvider></AppSettingsContextProvider></AppearanceProvider></RootSiblingParent>);
 
 }
 
