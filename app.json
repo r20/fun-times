@@ -7,7 +7,7 @@
       "ios",
       "android"
     ],
-    "version": "1.0.6",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/app-logo.png",
     "primaryColor": "#AEECEF",
@@ -25,7 +25,7 @@
     "description": "Fun Times helps you find and celebrate quirky milestones for birthdays, anniversaries, etc.  For example, enter a friend's birthday and learn interesting numeric milestones (e.g. they're turning 1 billion seconds old in a few weeks).  Add these celebration milestones to your calendar to receive a reminder notification.",
     "android": {
       "package": "com.carolinadev247.funtimes",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "READ_CALENDAR",
         "WRITE_CALENDAR"
@@ -38,7 +38,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.carolinadev247.funtimes",
-      "buildNumber": "1.0.6"
+      "buildNumber": "1.0.7"
     }
   }
 }

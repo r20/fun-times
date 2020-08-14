@@ -31,9 +31,11 @@ function StyleSettings(props) {
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [isActivityIndicatorOn, setIsActivityIndicatorOn] = useState(false);
 
+  const isIos = Platform.OS === 'ios';
+
   const onSelectCalendarColor = (newColor) => {
 
-    if (calendarContext.areAnyMilestonesOnCalendar()) {
+    if (!isIos && calendarContext.areAnyMilestonesOnCalendar()) {
 
       Alert.alert(
         i18n.t('calendarChangeColorTitle'),

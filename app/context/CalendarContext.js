@@ -317,8 +317,11 @@ function MyCalendarProvider(props) {
   const changeCalendarColorAsync = async (hexcolor) => {
 
     if (Platform.OS === 'ios') {
-      // TBD - test this on ios
       await Calendar.updateCalendarAsync(calendarId, { color: hexcolor });
+
+      // update state
+      myThemeContext.setCalendarColor(hexcolor);
+
     } else {
       /* For Android change name of calendar, create a new one and add events, then delete old calendar.
         Note that if they've added additional personal things on the calendar this would blow them away. */
@@ -555,7 +558,7 @@ function MyCalendarProvider(props) {
        Otherwise the start and/or end date might be wrong.
        It can even look right on the calendar, then if you edit the entry and look at the dates it has a different date and is wrong.
        
-       I don't know if ios behaves this way though.  It needs tested.
+       todo -- I don't know if ios behaves this way though.  It needs tested.
        */
 
       const milestoneKey = milestoneItem.key;
